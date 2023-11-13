@@ -4,7 +4,7 @@
     { max: 64, message: '最多可输入64个字符' },
     {
       pattern: /^[a-zA-Z0-9_\-]+$/,
-      message: 'ID只能由数字、字母、下划线、中划线组成',
+      message: '标识只能由数字、字母、下划线、中划线组成',
     },
   ]">
     <j-input v-model:value="value.id" size="small" @change="asyncOtherConfig" :disabled="metadataStore.model.action === 'edit'" placeholder="请输入标识"></j-input>
@@ -47,10 +47,10 @@
   </template>
   <template v-if="modelType === 'tags'">
     <value-type-form :name="['valueType']" v-model:value="value.valueType" key="property" title="数据类型"></value-type-form>
-    <j-form-item label="标签类型" :name="['expands', 'type']" :rules="[
-      { required: true, message: '请选择标签类型' },
-    ]">
-      <j-select v-model:value="value.expands.type" :options="ExpandsTypeList" mode="multiple" size="small" placeholder="请选择标签类型"></j-select>
+    <j-form-item :name="['expands', 'type']" :rules="[
+      { required: true, message: '请选择读写类型' },
+    ]" label="读写类型">
+      <j-select v-model:value="value.expands.type" :options="ExpandsTypeList" mode="multiple" placeholder="请选择读写类型" size="small"></j-select>
     </j-form-item>
   </template>
   <j-form-item label="说明" name="description" :rules="[

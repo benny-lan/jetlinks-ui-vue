@@ -20,15 +20,11 @@
                             style="margin-right: 10px"
                             v-model:value="data.type"
                         >
-                            <j-radio-button value="hour">
-                                最近1小时
-                            </j-radio-button>
-                            <j-radio-button value="today">
-                                今日
-                            </j-radio-button>
-                            <j-radio-button value="week">
-                                近一周
-                            </j-radio-button>
+                          <j-radio-button value="hour">
+                            最近1小时
+                          </j-radio-button>
+                          <j-radio-button value="day"> 最近24小时 </j-radio-button>
+                          <j-radio-button value="week"> 近一周 </j-radio-button>
                         </j-radio-group></template
                     >
                 </j-range-picker>
@@ -38,18 +34,26 @@
                     v-if="isEmpty"
                     style="height: 200px; margin-top: 100px"
                 />
-                <div
-                    v-else
-                    ref="chartRef"
-                    style="width: 100%; height: 300px"
-                ></div>
+              <template v-else>
+                <div style="height: 300px">
+                  <Echarts
+                      :options="echartsOptions"
+                  />
+                </div>
+
+                <ServerList
+                    v-if="serverOptions.length > 1"
+                    v-model:value="serverActive"
+                    :color="colorJvm"
+                    :options="serverOptions"
+                />
+              </template>
             </div>
         </div>
     </j-spin>
 </template>
 
 <script lang="ts" setup name="Jvm">
-import * as echarts from 'echarts';
 import { dashboard } from '@/api/link/dashboard';
 import dayjs from 'dayjs';
 import {
@@ -57,14 +61,21 @@ import {
     arrayReverse,
     typeDataLine,
     areaStyleJvm,
-    defulteParamsData,
+    colorJvm,
+    defaultParamsData
 } from './tool.ts';
 import { DataType } from '../typings';
+import ServerList from './ServerList.vue'
+import Echarts from './echarts.vue'
 
 const props = defineProps({
   serviceId: {
     type: String,
     default: undefined
+  },
+  isNoCommunity: {
+    type:Boolean,
+    default: false
   }
 })
 
@@ -75,18 +86,28 @@ const data = ref<DataType>({
     time: [null, null],
 });
 const isEmpty = ref(false);
+const serverActive = ref<string[]>([])
+const serverOptions = ref<string[]>([])
+const serverData = reactive({
+  xAxis: [],
+  data: []
+})
+
 const pickerTimeChange = () => {
     data.value.type = undefined;
+  getJVMEcharts(data.value)
 };
 
 const getJVMEcharts = async (val: any) => {
     loading.value = true;
-    const res: any = await dashboard(defulteParamsData('jvm', val));
+    const res: any = await dashboard(defaultParamsData('jvm', val));
     if (res.success) {
         const _jvmOptions = {};
         const _jvmXAxis = new Set();
         if (res.result?.length) {
-          const filterArray = res.result.filter((item : any) => item.data?.clusterNodeId === props.serviceId)
+          isEmpty.value = false;
+          // const filterArray =  props.isNoCommunity ? res.result.filter((item : any) => item.data?.clusterNodeId === props.serviceId) : res.result
+          const filterArray =  res.result
           filterArray.forEach((item: any) => {
                 const value = item.data.value;
                 const memoryJvmHeapFree = value.memoryJvmHeapFree;
@@ -104,7 +125,7 @@ const getJVMEcharts = async (val: any) => {
                 _jvmXAxis.add(
                     dayjs(value.timestamp).format('YYYY-MM-DD HH:mm'),
                 );
-                _jvmOptions[nodeID].push(_value);
+                _jvmOptions[nodeID]?.push(_value);
             });
             handleJVMOptions(_jvmOptions, [..._jvmXAxis.keys()]);
         } else {
@@ -123,53 +144,52 @@ const setOptions = (optionsData: any, key: string) => ({
     type: 'line',
     smooth: true,
     symbol: 'none',
-    areaStyle: areaStyleJvm,
+    // areaStyle: areaStyleJvm(_index),
 });
 const handleJVMOptions = (optionsData: any, xAxis: any) => {
-    if (optionsData.length === 0 && xAxis.length === 0) return;
-    const chart: any = chartRef.value;
-    if (chart) {
-        const myChart = echarts.init(chart);
-        const dataKeys = Object.keys(optionsData);
-        const options = {
-            xAxis: {
-                type: 'category',
-                boundaryGap: false,
-                data: arrayReverse(xAxis),
-            },
-            tooltip: {
-                trigger: 'axis',
-                valueFormatter: (value: any) => `${value}%`,
-            },
-            yAxis: {
-                type: 'value',
-            },
-            grid: {
-                left: '50px',
-                right: '50px',
-            },
-            dataZoom: [
-                {
-                    type: 'inside',
-                    start: 0,
-                    end: 100,
-                },
-                {
-                    start: 0,
-                    end: 100,
-                },
-            ],
-            color: ['#60DFC7'],
-            series: dataKeys.length
-                ? dataKeys.map((key) => setOptions(optionsData, key))
-                : typeDataLine,
-        };
-        myChart.setOption(options);
-        window.addEventListener('resize', function () {
-            myChart.resize();
-        });
-    }
+  const dataKeys = Object.keys(optionsData);
+  serverActive.value = dataKeys
+  serverOptions.value = dataKeys
+  serverData.xAxis = xAxis
+  serverData.data = optionsData
 };
+
+const echartsOptions = computed(() => {
+  const series = serverActive.value.length
+      ? serverActive.value.map((key) => setOptions(serverData.data, key))
+      : typeDataLine
+  return {
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: arrayReverse(serverData.xAxis),
+    },
+    tooltip: {
+      trigger: 'axis',
+      valueFormatter: (value: any) => `${value}%`,
+    },
+    yAxis: {
+      type: 'value',
+    },
+    grid: {
+      left: '50px',
+      right: '50px',
+    },
+    dataZoom: [
+      {
+        type: 'inside',
+        start: 0,
+        end: data.value.type !== 'hour' ? 10 : 100,
+      },
+      {
+        start: 0,
+        end: data.value.type !== 'hour' ? 10 : 100,
+      },
+    ],
+    color: colorJvm,
+    series: series
+  }
+})
 
 watch(
     () => data.value.type,
@@ -177,16 +197,18 @@ watch(
         if (value === undefined) return;
         const date = getTimeByType(value);
         data.value.time = [dayjs(date), dayjs(new Date())];
+
+      getJVMEcharts(data.value);
     },
     { immediate: true, deep: true },
 );
 
-watchEffect(() => {
-  const time = data.value.time
-  if (time && Array.isArray(time) && time.length === 2 && time[0] && props.serviceId) {
-    getJVMEcharts(data.value);
-  }
-})
+// watchEffect(() => {
+//   const time = data.value.time
+//   if (time && Array.isArray(time) && time.length === 2 && time[0]) {
+//
+//   }
+// })
 
 </script>
 

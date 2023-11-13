@@ -3,43 +3,18 @@
         <div class="title">请选择首页视图</div>
 
         <div class="choose-view">
-            <j-row class="view-content" :gutter="24">
-                <j-col
-                    :span="8"
-                    class="select-item"
-                    :class="{ selected: selectValue === 'device' }"
-                    @click="selectValue = 'device'"
-                >
-                    <img :src="getImage('/home/device.png')" alt="" />
-                </j-col>
-                <j-col
-                    :span="8"
-                    class="select-item"
-                    :class="{ selected: selectValue === 'ops' }"
-                    @click="selectValue = 'ops'"
-                >
-                    <img :src="getImage('/home/ops.png')" alt="" />
-                </j-col>
-                <j-col
-                    :span="8"
-                    class="select-item"
-                    :class="{ selected: selectValue === 'comprehensive' }"
-                    @click="selectValue = 'comprehensive'"
-                >
-                    <img :src="getImage('/home/comprehensive.png')" alt="" />
-                </j-col>
-            </j-row>
-            <j-button type="primary" class="btn" @click="confirm"
-                >确定</j-button
-            >
+            <HomeView v-model:value="selectValue"/>
+            <div class="btn">
+                <j-button type="primary" @click="confirm">保存修改</j-button>
+            </div>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
 import { setView_api } from '@/api/home';
-import { getImage } from '@/utils/comm';
 import { useUserInfo } from '@/store/userInfo';
+import HomeView from '@/components/HomeView/index.vue';
 
 const user = useUserInfo();
 const emits = defineEmits(['refresh']);
@@ -84,25 +59,13 @@ watch(
 
     .choose-view {
         width: 100%;
-        .view-content {
-            display: flex;
-            flex-flow: row wrap;
-            .select-item {
-                border: 2px solid transparent;
-                img {
-                    width: 100%;
-                }
-
-                &.selected {
-                    border-color: #10239e;
-                }
-            }
-        }
+        padding: 0 9%;
+        box-sizing: border-box;
 
         .btn {
-            display: block;
-            margin: 48px auto;
-            margin-bottom: 0;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 68px;
         }
     }
 }

@@ -1,5 +1,5 @@
 <template>
-    <j-spin :spinning="loading" v-if="metadata.properties.length">
+    <j-spin v-if="metadata.properties?.length" :spinning="loading">
         <j-card :bordered="false" style="padding: 0">
             <template #extra>
                 <j-space>
@@ -22,6 +22,10 @@
                         </template>
                     </template>
                     <template #bodyCell="{ column, record, index }">
+                        <template v-if="column.dataIndex === 'metadataName'">
+                            <span v-if="record.metadataName">{{ record.metadataName }}</span>
+                            <span v-else style="color: red;">{{ record.metadataId }}</span>
+                        </template>
                         <template v-if="column.dataIndex === 'channelId'">
                             <j-form-item
                                 :name="['dataSource', index, 'channelId']"
@@ -90,12 +94,12 @@
                                 <j-badge
                                     v-if="record.state.value === 'enabled'"
                                     status="success"
-                                    text="在线"
+                                    text="启用"
                                 />
                                 <j-badge
                                     v-else
                                     status="warning"
-                                    text="离线"
+                                    text="禁用"
                                 />
                             </template>
                             <j-badge v-else status="error" text="未绑定" />
@@ -184,7 +188,7 @@
             v-if="visible"
             @close="visible = false"
             @save="onPatchBind"
-            :metaData="modelRef.dataSource"
+            :metaData="metadata.properties"
             :edgeId="instanceStore.current.parentId"
         />
     </j-spin>
@@ -193,7 +197,7 @@
     </j-card>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" name="EdgeMap" setup>
 import { useInstanceStore } from '@/store/instance';
 import {
     getEdgeMap,
@@ -206,7 +210,7 @@ import PatchMapping from './PatchMapping.vue';
 import { onlyMessage } from '@/utils/comm';
 import { cloneDeep } from 'lodash-es';
 import { usePermissionStore } from '@/store/permission';
-
+import { dataTool } from 'echarts';
 const columns = [
     {
         title: '名称',
@@ -247,9 +251,10 @@ const columns = [
 
 const permissionStore = usePermissionStore();
 
+const data:any = ref([])
 const isPermission = permissionStore.hasPermission('device/Instance:update');
 
-const current = ref<number>(0);
+const current = ref<number>(1);
 const pageSize = ref<number>(10);
 
 const instanceStore = useInstanceStore();
@@ -257,10 +262,11 @@ const metadata = JSON.parse(instanceStore.current?.metadata || '{}');
 const loading = ref<boolean>(false);
 const channelList = ref<any[]>([]);
 
-const _properties = computed(() => {
-    const _cur = current.value >= 1 ? current.value : 1;
-    return metadata.properties.slice((_cur - 1) * 10, _cur * 10);
-});
+// const _properties = computed(() => {
+//     const _cur = current.value >= 1 ? current.value : 1;
+//     const _pageSize = pageSize.value
+//     return metadata.properties?.slice((_cur - 1) * _pageSize, _cur * _pageSize) || [];
+// });
 
 const modelRef = reactive<{
     dataSource: any[];
@@ -284,14 +290,21 @@ const getChannel = async () => {
     }
 };
 
-const handleSearch = async (_array: any[]) => {
+const handleSearch = async () => {
     loading.value = true;
-    const _metadata: any[] = _array.map((item: any) => ({
-        metadataId: item.id,
-        metadataName: `${item.name}(${item.id})`,
-        metadataType: 'property',
-        name: item.name,
-    }));
+    const _metadataMap = new Map ()
+    const _metadata: any[] = metadata.properties.map((item: any) => {
+        const value = {
+            metadataId: item.id,
+            metadataName: `${item.name}(${item.id})`,
+            metadataType: 'property',
+            name: item.name,
+        }
+        _metadataMap.set(item.id,value)
+        return value
+    });
+
+
     if (_metadata && _metadata.length) {
         const resp: any = await getEdgeMap(
             instanceStore.current?.parentId || '',
@@ -304,18 +317,25 @@ const handleSearch = async (_array: any[]) => {
             loading.value = false;
         });
         if (resp.status === 200) {
-            const array = resp.result?.[0].reduce((x: any, y: any) => {
-                const metadataId = _metadata.find(
-                    (item: any) => item.metadataId === y.metadataId,
-                );
-                if (metadataId) {
-                    Object.assign(metadataId, y);
-                } else {
-                    x.push(y);
-                }
-                return x;
-            }, _metadata);
-            modelRef.dataSource = array;
+            // const array = _metadata.map((item: any) => {
+            //   const metadataId = resp.result?.[0].find((x: any) => x.metadataId === item.metadataId);
+            //   Object.assign(item, metadataId);
+            //   return item
+            // })
+            // resp.result?.[0].forEach((item:any)=>{
+            //    const differ = array.every((i:any)=>{
+            //        return item.metadataId !== i.metadataId
+            //     })
+            //     if(differ){
+            //         array.push(item)
+            //     }
+            // })
+
+            resp.result?.[0].forEach((item:any)=>{
+                _metadataMap.has(item.metadataId) ? _metadataMap.set(item.metadataId,Object.assign(_metadataMap.get(item.metadataId),item)) : _metadataMap.set(item.metadataId,item)
+            })
+            data.value = [..._metadataMap.values()]
+            onPageChange()
         }
     }
     loading.value = false;
@@ -333,7 +353,7 @@ const unbind = async (id: string) => {
         );
         if (resp.status === 200) {
             onlyMessage('操作成功！', 'success');
-            handleSearch(_properties.value);
+            handleSearch();
         }
     }
 };
@@ -354,11 +374,14 @@ const onChannelChange = (_index: number, type: 'collector' | 'channel') => {
 
 onMounted(() => {
     getChannel();
-    handleSearch(_properties.value);
+    handleSearch();
 });
 
 const onPageChange = () => {
-    handleSearch(_properties.value);
+    const _cur = current.value >= 1 ? current.value : 1;
+    const _pageSize = pageSize.value
+    const array = data.value.slice((_cur - 1) * _pageSize, _cur * _pageSize) || [];
+    modelRef.dataSource = array;
 };
 
 const onSave = () => {
@@ -428,14 +451,14 @@ const onRefresh = async () => {
         });
         if (resp.status === 200) {
             const arr = cloneDeep(modelRef.dataSource);
-            const array = resp.result?.[0].map((x: any) => {
-                const _item = arr.find(
+            const array = arr.map((x: any) => {
+                const _item = resp.result?.[0].find(
                     (item: any) => item.metadataId === x.metadataId,
                 );
                 if (_item) {
                     return {
-                        ..._item,
                         ...x,
+                        ..._item,
                     };
                 } else {
                     return x;

@@ -32,18 +32,18 @@
                                     value: '',
                                     type: 'or',
                                 },
-                            //     {
-                            //         column: 'parentId$not',
-                            //         value: detail.id,
-                            //         type: 'or',
-                            //     },
+                                //     {
+                                //         column: 'parentId$not',
+                                //         value: detail.id,
+                                //         type: 'or',
+                                //     },
                             ],
                         },
                         {
                             terms: [
                                 {
                                     column: 'id$not',
-                                    value: detail.id,
+                                    value: parentIds.join(','),
                                     type: 'and',
                                 },
                             ],
@@ -65,7 +65,6 @@
                     selectedRowKeys: _selectedRowKeys,
                     onChange: onSelectChange,
                 }"
-                @cancelSelect="cancelSelect"
                 :params="params"
             >
                 <template #registryTime="slotProps">
@@ -88,12 +87,25 @@
     </j-modal>
 </template>
 
-<script setup lang="ts">
-import { query, bindDevice } from '@/api/device/instance';
+<script lang="ts" name="BindChildDevice" setup>
+import {
+    query,
+    queryByParent,
+    bindDevice,
+    queryDeviceMapping,
+    saveDeviceMapping,
+} from '@/api/device/instance';
 import moment from 'moment';
-import { message } from 'jetlinks-ui-components';
 import { useInstanceStore } from '@/store/instance';
 import { storeToRefs } from 'pinia';
+import { onlyMessage } from '@/utils/comm';
+
+const props = defineProps({
+    parentIds: {
+        type: Array,
+        default: () => [],
+    },
+});
 
 const instanceStore = useInstanceStore();
 const { detail } = storeToRefs(instanceStore);
@@ -103,6 +115,7 @@ const emit = defineEmits(['change']);
 const bindDeviceRef = ref<Record<string, any>>({});
 const params = ref<Record<string, any>>({});
 const _selectedRowKeys = ref<string[]>([]);
+const _selectedRowMap = ref<any[]>([]);
 const btnLoading = ref<boolean>(false);
 
 const statusMap = new Map();
@@ -169,27 +182,70 @@ const handleSearch = (e: any) => {
 
 const onSelectChange = (keys: string[], rows: string[]) => {
     _selectedRowKeys.value = [...keys];
+    console.log(rows);
+    _selectedRowMap.value = rows.map((item) => ({
+        deviceId: item.id,
+        deviceName: item.name,
+    }));
 };
 
 const cancelSelect = () => {
     _selectedRowKeys.value = [];
+    _selectedRowMap.value = [];
 };
 
 const handleOk = () => {
     if (_selectedRowKeys.value.length === 0) {
-        message.warning('请选择需要绑定的设备');
+        onlyMessage('请选择需要绑定的设备', 'warning');
         return;
     }
     btnLoading.value = true;
-    bindDevice(detail.value.id, _selectedRowKeys.value)
-        .then((resp) => {
-            emit('change', true);
-            cancelSelect();
-            message.success('操作成功');
-        })
-        .finally(() => {
-            btnLoading.value = false;
-        });
+    if (instanceStore.current.accessProvider === 'official-edge-gateway') {
+        // 网关设备
+        queryDeviceMapping(instanceStore.current.id)
+            .then((res) => {
+                const arr = bindDeviceRef.value?._dataSource
+                    .filter((item) => {
+                        return (
+                            !res.result?.[0]?.find(
+                                (val) => val.deviceId === item.id,
+                            ) && _selectedRowKeys.value.includes(item.id)
+                        );
+                    })
+                    .map((item) => {
+                        return {
+                            deviceId: item.id,
+                            deviceName: item.name,
+                        };
+                    });
+                if(arr.length){
+                    return saveDeviceMapping(instanceStore.current.id, {
+                        info: arr,
+                    });
+                }
+            })
+            .then((res) => {
+                return bindDevice(detail.value.id, _selectedRowKeys.value);
+            })
+            .then((res) => {
+                emit('change', true);
+                cancelSelect();
+                onlyMessage('操作成功');
+            })
+            .finally(() => {
+                btnLoading.value = false;
+            });
+    } else {
+        bindDevice(detail.value.id, _selectedRowKeys.value)
+            .then((res) => {
+                emit('change', true);
+                cancelSelect();
+                onlyMessage('操作成功');
+            })
+            .finally(() => {
+                btnLoading.value = false;
+            });
+    }
 };
 
 const handleCancel = () => {

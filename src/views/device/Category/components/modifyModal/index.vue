@@ -21,7 +21,6 @@
             <j-form-item label="名称" name="name">
                 <j-input
                     v-model:value="formModel.name"
-                    :maxlength="64"
                     placeholder="请输入名称"
                 />
             </j-form-item>
@@ -31,6 +30,7 @@
                     id="inputNumber"
                     v-model:value="formModel.sortIndex"
                     :min="1"
+                    :max="9999"
                     placeholder="请输入排序"
                 />
             </j-form-item>
@@ -47,11 +47,12 @@
 </template>
 <script setup lang="ts" name="modifyModal">
 import { PropType } from 'vue';
-import { Form, message } from 'jetlinks-ui-components';
+import { Form } from 'jetlinks-ui-components';
 import { queryTree, saveTree, updateTree } from '@/api/device/category';
 import { ValidateErrorEntity } from 'ant-design-vue/es/form/interface';
 import { list } from '@/api/iot-card/home';
 import { number } from 'echarts';
+import { onlyMessage } from '@/utils/comm';
 
 const emits = defineEmits(['refresh']);
 const formRef = ref();
@@ -101,7 +102,11 @@ const rules = ref({
             message: '最多可输入64个字符',
         },
     ],
-    sortIndex: [{ required: true, message: '请输入排序', trigger: 'blur' }],
+    sortIndex: [{ required: true, message: '请输入排序', trigger: 'blur' },{
+        pattern:/^\d+$/,
+        message:'请输入正整数',
+        trigger:'change'
+    }],
 });
 const visible = ref(false);
 const { resetFields, validate, validateInfos } = useForm(
@@ -136,11 +141,11 @@ const submitData = async () => {
             }
             const res = await saveTree(addParams.value);
             if (res.status === 200) {
-                message.success('操作成功！');
+                onlyMessage('操作成功！');
                 visible.value = false;
                 emits('refresh');
             } else {
-                message.error('操作失败！');
+                onlyMessage('操作失败！', 'error');
             }
         } else if (props.isAdd === 2) {
             const id = updateObj.value.id;
@@ -152,11 +157,11 @@ const submitData = async () => {
             };
             const res = await updateTree(id, updateParams);
             if (res.status === 200) {
-                message.success('操作成功！');
+                onlyMessage('操作成功！');
                 visible.value = false;
                 emits('refresh');
             } else {
-                message.error('操作失败！');
+                onlyMessage('操作失败！', 'error');
             }
         }
     });
@@ -173,7 +178,7 @@ const show = async (row: any) => {
                 childArr.value = row.children.sort(compare('sortIndex'));
                 formModel.value = {
                     name: '',
-                    sortIndex:
+                    sortIndex:childArr.value[childArr.value.length - 1].sortIndex === 9999 ? childArr.value[childArr.value.length - 1].sortIndex :
                         childArr.value[childArr.value.length - 1].sortIndex + 1,
                     description: '',
                 };
@@ -185,14 +190,14 @@ const show = async (row: any) => {
             if (arr.value.length > 0) {
                 formModel.value = {
                     name: '',
-                    sortIndex: arr.value[arr.value.length - 1].sortIndex + 1,
+                    sortIndex: arr.value[arr.value.length - 1].sortIndex === 9999 ? arr.value[arr.value.length - 1].sortIndex : arr.value[arr.value.length - 1].sortIndex + 1,
                     description: '',
                 };
             }
             visible.value = true;
         } else if (props.isChild === 2) {
             if (row.level === 5) {
-                message.warning('树形结构最多添加5层');
+                onlyMessage('树形结构最多添加5层', 'warning');
                 visible.value = false;
             } else {
                 addObj.value = row;

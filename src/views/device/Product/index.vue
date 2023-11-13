@@ -174,8 +174,7 @@
 <script setup lang="ts">
 import server from '@/utils/request';
 import type { ActionsType } from '@/components/Table/index.vue';
-import { getImage } from '@/utils/comm';
-import { message } from 'jetlinks-ui-components';
+import { getImage, onlyMessage } from '@/utils/comm';
 import {
     getProviders,
     category,
@@ -198,6 +197,7 @@ import { useMenuStore } from 'store/menu';
 import { useRoute } from 'vue-router';
 import { useRouterParams } from '@/utils/hooks/useParams';
 import { accessConfigTypeFilter } from '@/utils/setting';
+import {cloneDeep} from "lodash";
 /**
  * 表格数据
  */
@@ -306,6 +306,7 @@ const getActions = (
 
             icon: 'icon-xiazai',
             onClick: () => {
+                console.log(data);
                 const extra = omit(data, [
                     'transportProtocol',
                     'protocolName',
@@ -314,7 +315,7 @@ const getActions = (
                     'accessProvider',
                     'messageProtocol',
                 ]);
-                downloadObject(extra, '产品');
+                downloadObject(extra, data.name+'产品');
             },
         },
         {
@@ -334,10 +335,10 @@ const getActions = (
                         response = await _deploy(data.id);
                     }
                     if (response && response.status === 200) {
-                        message.success('操作成功！');
+                        onlyMessage('操作成功！');
                         tableRef.value?.reload();
                     } else {
-                        message.error('操作失败！');
+                        onlyMessage('操作失败！', 'error');
                     }
                 },
             },
@@ -354,10 +355,10 @@ const getActions = (
                 onConfirm: async () => {
                     const resp = await deleteProduct(data.id);
                     if (resp.status === 200) {
-                        message.success('操作成功！');
+                        onlyMessage('操作成功！');
                         tableRef.value?.reload();
                     } else {
-                        message.error('操作失败！');
+                        onlyMessage('操作失败！', 'error');
                     }
                 },
             },
@@ -388,30 +389,36 @@ const beforeUpload = (file: any) => {
     reader.readAsText(file);
     reader.onload = async (result) => {
         const text = result.target?.result;
-        console.log('text: ', text);
+        console.log(text);
         if (!file.type.includes('json')) {
-            message.error('请上传json格式文件');
+            onlyMessage('请上传json格式文件', 'error');
             return false;
         }
-        try {
-            const data = JSON.parse(text || '{}');
+        if(!text){
+            onlyMessage('文件内容不能为空','error')
+            return false;
+        }
+            const data = JSON.parse(text);
             // 设置导入的产品状态为未发布
             data.state = 0;
             if (Array.isArray(data)) {
-                message.error('请上传json格式文件');
+                onlyMessage('请上传正确格式文件', 'error');
                 return false;
             }
             delete data.state;
+            if(!data?.name){
+                data.name = "产品" + Date.now();
+            }
+            if(!data?.deviceType || JSON.stringify(data?.deviceType) === '{}' ){
+                onlyMessage('缺少deviceType字段或对应的值','error')
+                return false
+            }
             const res = await updateDevice(data);
             if (res.status === 200) {
-                message.success('操作成功');
+                onlyMessage('操作成功');
                 tableRef.value?.reload();
             }
             return true;
-        } catch {
-            // message.error('请上传json格式文件');
-        }
-        return true;
     };
     return false;
 };
@@ -449,7 +456,6 @@ const query = reactive({
             key: 'id',
             search: {
                 type: 'string',
-                defaultTermType: 'eq',
             },
         },
         {
@@ -458,7 +464,7 @@ const query = reactive({
             dataIndex: 'accessProvider',
             search: {
                 type: 'select',
-                options: () => {
+                options: async () => {
                     return new Promise((resolve) => {
                         getProviders().then((resp: any) => {
                             const data = resp.result || [];
@@ -470,8 +476,8 @@ const query = reactive({
         },
         {
             title: '接入方式',
-            key: 'accessName',
-            dataIndex: 'accessName',
+            key: 'accessId',
+            dataIndex: 'accessId',
             search: {
                 type: 'select',
                 options: async () => {
@@ -482,7 +488,7 @@ const query = reactive({
                             typeList.value = [];
                             typeList.value = resp.result.map((item: any) => ({
                                 label: item.name,
-                                value: item.name,
+                                value: item.id,
                             }));
                             res(typeList.value);
                         });
@@ -605,7 +611,33 @@ const query = reactive({
 });
 const saveRef = ref();
 const handleSearch = (e: any) => {
-    params.value = e;
+
+  const newTerms = cloneDeep(e)
+  if (newTerms.terms?.length) {
+    newTerms.terms.forEach((a : any) => {
+        a.terms = a.terms.map((b: any) => {
+          if (b.column === 'id$dim-assets') {
+            const value = b.value
+            b = {
+              column: 'id',
+              termType: 'dim-assets',
+              value: {
+                assetType: 'product',
+                targets: [
+                  {
+                    type: 'org',
+                    id: value,
+                  },
+                ],
+              },
+            }
+          }
+          return b
+        })
+    })
+  }
+
+  params.value = newTerms;
 };
 const routerParams = useRouterParams();
 onMounted(() => {

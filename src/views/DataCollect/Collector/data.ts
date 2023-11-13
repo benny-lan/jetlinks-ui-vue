@@ -1,7 +1,9 @@
 export const colorMap = new Map();
 colorMap.set('running', 'success');
 colorMap.set('partialError', 'warning');
+colorMap.set('partError', 'warning'); // 部分错误
 colorMap.set('failed', 'error');
+colorMap.set('allError', 'error'); // 全部错误
 colorMap.set('stopped', 'default');
 colorMap.set('processing', '#cccccc');
 colorMap.set('enabled', 'processing');
@@ -55,7 +57,7 @@ export const ModBusRules = {
         },
         {
             pattern: regOnlyNumber,
-            message: '请输入0-999999999之间的正整数',
+            message: '请输入0-999999之间的正整数',
         },
     ],
     quantity: [
@@ -168,6 +170,9 @@ export const LeftTreeRules = {
     endianIn: [
         { required: true, message: '请选择单字高低位切换', trigger: 'blur' },
     ],
+    requestTimeout:[
+        { pattern: /^\d+$/, message:'请输入2000-60000的正整数',trigger: 'change'}
+    ]
 };
 
 export const FormTableColumns = [

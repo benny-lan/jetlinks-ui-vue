@@ -82,12 +82,12 @@
 </template>
 
 <script lang="ts" setup>
-import { getImage } from '@/utils/comm';
+import { getImage, onlyMessage } from '@/utils/comm';
 import { queryLevel, saveLevel } from '@/api/rule-engine/config';
 import { LevelItem } from './typing';
-import { message } from 'jetlinks-ui-components';
 import Io from './Io/index.vue';
-const list = ref([
+import { isNoCommunity } from '@/utils/utils';
+const list = isNoCommunity ?[
     {
         key: 'config',
         tab: '告警级别',
@@ -96,7 +96,12 @@ const list = ref([
         key: 'io',
         tab: '数据流转',
     },
-]);
+] : [
+    {
+        key: 'config',
+        tab: '告警级别',
+    }
+]
 let levels = ref<LevelItem[]>([]);
 let tab = ref<'io' | 'config' | string>('config');
 const getAlarmLevel = () => {
@@ -110,7 +115,7 @@ getAlarmLevel();
 const handleSaveLevel = async () => {
     saveLevel(levels.value).then((res) => {
         if (res.status === 200) {
-            message.success('操作成功');
+            onlyMessage('操作成功');
         }
     });
 };

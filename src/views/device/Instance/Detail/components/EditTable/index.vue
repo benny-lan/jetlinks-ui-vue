@@ -1,5 +1,5 @@
 <template>
-    <j-spin :spinning="loading" v-if="metadata.properties.length">
+    <j-spin v-if="metadata.properties?.length" :spinning="loading">
         <j-card :bordered="false" borderStyle="padding: 0">
             <template #extra>
                 <j-space>
@@ -8,7 +8,7 @@
                 </j-space>
             </template>
             <j-form ref="formRef" :model="modelRef">
-                <j-table :dataSource="modelRef.dataSource" :columns="columns">
+                <j-table :columns="columns" :dataSource="modelRef.dataSource" @change="tableChange">
                     <template #headerCell="{ column }">
                         <template v-if="column.key === 'collectorId'">
                             采集器
@@ -20,28 +20,24 @@
                     <template #bodyCell="{ column, record, index }">
                         <template v-if="column.dataIndex === 'channelId'">
                             <j-form-item
-                                :name="['dataSource', index, 'channelId']"
+                                :name="['dataSource', myCurrent * 10 + index, 'channelId']"
                             >
                                 <j-select
                                     style="width: 100%"
                                     v-model:value="record[column.dataIndex]"
                                     placeholder="请选择"
                                     allowClear
+                                    :options="channelList"
                                     :filter-option="filterOption"
+                                    show-search
+                                    @select="(_, option) => { record.provider = option.provider }"
                                 >
-                                    <j-select-option
-                                        v-for="item in channelList"
-                                        :key="item.value"
-                                        :value="item.value"
-                                        :label="item.label"
-                                        >{{ item.label }}</j-select-option
-                                    >
                                 </j-select>
                             </j-form-item>
                         </template>
                         <template v-if="column.dataIndex === 'collectorId'">
                             <j-form-item
-                                :name="['dataSource', index, 'collectorId']"
+                                :name="['dataSource', myCurrent * 10 + index, 'collectorId']"
                                 :rules="[
                                     {
                                         required: !!record.channelId,
@@ -58,7 +54,7 @@
                         </template>
                         <template v-if="column.dataIndex === 'pointId'">
                             <j-form-item
-                                :name="['dataSource', index, 'pointId']"
+                                :name="['dataSource', myCurrent * 10 + index, 'pointId']"
                                 :rules="[
                                     {
                                         required: !!record.channelId,
@@ -122,7 +118,7 @@ import {
 } from '@/api/device/instance';
 import MSelect from '../MSelect.vue';
 import PatchMapping from './PatchMapping.vue';
-import { message } from 'ant-design-vue/es';
+import { onlyMessage } from '@/utils/comm';
 
 const columns = [
     {
@@ -162,6 +158,8 @@ const columns = [
     },
 ];
 
+const myCurrent = ref(0)
+
 const filterOption = (input: string, option: any) => {
     return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
 };
@@ -188,16 +186,16 @@ const visible = ref<boolean>(false);
 const getChannel = async () => {
     const resp: any = await queryChannelNoPaging({
         paging: false,
-        terms: [
-            {
-                terms: [
-                    {
-                        column: 'provider',
-                        value: props.provider,
-                    },
-                ],
-            },
-        ],
+        // terms: [
+        //     {
+        //         terms: [
+        //             {
+        //                 column: 'provider',
+        //                 value: props.provider,
+        //             },
+        //         ],
+        //     },
+        // ],
     });
     if (resp.status === 200) {
         channelList.value = resp.result?.map((item: any) => ({
@@ -211,12 +209,12 @@ const getChannel = async () => {
 const handleSearch = async () => {
     loading.value = true;
     getChannel();
-    const _metadata = metadata.properties.map((item: any) => ({
+    const _metadata = metadata.properties?.map?.((item: any) => ({
         metadataId: item.id,
         metadataName: `${item.name}(${item.id})`,
         metadataType: 'property',
         name: item.name,
-    }));
+    })) || [];
     if (_metadata && _metadata.length) {
         const resp: any = await queryMapping(
             'device',
@@ -240,13 +238,17 @@ const handleSearch = async () => {
     loading.value = false;
 };
 
+const tableChange = (pagination: { current: number }) => {
+  myCurrent.value = pagination.current - 1
+}
+
 const unbind = async (id: string) => {
     if (id) {
         const resp = await removeMapping('device', instanceStore.current.id, [
             id,
         ]);
         if (resp.status === 200) {
-            message.success('操作成功！');
+            onlyMessage('操作成功！');
             handleSearch();
         }
     }
@@ -269,13 +271,14 @@ const onSave = () => {
                 (i: any) => i.channelId,
             );
             if (arr && arr.length !== 0) {
+                console.log(arr)
                 const resp = await saveMapping(
                     instanceStore.current.id,
                     props.provider,
                     arr,
                 );
                 if (resp.status === 200) {
-                    message.success('操作成功！');
+                    onlyMessage('操作成功！');
                     handleSearch();
                 }
             }

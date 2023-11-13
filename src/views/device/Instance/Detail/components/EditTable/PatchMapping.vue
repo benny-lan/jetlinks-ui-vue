@@ -57,7 +57,7 @@
 
 <script lang="ts" setup>
 import { treeMapping, saveMapping } from '@/api/device/instance';
-import { message } from 'jetlinks-ui-components';
+import { onlyMessage } from '@/utils/comm';
 const _props = defineProps({
     type: {
         type: String,
@@ -82,17 +82,18 @@ const rightList = ref<any[]>([]);
 const dataSource = ref<any[]>([]);
 const loading = ref<boolean>(false);
 
-const handleData = (data: any[], type: string) => {
+const handleData = (data: any[], type: string,provider?:string) => {
     data.forEach((item) => {
         item.key = item.id;
         item.title = item.name;
         item.checkable = type === 'collectors';
+        provider ? item.provider = provider : ''
         if (
             item.collectors &&
             Array.isArray(item.collectors) &&
             item.collectors.length
         ) {
-            item.children = handleData(item.collectors, 'collectors');
+            item.children = handleData(item.collectors, 'collectors',item.provider);
         }
         if (item.points && Array.isArray(item.points) && item.points.length) {
             item.children = handleData(item.points, 'points');
@@ -104,12 +105,12 @@ const handleData = (data: any[], type: string) => {
 const handleSearch = async () => {
     loading.value = true;
     const resp = await treeMapping({
-        terms: [
-            {
-                column: 'provider',
-                value: _props.type,
-            },
-        ],
+        // terms: [
+        //     {
+        //         column: 'provider',
+        //         value: _props.type,
+        //     },
+        // ],
     });
     loading.value = false;
     if (resp.status === 200) {
@@ -134,8 +135,9 @@ const _delete = (_key: string) => {
 };
 
 const handleClick = async () => {
+   
     if (!rightList.value.length) {
-        message.warning('请选择采集器');
+        onlyMessage('请选择采集器', 'warning');
     } else {
         const params: any[] = [];
         rightList.value.map((item: any) => {
@@ -146,19 +148,20 @@ const handleClick = async () => {
                 metadataType: 'property',
                 metadataId: (_props.metaData as any[]).find((i: any) => i.name === element.name)
                     ?.metadataId,
-                provider: _props.type
+                provider: item.provider
             }));
             params.push(...array);
         });
+        
         const filterParms = params.filter((item) => !!item.metadataId);
         if (filterParms && filterParms.length !== 0) {
             const res = await saveMapping(_props.deviceId, _props.type, filterParms);
             if (res.status === 200) {
-                message.success('操作成功');
+                onlyMessage('操作成功');
                 _emits('save');
             }
         } else {
-            message.error('暂无对应属性的映射');
+            onlyMessage('暂无对应属性的映射', 'error');
         }
     }
 };

@@ -1,0 +1,245 @@
+<template>
+    <div class="upload-image-warp" >
+        <div :style="borderStyle" class="upload-image-border">
+            <j-upload
+                :action="FILE_UPLOAD"
+                :before-upload="beforeUpload"
+                :headers="{
+                    'X-Access-Token': LocalStore.get(TOKEN_KEY),
+                }"
+                :show-upload-list="false"
+                class="avatar-uploader"
+                list-type="picture-card"
+                name="file"
+                v-bind="props"
+            >
+                <div :style="props.style" class="upload-image-content">
+                    <template v-if="imageUrl">
+                        <img :src="imageUrl" class="upload-image" width="100%" />
+                        <div v-if="imageUrl === defaultValue" class="upload-image-mask">替换图标</div>
+                        <div v-else class="upload-image-mask" @click.stop="onDelete">删除图标</div>
+                    </template>
+                    <template v-else>
+                        <AIcon
+                            v-if="loading"
+                            style="font-size: 20px"
+                            type="LoadingOutlined"
+                        />
+                    </template>
+                </div>
+            </j-upload>
+            <div v-if="props.disabled" class="upload-loading-mask"></div>
+            <div v-if="imageUrl && loading" class="upload-loading-mask">
+                <AIcon style="font-size: 20px" type="LoadingOutlined" />
+            </div>
+        </div>
+    </div>
+  <ImageCropper
+    v-if="cropperVisible"
+    :img="cropperImg"
+    title="更改图标"
+    @cancel="cropperVisible = false"
+    @ok="saveImage"
+  />
+</template>
+
+<script lang="ts" name='JProUpload' setup>
+import { UploadProps } from 'ant-design-vue';
+import { FILE_UPLOAD } from '@/api/comm';
+import { TOKEN_KEY } from '@/utils/variable';
+import {getBase64, LocalStore, onlyMessage} from '@/utils/comm';
+import { CSSProperties } from 'vue';
+import ImageCropper from '@/components/Upload/Cropper.vue';
+
+type Emits = {
+    (e: 'update:modelValue', data: string): void;
+    (e: 'change', data: string): void;
+};
+interface JUploadProps extends UploadProps {
+    modelValue: string;
+    disabled?: boolean;
+    types?: string[];
+    errorMessage?: string;
+    size?: number;
+    style?: CSSProperties;
+    // bgImage?: string;
+    borderStyle?:CSSProperties;
+    defaultValue?: string;
+}
+
+const emit = defineEmits<Emits>();
+
+const props: JUploadProps = defineProps({
+    modelValue: {
+        type: String,
+        default: '',
+    },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
+    // bgImage: {
+    //     type: String,
+    //     default: '',
+    // },
+    accept:{
+        type: String,
+        default: undefined
+    },
+    borderStyle: {
+        type: Object,
+        default: undefined
+    },
+    defaultValue: {
+        type: String,
+        default: '',
+    }
+});
+
+const loading = ref<boolean>(false);
+const imageUrl = ref<string>(props?.modelValue || '');
+const imageTypes = props.types ? props.types : ['image/jpeg', 'image/png'];
+
+const cropperImg = ref()
+const cropperVisible = ref(false)
+
+watch(
+    () => props.modelValue,
+    (newValue) => {
+        imageUrl.value = newValue;
+    },
+    {
+        deep: true,
+        immediate: true,
+    },
+);
+
+const onDelete = () => {
+    emit('update:modelValue', props.defaultValue || '');
+    emit('change', props.defaultValue || '');
+}
+
+const beforeUpload = (file: UploadProps['fileList'][number]) => {
+    const isType = imageTypes.includes(file.type);
+    const maxSize = props.size || 2 // 最大值
+    if (!isType) {
+        if (props.errorMessage) {
+            onlyMessage(props.errorMessage, 'error');
+        } else {
+            onlyMessage(`请上传正确格式的图片`, 'error');
+        }
+        return false;
+    }
+    const isSize = file.size / 1024 / 1024 < maxSize;
+    if (!isSize) {
+        onlyMessage(`图片大小必须小于${maxSize}M`, 'error');
+        return false
+    }
+
+    getBase64(file, (base64Url) => {
+      cropperImg.value = base64Url
+      cropperVisible.value = true
+    })
+
+    return false;
+};
+
+
+const saveImage = (url: string) => {
+  cropperVisible.value = false
+  imageUrl.value = url
+  emit('update:modelValue', url);
+  emit('change', url);
+}
+</script>
+
+<style lang="less" scoped>
+@border: 1px dashed @border-color-base;
+@mask-color: rgba(#000, 0.35);
+@with: 150px;
+@height: 150px;
+
+.flex-center() {
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-image-warp {
+    display: flex;
+    justify-content: flex-start;
+
+
+    .upload-image-border {
+        position: relative;
+        width: @with;
+        height: @height;
+        overflow: hidden;
+        border-radius: 5px;
+        transition: all 0.3s;
+
+        &:hover {
+            border-color: @primary-color-hover;
+        }
+
+        :deep(.ant-upload-picture-card-wrapper) {
+            width: 100%;
+            height: 100%;
+        }
+        :deep(.ant-upload) {
+            width: 100%;
+            height: 100%;
+        }
+
+        .upload-image-content {
+            .flex-center();
+
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+
+            .upload-image-mask {
+                .flex-center();
+
+                position: absolute;
+                top: 0;
+                left: 0;
+                display: none;
+                width: 100%;
+                height: 100%;
+                color: #fff;
+                font-size: 14px;
+                border-radius: 5px;
+                background-color: @mask-color;
+            }
+
+            .upload-image {
+                width: 100%;
+                height: 100%;
+                background-repeat: no-repeat;
+                background-position: center;
+                background-size: cover;
+            }
+
+            &:hover .upload-image-mask {
+                display: flex;
+            }
+        }
+    }
+
+    .upload-loading-mask {
+        .flex-center();
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        width: 100%;
+        height: 100%;
+        color: #fff;
+        border-radius: 15px;
+        background-color: @mask-color;
+    }
+}
+</style>

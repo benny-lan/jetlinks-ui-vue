@@ -1,12 +1,18 @@
 import { defineStore } from 'pinia'
 import { queryOwnThree } from '@/api/system/menu'
-import { filterAsyncRouter, findCodeRoute, MenuItem } from '@/utils/menu'
+import {
+  handleMenus,
+  MenuItem,
+  handleSiderMenu,
+  getAsyncRoutesMap, handleMenusMap
+} from '@/utils/menu'
 import { cloneDeep, isArray } from 'lodash-es'
 import { usePermissionStore } from './permission'
 import router from '@/router'
 import { onlyMessage } from '@/utils/comm'
 import { AccountMenu, NotificationRecordCode, NotificationSubscriptionCode } from '@/router/menu'
 import { MESSAGE_SUBSCRIBE_MENU_CODE, USER_CENTER_MENU_CODE } from '@/utils/consts'
+import {isNoCommunity} from "@/utils/utils";
 
 const defaultOwnParams = [
   {
@@ -31,14 +37,7 @@ const defaultOwnParams = [
 ]
 
 type MenuStateType = {
-  menus: {
-    [key: string]: {
-      buttons?: string[]
-      title: string
-      parentName: string
-      path: string
-    }
-  }
+  menus: any
   siderMenus: MenuItem[]
   params: Record<string, any>
 }
@@ -88,6 +87,16 @@ export const useMenuStore = defineStore({
         onlyMessage('暂无权限，请联系管理员', 'error')
         console.warn(`没有找到对应的页面: ${name}`)
       }
+    },
+    routerPush(name: string, params?: Record<string, any>, query?: Record<string, any>) {
+      this.params = { [name]: params || {}}
+        router.push({
+          name, params, query, state: { params }
+        })
+    },
+    handleMenusMapById(item: { code: string, path: string}) {
+      const { name, path } = item
+      this.menus[name] = {path}
     },
     queryMenuTree(isCommunity = false): Promise<any[]> {
       return new Promise(async (res) => {

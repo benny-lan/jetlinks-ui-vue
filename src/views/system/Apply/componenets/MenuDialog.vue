@@ -1,37 +1,17 @@
 <template>
-    <j-modal
-        visible
-        title="集成菜单"
-        width="600px"
-        @ok="handleOk"
-        @cancel="cancel"
-        class="edit-dialog-container"
-        :confirmLoading="loading"
-    >
-        <j-select
-            v-model:value="form.checkedSystem"
-            @change="(value:string) => value && getTree(value)"
-            style="width: 200px"
-            placeholder="请选择集成系统"
-        >
-            <j-select-option
-                v-for="item in form.systemList"
-                :value="item.value"
-                >{{ item.label }}</j-select-option
-            >
+    <j-modal :confirmLoading="loading" class="edit-dialog-container" title="集成菜单" visible width="600px" @cancel="cancel"
+        @ok="handleOk">
+        <j-select v-model:value="form.checkedSystem" placeholder="请选择集成系统" style="width: 200px"
+            @change="(value) => value && getTree(value)  ">
+            <j-select-option v-for="item in form.systemList" :key="item.value" :value="item.value">{{ item.label
+            }}</j-select-option>
         </j-select>
 
         <p style="margin: 20px 0 0 0" v-show="form.menuTree.length > 0">
             当前集成菜单
         </p>
-        <j-tree
-            v-model:checkedKeys="form.checkedMenu"
-            v-model:expandedKeys="form.expandedKeys"
-            checkable
-            :tree-data="form.menuTree"
-            :fieldNames="{ key: 'id', title: 'name' }"
-            @check="treeCheck"
-        >
+        <j-tree v-model:checkedKeys="form.checkedMenu" v-model:expandedKeys="form.expandedKeys" :fieldNames="{ key: 'code', title: 'name' }"
+            :height="300" :tree-data="form.menuTree" checkable @check="treeCheck">
             <template #title="{ name }">
                 <span>{{ name }}</span>
             </template>
@@ -41,50 +21,60 @@
 
 <script setup lang="ts">
 import { optionItemType } from '@/views/system/DataSource/typing';
-import { applyType } from '../Save/typing';
 import {
     getOwner_api,
     getOwnerStandalone_api,
     getOwnerTree_api,
     getOwnerTreeStandalone_api,
     saveOwnerMenu_api,
+    updateApp_api,
 } from '@/api/system/apply';
 import { CheckInfo } from 'ant-design-vue/lib/vc-tree/props';
 import { useMenuStore } from '@/store/menu';
-import { message } from 'jetlinks-ui-components';
 import { getMenuTree_api } from '@/api/system/menu';
+import { onlyMessage } from '@/utils/comm';
 
 const menuStory = useMenuStore();
-const emits = defineEmits(['update:visible']);
+const emits = defineEmits(['update:visible', 'refresh']);
 const props = defineProps<{
     mode: 'add' | 'edit';
     visible: boolean;
-    id: string;
-    provider: applyType;
+    data: any;
 }>();
 // 弹窗相关
 const loading = ref(false);
-const handleOk = () => {
-    const items = filterTree(form.menuTree, [
+const handleOk = async () => {
+    const menuTree = JSON.parse(JSON.stringify(form.menuTree));
+    const items = filterTree(menuTree, [
         ...form.checkedMenu,
-        ...form.half,
+        // ...form.half,
     ]);
+    console.log(items);
     if (form.checkedSystem) {
         if (items && items.length !== 0) {
             loading.value = true;
-            saveOwnerMenu_api('iot', form.id, items)
-                .then((resp) => {
-                    if (resp.status === 200) {
-                        message.success('操作成功');
-                        emits('update:visible', false);
+            const resp = await saveOwnerMenu_api('iot', form.id, items).finally(() => (loading.value = false));
+            await updateApp_api(form.id as string, {
+                ...props.data,
+                integrationModes: props.data?.integrationModes?.map((item: any) => item?.value || item),
+                page: {
+                    ...props.data?.page,
+                    configuration: {
+                        checkedSystem: form.checkedSystem
                     }
-                })
-                .finally(() => (loading.value = false));
+                }
+            })
+            if (resp.status === 200) {
+                // 保存集成菜单
+                onlyMessage('操作成功');
+                emits('update:visible', false);
+                emits('refresh')
+            }
         } else {
-            message.warning('请勾选配置菜单');
+            onlyMessage('请勾选配置菜单', 'warning');
         }
     } else {
-        message.warning('请选择所属系统');
+        onlyMessage('请选择所属系统', 'warning');
     }
 };
 const cancel = () => {
@@ -94,21 +84,16 @@ const cancel = () => {
 };
 
 const form = reactive({
-    id: props.id,
+    id: props.data?.id,
     checkedSystem: undefined as undefined | string,
     checkedMenu: [] as string[],
     expandedKeys: [] as string[],
     half: [] as string[],
 
-    provider: props.provider,
+    provider: props.data?.provider,
     systemList: [] as optionItemType[],
     menuTree: [] as any[],
 });
-
-if (props.id) {
-    getSystemList();
-    getMenus();
-}
 /**
  * 与集成系统关联的菜单
  * @param params
@@ -120,26 +105,38 @@ function getTree(params: string) {
             : getOwnerTree_api(params);
     api.then((resp: any) => {
         form.menuTree = resp.result;
-        form.expandedKeys = resp.result.map((item: any) => item.id);
+        form.expandedKeys = resp.result.map((item: any) => item?.code);
     });
+}
+
+const getCheckMenu = (data: any, keys: any) => {
+    data.forEach((item: any) => {
+            if (item.children) {
+                getCheckMenu(item.children, keys)
+            } else {
+                keys.push(item.code)
+            }
+    })
 }
 /**
  * 获取当前用户可访问菜单
  */
-function getMenus() {
+function getMenus(id: string) {
     const params = {
         terms: [
             {
                 column: 'appId',
-                value: form.id,
+                value: id,
             },
         ],
     };
     getMenuTree_api(params).then((resp: any) => {
         if (resp.status === 200) {
-            form.menuTree = resp.result;
-            const keys = resp.result.map((item: any) => item.id) as string[];
-            form.expandedKeys = keys;
+            // form.menuTree = resp.result;
+            // const keys = resp.result.map((item: any) => item?.code) as string[];
+            let keys: any = [];
+            getCheckMenu(resp.result, keys)
+            // form.expandedKeys = keys;
             form.checkedMenu = keys;
         }
     });
@@ -147,10 +144,10 @@ function getMenus() {
 /**
  * 获取集成系统选项
  */
-function getSystemList() {
+function getSystemList(id: string) {
     const api =
         form.provider === 'internal-standalone'
-            ? getOwnerStandalone_api(form.id, ['iot'])
+            ? getOwnerStandalone_api(id, ['iot'])
             : getOwner_api(['iot']);
 
     api.then((resp: any) => {
@@ -162,24 +159,44 @@ function getSystemList() {
         }
     });
 }
+
+watch(() => props.data, (newVal: any) => {
+    form.checkedSystem = newVal?.page.configuration?.checkedSystem
+    if (form.checkedSystem) {
+        getTree(form.checkedSystem)
+    }
+    if (newVal?.id) {
+        getSystemList(newVal?.id);
+        getMenus(newVal?.id);
+    }
+}, {
+    deep: true,
+    immediate: true
+})
 // 树选中事件
 function treeCheck(checkedKeys: any, e: CheckInfo) {
-    form.checkedMenu = checkedKeys;
+    form.checkedMenu = checkedKeys
     form.half = e.halfCheckedKeys as string[];
 }
 //过滤节点-默认带上父节点
 function filterTree(nodes: any[], list: any[]) {
-    if (!nodes?.length) {
-        return nodes;
+    if (!nodes) {
+        return [];
     }
     return nodes.filter((it) => {
         // 不符合条件的直接砍掉
-        if (list.indexOf(it.id) <= -1) {
-            return false;
+        if (list.includes(it.code)) {
+            return true
+        } else if (it.children) {
+            it.children = filterTree(it.children, list);
+            return it.children.length
         }
+        // if (list.indexOf(it.code) <= -1) {
+        //     return false;
+        // }
         // 符合条件的保留，并且需要递归处理其子节点
-        it.children = filterTree(it.children, list);
-        return true;
+        //    it.children = filterTree(it.children, list);
+        // return true;
     });
 }
 </script>

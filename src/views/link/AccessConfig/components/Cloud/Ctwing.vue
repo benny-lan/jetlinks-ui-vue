@@ -31,7 +31,6 @@
                                             ]"
                                         >
                                             <j-input
-                                                disabled
                                                 v-model:value="
                                                     formState.apiAddress
                                                 "
@@ -113,48 +112,78 @@
                                 <div class="doc">
                                     <h1>操作指引：</h1>
                                     <div>
-                                        1、CTWing端创建产品、设备，以及一个第三方应用
+                                        1、CTWing端创建应用、产品、设备；配置完成后查看产品详情。其中产品ID以及Master-APIkey在JetLinks平台配置时会使用。
+                                    </div>
+                                    <div class="image">
+                                        <j-image :src="img1" width="100%" />
                                     </div>
                                     <div>
-                                        2、CTWing端配置产品/设备/分组级订阅，订阅方URL地址请填写:
-                                        <div
+                                        2、IOT端创建类型为CTWing的设备接入网关
+                                        <!-- <div
                                             class="url"
                                             style="word-wrap: break-word"
                                         >
                                             {{
                                                 `${origin}/api/ctwing/${randomString()}/notify`
                                             }}
-                                        </div>
+                                        </div> -->
+                                    </div>
+                                    <div>
+                                        3、IOT端创建产品，选中接入方式为CTWing，填写CTWing平台中的产品ID、Master-APIkey。
                                     </div>
                                     <div class="image">
-                                        <j-image width="100%" :src="img1" />
+                                        <j-image :src="img2" width="100%" />
                                     </div>
                                     <div>
-                                        3、IOT端创建类型为CTWing的设备接入网关
-                                    </div>
-                                    <div>
-                                        4、IOT端创建产品，选中接入方式为CTWing,填写CTWing平台中的产品ID、Master-APIkey。
+                                        4、IOT端添加设备，设备ID需要配置真实设备的IMEI号，配置完成后启用设备（如果启用设备提示错误，请检查CTWing网关参数是否配置正确）。
                                     </div>
                                     <div class="image">
-                                        <j-image width="100%" :src="img2" />
-                                    </div>
-                                    <div>
-                                        5、IOT端添加设备，为每一台设备设置唯一的IMEI（需与CTWing平台中填写的值一致）
+                                        <j-image :src="img3" width="100%" />
                                     </div>
                                     <div class="image">
-                                        <j-image width="100%" :src="img3" />
+                                        <j-image :src="img4" width="100%" />
                                     </div>
-                                    <h1>设备接入网关配置说明</h1>
+                                    <j-descriptions
+                                        :column="1"
+                                        :labelStyle="{ width: '100px' }"
+                                        bordered
+                                        size="small"
+                                    >
+                                        <j-descriptions-item label="参数"
+                                            >说明</j-descriptions-item
+                                        >
+                                        <j-descriptions-item label="IMEI"
+                                            >真实设备的IMEI号，需要填写正确，否则推送数据会接收失败</j-descriptions-item
+                                        >
+                                        <j-descriptions-item label="SN">
+                                            真实设备的SN号
+                                        </j-descriptions-item>
+                                        <j-descriptions-item label="IMSI">
+                                            真实设备的IMSI号
+                                        </j-descriptions-item>
+                                        <j-descriptions-item label="PSK">
+                                            真实设备的PSK，非必填
+                                        </j-descriptions-item>
+                                    </j-descriptions>
                                     <div>
-                                        1.请将CTWing的AEP平台-应用管理中的App
-                                        Key和App Secret复制到当前页面
+                                        5、CTWing端配置产品/设备/分组级订阅，订阅方URL地址请填写： {{
+                                                `${origin}/api/ctwing/${randomString()}/notify`
+                                            }}（此处订阅地址可以在JetLinks平台中配置完成CTWing网关后再填写）。
                                     </div>
                                     <div class="image">
-                                        <j-image width="100%" :src="img4" />
+                                        <j-image :src="img5" width="100%" />
                                     </div>
-                                    <h1>其他说明</h1>
                                     <div>
-                                        1.在IOT端启用设备时，若CTWing平台没有与之对应的设备，则将在CTWing端自动创建新设备
+                                        6、以上步骤配置完成后，可以触发真实设备进行上数，在平台对应设备详情页查看设备状态。
+                                    </div>
+                                    <div class="image">
+                                        <j-image :src="img6" width="100%" />
+                                    </div>
+                                    <h1>
+                                        其他说明
+                                    </h1>
+                                    <div>
+                                        在IOT端启用设备时，若CTWing平台没有与之对应的设备，则将在CTWing端自动创建新设备
                                     </div>
                                 </div>
                             </j-scrollbar>
@@ -299,6 +328,7 @@
                 :hasPermission="`link/AccessConfig:${
                     id === ':id' ? 'add' : 'update'
                 }`"
+                :loading="loading"
             >
                 保存
             </PermissionButton>
@@ -330,6 +360,8 @@ const img1 = getImage('/network/01.png');
 const img2 = getImage('/network/02.jpg');
 const img3 = getImage('/network/03.png');
 const img4 = getImage('/network/04.jpg');
+const img5 = getImage('/network/05-Ctwing.png')
+const img6 = getImage('/network/06-Ctwing.png')
 
 interface FormState {
     apiAddress: string;
@@ -345,6 +377,7 @@ const route = useRoute();
 const view = route.query.view as string;
 const id = route.params.id as string;
 
+const loading = ref(false)
 const props = defineProps({
     provider: {
         type: Object,
@@ -403,6 +436,7 @@ const procotolSearch = (value: string) => {
 
 const saveData = async () => {
     const data: any = await formRef2.value?.validate();
+    loading.value = true
     const params = {
         ...data,
         configuration: {
@@ -429,6 +463,7 @@ const saveData = async () => {
             setTimeout(() => window.close(), 300);
         }
     }
+    loading.value = false
 };
 
 const queryProcotolList = async (id: string, params = {}) => {

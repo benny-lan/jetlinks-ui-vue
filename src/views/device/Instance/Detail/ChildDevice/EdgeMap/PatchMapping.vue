@@ -5,6 +5,7 @@
         visible
         @ok="handleClick"
         @cancel="handleClose"
+        :confirmLoading="confirmLoading"
     >
         <div class="map-tree">
             <div class="map-tree-top">
@@ -16,9 +17,11 @@
                         <j-tree
                             checkable
                             :height="300"
-                            :tree-data="dataSource"
+                            v-model:expandedKeys="expandedKeys"
                             :checkedKeys="checkedKeys"
+                            :load-data="onLoadData"
                             @check="onCheck"
+                            :tree-data="treeList"
                         />
                     </j-card>
                     <div style="width: 100px">
@@ -56,8 +59,17 @@
 </template>
 
 <script lang="ts" setup>
-import { treeEdgeMap, saveEdgeMap, addDevice } from '@/api/device/instance';
-import { message } from 'jetlinks-ui-components';
+import {
+    treeEdgeMap,
+    saveEdgeMap,
+    addDevice,
+    edgeChannel,
+    edgeCollector,
+    edgePoint,
+    saveDeviceMapping,
+} from '@/api/device/instance';
+import { onlyMessage } from '@/utils/comm';
+import type { TreeProps } from 'ant-design-vue';
 const _props = defineProps({
     metaData: {
         type: Array,
@@ -74,6 +86,9 @@ const _props = defineProps({
     deviceData: {
         type: Object,
     },
+    text: {
+        type: String,
+    }
 });
 const _emits = defineEmits(['close', 'save']);
 
@@ -85,6 +100,7 @@ const rightList = ref<any[]>([]);
 const dataSource = ref<any[]>([]);
 const loading = ref<boolean>(false);
 
+const confirmLoading = ref(false)
 const handleData = (data: any[], type: string) => {
     data.forEach((item) => {
         item.key = item.id;
@@ -113,16 +129,83 @@ const handleSearch = async () => {
     }
 };
 
+const expandedKeys = ref<string[]>([]);
 const onCheck = (keys: string[], e: any) => {
     checkedKeys.value = [...keys];
+    expandedKeys.value.push(e.node.id);
     leftList.value = e?.checkedNodes || [];
 };
 
 const onRight = () => {
-    console.log(rightList.value,leftList.value);
+    console.log(rightList.value, leftList.value);
     rightList.value = leftList.value;
 };
 
+const treeList = ref<any[]>([]);
+const getChannel = async () => {
+    if (_props.edgeId) {
+        loading.value = true;
+        const resp: any = await edgeChannel(_props.edgeId);
+        loading.value = false;
+        if (resp.status === 200) {
+            treeList.value = resp.result?.[0]?.map((item: any) => ({
+                ...item,
+                title: item.name,
+                key: item.id,
+                checkable: false,
+                type: 'channel',
+                parentId: '',
+                provider: item.provider,
+            }));
+        }
+    }
+};
+
+const onLoadData: TreeProps['loadData'] = (treeNode) => {
+    console.log(treeNode);
+    return new Promise(async (resolve) => {
+        if (treeNode.dataRef?.children) {
+            resolve();
+            return;
+        }
+        const params = {
+            terms: [
+                {
+                    terms: [
+                        {
+                            column:
+                                treeNode.type === 'channel'
+                                    ? 'channelId'
+                                    : 'collectorId',
+                            value: treeNode.key,
+                        },
+                    ],
+                },
+            ],
+        };
+        const res =
+            treeNode.type === 'channel'
+                ? await edgeCollector(
+                      <string>_props.edgeId,
+                      params,
+                  )
+                : await edgePoint(
+                      <string>_props.edgeId,
+                      params,
+                  );
+        (<any>treeNode.dataRef).children = res.result?.[0].map((item: any) => ({
+            ...item,
+            title: item.name,
+            key: item.id,
+            type: treeNode.type === 'channel' ? 'collector' : 'point',
+            parentId: treeNode.key,
+            checkable: treeNode.type === 'channel' ? true : false,
+            isLeaf: treeNode.type === 'channel' ? false : true,
+        }));
+        treeList.value = [...treeList.value];
+        resolve();
+    });
+};
 const _delete = (_key: string) => {
     const _index = rightList.value.findIndex((i) => i.key === _key);
     rightList.value.splice(_index, 1);
@@ -131,8 +214,9 @@ const _delete = (_key: string) => {
 };
 
 const handleClick = async () => {
+    confirmLoading.value = true
     if (!rightList.value.length) {
-        message.warning('请选择采集器');
+        onlyMessage('请选择采集器', 'warning');
     } else {
         const params: any[] = [];
         rightList.value.map((item: any) => {
@@ -144,7 +228,7 @@ const handleClick = async () => {
                 metadataId: (_props.metaData as any[]).find(
                     (i: any) => i.name === element.name,
                 )?.metadataId,
-                provider: dataSource.value.find(
+                provider: treeList.value.find(
                     (it: any) => it.id === item.parentId,
                 ).provider,
             }));
@@ -159,31 +243,38 @@ const handleClick = async () => {
                     requestList: filterParms,
                 });
                 if (res.status === 200) {
-                    message.success('操作成功');
+                    onlyMessage('操作成功');
                     _emits('save');
                 }
             } else {
-                message.error('暂无对应属性的映射');
+                onlyMessage('暂无对应属性的映射', 'error');
             }
         } else {
             if (filterParms && filterParms.length !== 0) {
-                const res = await addDevice(_props.deviceData);
+                const res: any = await addDevice(_props.deviceData);
                 if (res.status === 200) {
-                    const resq = await saveEdgeMap(_props.edgeId, {
+                    const resq: any = await saveEdgeMap(_props.edgeId, {
                         deviceId: res.result?.id,
                         provider: filterParms[0]?.provider,
                         requestList: filterParms,
                     });
+                    const resp = await saveDeviceMapping(_props.edgeId, {
+                        info: [{
+                            deviceId: res.result?.id,
+                            deviceName: res.result?.name,
+                        }],
+                    })
                     if (res.status === 200) {
-                        message.success('操作成功');
+                        onlyMessage('操作成功');
                         _emits('save');
                     }
                 }
             } else {
-                message.error('暂无对应属性的映射');
+                onlyMessage('暂无对应属性的映射', 'error');
             }
         }
     }
+    confirmLoading.value = false
 };
 const handleClose = () => {
     _emits('close');
@@ -191,7 +282,8 @@ const handleClose = () => {
 
 onMounted(() => {
     if (_props.edgeId) {
-        handleSearch();
+        // handleSearch();
+        getChannel();
     }
 });
 </script>

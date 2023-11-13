@@ -47,7 +47,7 @@
               <div class="card-item-content-text">
                 设备类型
               </div>
-              <div>直连设备</div>
+              <div>{{ slotProps.deviceType.text}}</div>
             </j-col>
           </j-row>
         </template>
@@ -192,6 +192,12 @@ const columns = [
     hideInTable: true,
     search: {
       type: 'treeSelect',
+      componentProps: {
+        fieldNames: {
+          label: 'name',
+          value: 'value',
+        },
+      },
       options: () => new Promise((resolve) => {
         getTreeData_api({ paging: false }).then((resp: any) => {
           const formatValue = (list: any[]) => {

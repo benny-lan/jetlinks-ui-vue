@@ -1,7 +1,7 @@
 <template>
   <template v-if="isPermission">
     <template v-if="popConfirm">
-      <j-popconfirm :overlayStyle='{width: "220px"}' v-bind="popConfirm" :disabled="!isPermission || props.disabled">
+      <j-popconfirm :disabled="!isPermission || props.disabled" :overlayStyle='{width: "220px", zIndex: 1075 }' v-bind="popConfirm">
         <j-tooltip v-if="tooltip" v-bind="tooltip">
           <slot v-if="noButton"></slot>
           <j-button v-else v-bind="props" :disabled="_isPermission" :style="props.style">
@@ -40,7 +40,7 @@
       </j-button>
     </template>
   </template>
-  <j-tooltip v-else title="暂无权限，请联系管理员">
+  <j-tooltip v-else :placement="placement" title="暂无权限，请联系管理员">
     <slot v-if="noButton"></slot>
     <j-button v-else v-bind="props" :disabled="_isPermission" :style="props.style">
       <slot></slot>
@@ -84,10 +84,14 @@ const props = defineProps({
     type: Object as PropType<PopconfirmProps>,
   },
   hasPermission: {
-    type: String || Array || Boolean,
+    type: [String , Array, Boolean],
   },
   style: {
     type: Object as PropType<CSSProperties>
+  },
+  placement:{
+    type: String,
+    default: 'top'
   },
   ...omit(buttonProps(), 'icon')
 })

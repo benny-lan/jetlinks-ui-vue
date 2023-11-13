@@ -30,6 +30,8 @@
                   v-model:selected-keys="selectedKeys"
                   v-model:expandedKeys="expandedKeys"
                   :fieldNames="{ key: 'id' }"
+                  :show-icon="true"
+                  :showLine="{ showLeafIcon: false }"
               >
                   <template #title="{ name, data }">
                     <div class='department-tree-item-content'>
@@ -100,8 +102,7 @@ import { getTreeData_api, delDepartment_api } from '@/api/system/department';
 import { debounce, cloneDeep, omit } from 'lodash-es';
 import { ArrayToTree } from '@/utils/utils';
 import EditDepartmentDialog from './EditDepartmentDialog.vue';
-
-import { message } from 'jetlinks-ui-components';
+import { onlyMessage } from '@/utils/comm';
 
 const permission = 'system/Department';
 
@@ -126,15 +127,15 @@ function getTree(cb?: Function) {
             { column: 'name$LIKE', value: `%${searchValue.value}%` },
         ];
     }
-
+    treeMap.clear()
     getTreeData_api(params)
         .then((resp: any) => {
-            selectedKeys.value = [resp.result[0].id];
             sourceTree.value = resp.result.sort((a: any, b: any) =>
                 a.sortIndex === b.sortIndex
                     ? b.createTime - a.createTime
                     : a.sortIndex - b.sortIndex,
             ); // 报存源数据
+            selectedKeys.value = [resp.result[0]?.id];
             handleTreeMap(resp.result); // 将树形结构转换为map结构
             treeData.value = resp.result; // 第一次不用进行过滤
             cb && cb();
@@ -154,6 +155,7 @@ const search = debounce(() => {
                 treeArray.set(item.id, item);
             }
         });
+        expandedKeys.value = []
         dig(searchTree);
         treeData.value = ArrayToTree(cloneDeep([...treeArray.values()]));
     } else {
@@ -169,6 +171,10 @@ const search = debounce(() => {
                 const _item = treeMap.get(item);
                 pIds.push(_item.parentId);
                 treeArray.set(item, _item);
+                expandedKeys.value.push(_item.id)
+                if(pIds.length > 0){
+                    dig(pIds)
+                }
             }
         });
     }
@@ -187,14 +193,16 @@ function handleTreeMap(_data: any[]) {
 // 删除部门
 function delDepartment(id: string) {
     delDepartment_api(id).then(() => {
-        message.success('操作成功');
+        onlyMessage('操作成功');
         getTree();
     });
 }
 function refresh(id: string) {
     // @ts-ignore
-    window?.onTabSaveSuccess && window.onTabSaveSuccess(id);
-    setTimeout(() => window.close(), 300);
+    if(window?.onTabSaveSuccess){
+        window.onTabSaveSuccess(id);
+        setTimeout(() => window.close(), 300);
+    }
     getTree();
 }
 
@@ -266,19 +274,22 @@ init();
 
     .tree {
       overflow-y: auto;
-      overflow-x: hidden;
-
+      overflow-x: auto;
+      flex: 1 1 auto;
       .department-tree-item-content {
         display: flex;
         align-items: center;
 
         .title {
-          width: calc(100% - 80px);
-        }
+                flex: 1;
+                min-width: 80px;
+                margin-right: 80px;
+            }
         .func-btns {
           display: none;
           font-size: 14px;
           width: 80px;
+          margin-left: -80px;
           :deep(.ant-btn-link) {
             padding: 0 4px;
             height: 24px;

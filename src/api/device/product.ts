@@ -106,7 +106,7 @@ export const addProduct = (data:any) => server.post('/device-product',data)
  * @param data 
  * @returns 
  */
-export const editProduct = (data: any) => server.patch('/device-product', data)
+export const editProduct = (data: any) => server.put(`/device-product/${data.id}`, data)
 
 /**
  * 删除产品
@@ -192,7 +192,7 @@ export const getStreamingAggType = () => server.get<Record<string, string>[]>('/
  * @pId 产品id
  * @accessId 设备接入id
  */
-export const getAccessConfig = (pId: string, accessId: string) => server.get(`/protocol/${pId}/${accessId}/configuration`)
+export const getAccessConfig = (pId: string, accessId: string) => server.get(`/device-product/${pId}/${accessId}/config-metadata`)
 
 export const getMetadataConfig = (params: {
   deviceId: string;
@@ -211,4 +211,13 @@ export const getMetadataDeviceConfig = (params: {
     dataType: string;
   };
 }) => server.get<Record<any, any>[]>(`/device/instance/${params.deviceId}/config-metadata/${params.metadata.type}/${params.metadata.id}/${params.metadata.dataType}`)
+
+/**
+ * 规则属性
+ */
+export const saveProductVirtualProperty = (productId: string, data: any[]) => server.patch(`/virtual/property/product/${productId}/_batch`, data)
+
+export const queryProductVirtualProperty = (productId: string, propertyId: string) => server.get(`/virtual/property/product/${productId}/${propertyId}`)
+
+
 

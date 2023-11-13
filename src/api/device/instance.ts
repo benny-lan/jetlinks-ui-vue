@@ -5,6 +5,13 @@ import { DeviceInstance } from '@/views/device/Instance/typings'
 import { DeviceMetadata, UnitType } from '@/views/device/Product/typings';
 
 /**
+ * 重置设备继承产品的物模型规则
+ * @param deviceId 设备ID
+ * @param productId 产品ID
+ */
+export const resetRule = (productId:string,deviceId:string,data:any) => server.remove(`/virtual/property/product/${productId}/${deviceId}/_batch`,{},{data})
+
+/**
  * 删除设备物模型
  * @param deviceId 设备ID
  * @returns 
@@ -99,7 +106,7 @@ export const templateDownload = (productId: string, type: string) => server.get(
  * @param type 文件类型
  * @returns 
  */
-export const deviceImport = (productId: string, fileUrl: string, autoDeploy: boolean) => `${BASE_API_PATH}/device-instance/${productId}/import?fileUrl=${fileUrl}&autoDeploy=${autoDeploy}&:X_Access_Token=${LocalStore.get(TOKEN_KEY)}`
+export const deviceImport = (productId: string, fileUrl: string, autoDeploy: boolean) => `${BASE_API_PATH}/device-instance/${productId}/import/_withlog?fileUrl=${fileUrl}&autoDeploy=${autoDeploy}&:X_Access_Token=${LocalStore.get(TOKEN_KEY)}`
 
 /**
  * 设备导出
@@ -252,6 +259,22 @@ export const unbindBatchDevice = (deviceId: string, data: Record<string, any>) =
  */
 export const bindDevice = (deviceId: string, data: Record<string, any>) => server.post(`/device/gateway/${deviceId}/bind`, data)
 
+
+/**
+ * 查询是否存在云端映射设备
+ */
+export const queryDeviceMapping = (deviceId: string, data?: any) => server.post(`/edge/operations/${deviceId}/device-mapping-list/invoke`, data)
+
+/**
+ * 批量保存云端映射设备
+ */
+export const saveDeviceMapping = (deviceId: string, data: any) => server.post(`/edge/operations/${deviceId}/device-mapping-save-batch/invoke`, data)
+
+/**
+ *批量删除云端映射设备 
+ */
+export const deleteDeviceMapping = (deviceId: string, data:any) => server.post(`/edge/operations/${deviceId}/device-mapping-delete-by-deviceid/invoke`, data)
+
 /**
  * 获取产品列表
  * @param data
@@ -261,7 +284,7 @@ export const getProductListNoPage = (data: any) => server.post('/device/product/
 /**
  * 修改设备
  */
-export const editDevice = (parmas: any) => server.patch('/device-instance', parmas)
+export const editDevice = (params: any) => server.patch('/device-instance', params)
 
 /**
  * 新增设备
@@ -573,4 +596,43 @@ export const queryLogsType = () => server.get(`/dictionary/device-log-type/items
 
 export const getDeviceNumber = (data?:any) => server.post<number>('/device-instance/_count', data)
 
+/**
+ * 导入映射设备
+ * @param productId
+ * @param data/
+ */
+export const importDeviceByPlugin = (productId: string, data: any[]) => server.post(`/device/instance/plugin/${productId}/import`, data)
 
+export const metadataMapById = (type: 'device' | 'product', productId: string, data: any[]) => server.patch(`/device/metadata/mapping/${type}/${productId}`, data)
+
+export const getMetadataMapById = (type: 'device' | 'product', productId: string) => server.get(`/device/metadata/mapping/${type}/${productId}`)
+
+export const getInkingDevices = (data: string[]) => server.post('/plugin/mapping/device/_all', data)
+
+export const getProtocolMetadata = (id: string, transport: string) => server.get(`/protocol/${id}/${transport}/metadata`)
+
+/**
+ * 规则属性
+ */
+export const saveDeviceVirtualProperty = (productId: string, deviceId: string, data: any[]) => server.patch(`/virtual/property/product/${productId}/${deviceId}/_batch`, data)
+
+export const queryDeviceVirtualProperty = (productId: string, deviceId: string, propertyId: string) => server.get(`/virtual/property/device/${productId}/${deviceId}/${propertyId}`)
+
+export const queryByParent = (deviceId: string) => server.get(`/device/gateway/${deviceId}/parent`)
+
+export const queryCodeTips = (productId: string, deviceId: string) => server.get(`/device/transparent-codec/${productId}/${deviceId}.d.ts`)
+export const queryProductCodeTips = (productId: string) => server.get(`/device/transparent-codec/${productId}.d.ts`)
+
+/**
+ * 获取设备物模型规则TS
+ * @param deviceId 设备ID
+ * @returns 
+ */
+export const queryTypescript = (deviceId:string) => server.get(`/device/${deviceId}/virtual-property.d.ts`) 
+
+/**
+ * 获取产品物模型规则TS
+ * @param productId 产品ID
+ * @returns 
+ */
+export const queryProductTs = (productId:string) => server.get(`/product/${productId}/virtual-property.d.ts`)

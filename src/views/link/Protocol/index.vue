@@ -3,7 +3,7 @@
         <div>
             <pro-search
                 :columns="columns"
-                target="search"
+                target="search-protocol"
                 @search="handleSearch"
             />
             <FullPage>
@@ -207,7 +207,7 @@ const columns = [
         title: '操作',
         key: 'action',
         fixed: 'right',
-        width: 200,
+        width: 100,
         scopedSlots: true,
     },
 ];

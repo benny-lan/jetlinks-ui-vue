@@ -5,6 +5,7 @@
             :request="query"
             :params="_params"
             :bodyStyle="{ padding: '0 0 0 20px' }"
+            :scroll="{y : 450}"
         >
             <template #headerTitle>
                 <j-input-search
@@ -75,7 +76,7 @@
 </template>
 
 <script lang="ts" setup>
-import _, { groupBy, toArray } from 'lodash-es';
+import _, { groupBy, throttle, toArray } from 'lodash-es';
 import { PropertyData } from '../../../typings';
 import PropertyCard from './PropertyCard.vue';
 import ValueRender from './ValueRender.vue';
@@ -84,16 +85,17 @@ import Detail from './Detail/index.vue';
 import Indicators from './Indicators.vue';
 import { getProperty } from '@/api/device/instance';
 import { useInstanceStore } from '@/store/instance';
-import { message } from 'ant-design-vue';
 import { getWebSocket } from '@/utils/websocket';
 import { map } from 'rxjs/operators';
 import { queryDashboard } from '@/api/comm';
+import { onlyMessage } from '@/utils/comm';
 
 const columns = [
     {
         title: '名称',
         dataIndex: 'name',
         key: 'name',
+        ellipsis: true
     },
     {
         title: '值',
@@ -137,7 +139,7 @@ const _params = reactive({
 
 const subRef = ref();
 
-const list = ref<any[]>([]);
+// const list = ref<any[]>([]);
 
 const getActions = (data: Partial<Record<string, any>>) => {
     const arr = [];
@@ -192,7 +194,7 @@ const getActions = (data: Partial<Record<string, any>>) => {
                         data.id,
                     );
                     if (resp.status === 200) {
-                        message.success('操作成功！');
+                        onlyMessage('操作成功！');
                     }
                 }
             },
@@ -213,15 +215,21 @@ const getActions = (data: Partial<Record<string, any>>) => {
     return arr;
 };
 
-// const valueChange = (arr: Record<string, any>[]) => {
-//     (arr || [])
-//         .sort((a: any, b: any) => a.timestamp - b.timestamp)
-//         .forEach((item: any) => {
-//             const { value } = item;
-//             propertyValue.value[value?.property] = { ...item, ...value };
-//         });
-//     list.value = []
-// };
+const valueChange = (arr: Record<string, any>[]) => {
+    (arr || [])
+        .sort((a: any, b: any) => a.timestamp - b.timestamp)
+        .forEach((item: any) => {
+            const { value } = item;
+            propertyValue.value[value?.property] = { ...item, ...value };
+        });
+};
+
+let messageCache = new Map()
+
+const throttleFn = throttle(() => {
+    const _list = [...messageCache.values()]
+    valueChange(_list)
+}, 500)
 
 const subscribeProperty = () => {
     const id = `instance-info-property-${instanceStore.current.id}-${
@@ -235,22 +243,26 @@ const subscribeProperty = () => {
     })
         ?.pipe(map((res: any) => res.payload))
         .subscribe((payload) => {
-            list.value = [...list.value, payload];
-            unref(list)
-                .sort((a: any, b: any) => a.timestamp - b.timestamp)
-                .forEach((item: any) => {
-                    const { value } = item;
-                    propertyValue.value[value?.property] = {
-                        ...item,
-                        ...value,
-                    };
-                });
+            if(payload.value?.property) {
+                messageCache.set(payload.value?.property, payload)
+                throttleFn()
+            }
+            // unref(list)
+            //     .sort((a: any, b: any) => a.timestamp - b.timestamp)
+            //     .forEach((item: any) => {
+            //         const { value } = item;
+            //         propertyValue.value[value?.property] = {
+            //             ...item,
+            //             ...value,
+            //         };
+            //     });
             // list.value = [...list.value, payload];
             // throttle(valueChange(list.value), 500);
         });
 };
 
 const getDashboard = async () => {
+    if(!dataSource.value?.length) return 
     const param = [
         {
             dashboard: 'device',
@@ -287,6 +299,7 @@ const getDashboard = async () => {
             });
         propertyValue.value = { ...unref(propertyValue), ...obj };
     }
+    subRef.value && subRef.value?.unsubscribe();
     subscribeProperty();
     loading.value = false;
 };
@@ -302,9 +315,11 @@ const query = (params: Record<string, any>) =>
             });
             arr = _.cloneDeep(li);
         }
+        dataSource.value = arr.slice(_from, _to)
+        messageCache.clear()
         resolve({
             result: {
-                data: arr.slice(_from, _to),
+                data: dataSource.value,
                 pageIndex: params.pageIndex || 0,
                 pageSize: params.pageSize || 12,
                 total: arr.length,

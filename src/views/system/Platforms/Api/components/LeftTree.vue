@@ -7,8 +7,9 @@
             :tree-data="treeData"
             @select="clickSelectItem"
             v-model:selected-keys="selectedKeys"
-            showLine
             class="left-tree-container"
+            :show-icon="true"
+            :showLine="{ showLeafIcon: false }"
         >
             <template #title="{ name }">
                 {{ name }}
@@ -27,7 +28,9 @@ import {
     getTreeTwo_api,
 } from '@/api/system/apiPage';
 import type { modeType, treeNodeTpye } from '../typing';
+import { useDepartmentStore } from '@/store/department';
 
+const department = useDepartmentStore();
 const emits = defineEmits(['select']);
 const props = defineProps<{
     mode: modeType;
@@ -77,12 +80,41 @@ const getTreeData = () => {
                 }
 
                 treeData.value = tree;
+                const apis = {}
+                const table: any = dealTreeData(tree)
+                table.forEach((item:any)=>{
+                    apis[item.id] = item
+                })
+                department.setChangedApis(apis);
             })
             .finally(() => {
                 spinning.value = false;
             });
     });
 };
+const dealTreeData = (tree:Array<any>) =>{
+    let table:any = []
+    tree.forEach((item)=>{
+                    if(item?.children){
+                        item?.children.forEach(i=>{
+                            i?.apiList?.forEach((apiItem:any)=>{
+                                const { method, url } = apiItem as any;
+                                    for (const key in method) {
+                                        if (Object.prototype.hasOwnProperty.call(method, key)) {
+                                            table.push({
+                                                ...method[key],
+                                                url,
+                                                method: key,
+                                                id: method[key].operationId,
+                                            });
+                                        }
+                                    }
+                            })
+                        })
+                    }
+                })
+    return table
+}
 const clickSelectItem: TreeProps['onSelect'] = (key: any[], node: any) => {
     if (key[0] === 'home') return emits('select', node.node.dataRef, {});
 
@@ -152,10 +184,11 @@ const filterPath = (path: object, filterArr: string[]) => {
 
 <style lang="less">
 .left-tree-container {
+    min-height: 200px;
     .ant-tree-list {
         .ant-tree-list-holder-inner {
             .ant-tree-switcher-noop {
-                display: none !important;
+                // display: none !important;
             }
         }
     }

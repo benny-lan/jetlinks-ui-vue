@@ -9,13 +9,12 @@
         @cancel="close"
         okText="确定"
         cancelText="取消"
-        v-bind="layout"
         width="650px"
         :confirmLoading="loading"
     >
         <div style="margin-top: 10px">
             <j-form
-                :layout="'vertical'"
+                layout="vertical"
                 :model="form"
                 :rules="rules"
                 ref="formRef"
@@ -74,7 +73,7 @@
                             children: 'children',
                         }"
                         :filterTreeNode="
-                            (v, option) => filterSelectNode(v, option)
+                            (v, option) => filterSelectNode(v, option, 'name')
                         "
                     >
                         <template> </template>
@@ -117,17 +116,17 @@
 import { category } from '@/api/device/product';
 import { Form } from 'jetlinks-ui-components';
 import { getImage } from '@/utils/comm.ts';
-import { message } from 'jetlinks-ui-components';
 import DialogTips from '../DialogTips/index.vue';
 import { useProductStore } from '@/store/product';
-import { filterTreeSelectNode, filterSelectNode } from '@/utils/comm';
-import { FILE_UPLOAD } from '@/api/comm';
+import { filterSelectNode, onlyMessage } from '@/utils/comm';
 import { isInput } from '@/utils/regular';
 import type { Rule } from 'ant-design-vue/es/form';
 import { queryProductId, addProduct, editProduct } from '@/api/device/product';
 import encodeQuery from '@/utils/encodeQuery';
+
 const productStore = useProductStore();
 const emit = defineEmits(['success']);
+
 const props = defineProps({
     title: {
         type: String,
@@ -165,13 +164,13 @@ const deviceList = ref([
         label: '网关子设备',
         value: 'childrenDevice',
         iconUrl: getImage('/device-type-2.png'),
-        tooltip: '能挂载子设备与平台进行通信的设备',
+        tooltip: '作为网关的子设备，由网关代理连接到物联网平台',
     },
     {
         label: '网关设备',
         value: 'gateway',
         iconUrl: getImage('/device/device-type-3.png'),
-        tooltip: '作为网关的子设备，有网关代理连接到物联网平台',
+        tooltip: '能挂载子设备与平台进行通信的设备',
     },
 ]);
 
@@ -274,7 +273,7 @@ const show = (data: any) => {
         form.classifiedName = data.classifiedName;
         form.photoUrl = data.photoUrl || photoValue.value;
         form.deviceType = data.deviceType.value;
-        form.describe = form.describe;
+        form.describe = data.describe;
         form.id = data.id;
         idDisabled.value = true;
     } else if (props.isAdd === 1) {
@@ -314,15 +313,16 @@ const submitData = () => {
                 if (form.id === '') {
                     form.id = undefined;
                 }
-                const res = await addProduct(form);
-                loading.value = false
+                const res = await addProduct(form).finally(()=>{
+                    loading.value = false
+                });
                 if (res.status === 200) {
-                    message.success('保存成功！');
+                    onlyMessage('保存成功！');
                     visible.value = false;
                     emit('success');
                     dialogRef.value.show(res.result.id);
                 } else {
-                    message.error('操作失败');
+                    onlyMessage('操作失败', 'error');
                 }
             } else if (props.isAdd === 2) {
                 // 编辑
@@ -332,14 +332,15 @@ const submitData = () => {
                 form.classifiedName
                     ? form.classifiedName
                     : (form.classifiedName = '');
-                const res = await editProduct(form);
-                loading.value = false
+                const res = await editProduct(form).finally(() => {
+                  loading.value = false
+                });
                 if (res.status === 200) {
-                    message.success('保存成功！');
+                    onlyMessage('保存成功！');
                     emit('success');
                     visible.value = false;
                 } else {
-                    message.error('操作失败');
+                    onlyMessage('操作失败', 'error');
                 }
             }
         })

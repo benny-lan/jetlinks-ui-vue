@@ -5,6 +5,7 @@
             <j-form ref="basicFormRef" :model="form.data" class="basic-form">
                 <div class="row" style="display: flex">
                     <j-form-item
+                        ref="uploadIcon"
                         label="菜单图标"
                         name="icon"
                         :rules="[
@@ -128,6 +129,20 @@
                                 />
                             </j-form-item>
                         </j-col>
+                      <j-col :span="12">
+                        <j-form-item
+                            label="所属应用"
+                            name="owner"
+                        >
+                          <j-select
+                              v-model:value="form.data.owner"
+                              :options="[{ label: 'Iot', value: 'iot' }]"
+                              allowClear
+                              placeholder="请选择所属应用"
+                              style="width: 100%"
+                          />
+                        </j-form-item>
+                      </j-col>
                     </j-row>
                 </div>
 
@@ -252,7 +267,8 @@
         <ChooseIconDialog
             v-if="dialogVisible"
             v-model:visible="dialogVisible"
-            @confirm="(typeStr:string)=>form.data.icon = typeStr"
+            :icon="form.data.icon"
+            @confirm="(typeStr:string)=>choseIcon(typeStr)"
         />
     </div>
 </template>
@@ -260,7 +276,6 @@
 <script setup lang="ts">
 import PermissionButton from '@/components/PermissionButton/index.vue';
 import { FormInstance } from 'ant-design-vue';
-import { message } from 'jetlinks-ui-components';
 import ChooseIconDialog from '../components/ChooseIconDialog.vue';
 import PermissChoose from '../components/PermissChoose.vue';
 import {
@@ -273,6 +288,7 @@ import {
 } from '@/api/system/menu';
 import { Rule } from 'ant-design-vue/lib/form';
 import { isNoCommunity } from '@/utils/utils';
+import { onlyMessage } from '@/utils/comm';
 
 const permission = 'system/Menu';
 // 路由
@@ -288,6 +304,7 @@ const routeParams = {
 // 表单
 const basicFormRef = ref<FormInstance>();
 const permissFormRef = ref<FormInstance>();
+const uploadIcon = ref<FormInstance>();
 const form = reactive({
     data: {
         name: '',
@@ -359,6 +376,8 @@ const form = reactive({
                 const accessSupportValue = form.data.accessSupport;
                 const params = {
                     ...form.data,
+                    owner: form.data?.owner ?? null,
+                    options: { show: true },
                     accessSupport: {
                         value: accessSupportValue,
                         label:
@@ -368,12 +387,11 @@ const form = reactive({
                                 ? '支持'
                                 : '间接控制',
                     },
-                    owner: 'iot',
                 };
                 api(params)
                     .then((resp: any) => {
                         if (resp.status === 200) {
-                            message.success('操作成功！');
+                            onlyMessage('操作成功！');
                             // 新增后刷新页面，编辑则不需要
                             if (!routeParams.id) {
                                 router.push(
@@ -383,7 +401,7 @@ const form = reactive({
                                 form.init();
                             }
                         } else {
-                            message.error('操作失败！');
+                            onlyMessage('操作失败！', 'error');
                         }
                     })
                     .finally(() => (form.saveLoading = false));
@@ -393,6 +411,10 @@ const form = reactive({
 });
 form.init();
 
+const choseIcon = (typeStr:string) =>{
+    form.data.icon = typeStr;
+    uploadIcon.value?.clearValidate();
+}
 // 弹窗
 const dialogVisible = ref(false);
 
@@ -435,7 +457,7 @@ type assetType = {
 
             &::before {
                 position: absolute;
-                top: 5px px;
+                top: 5px;
                 left: 0;
                 width: 4px;
                 height: calc(100% - 10px);

@@ -25,18 +25,16 @@
                 props.data?.alarmConfigName
             }}</j-descriptions-item>
             <j-descriptions-item label="告警时间" :span="1">{{
-                dayjs(data?.alarmTime).format('YYYY-MM-DD HH:mm:ss')
+                dayjs(props.data?.alarmTime).format('YYYY-MM-DD HH:mm:ss')
             }}</j-descriptions-item>
             <j-descriptions-item label="告警级别" :span="1">
                 <j-tooltip
                     placement="topLeft"
-                    :title="(Store.get('default-level') || []).find((item: any) => item?.level === data?.level)
-                ?.title || props.data?.level"
+                    :title="_level"
                 >
                     <Ellipsis>
                         <span>
-                            {{(Store.get('default-level') || []).find((item: any) => item?.level === data?.level)
-                ?.title || props.data?.level}}
+                            {{_level}}
                         </span>
                     </Ellipsis>
                 </j-tooltip>
@@ -51,8 +49,8 @@
             <j-descriptions-item label="告警流水" :span="2"
                 ><div style="max-height: 500px; overflow-y: auto">
                     <JsonViewer
-                        :value="JSON.parse(data?.alarmInfo || '{}')"
-                        :expand-depth="5"
+                        :expandDepth="4"
+                        :expanded="true" :value="data"
                     ></JsonViewer></div
             ></j-descriptions-item>
         </j-descriptions>
@@ -60,17 +58,34 @@
 </template>
 
 <script lang="ts" setup>
+import { queryLevel } from '@/api/rule-engine/config';
 import dayjs from 'dayjs';
-import { Store } from 'jetlinks-store';
 import JsonViewer from 'vue-json-viewer';
 const props = defineProps({
     data: Object,
     description: String,
 });
+const data = computed(()=>{
+    return JSON.parse(props.data?.alarmInfo);
+})
+const defaultLevel = ref<any[]>([])
+
 const emit = defineEmits(['close']);
 const closeModal = () => {
     emit('close');
 };
+
+const _level = computed(() => {
+    return (defaultLevel.value || []).find((item: any) => item?.level === props.data?.level)?.title || props.data?.level
+})
+
+onMounted(() => {
+    queryLevel().then((res)=>{
+        if(res.status === 200 ){
+            defaultLevel.value = res.result?.levels || [];
+        }
+    })
+})
 </script>
 <style lang="less" scoped>
 </style>

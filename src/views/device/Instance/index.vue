@@ -17,7 +17,9 @@
                     isCheck
                         ? {
                               selectedRowKeys: _selectedRowKeys,
-                              onChange: onSelectChange,
+                              onSelect: onSelectChange,
+                              onSelectAll: selectAll,
+                              onSelectNone: ()=>_selectedRowKeys = []
                           }
                         : false
                 "
@@ -271,7 +273,7 @@
     </page-container>
     <Import
         v-if="importVisible"
-        @close="importVisible = false"
+        @cancel="importVisible = false"
         @save="onRefresh"
     />
     <Export
@@ -306,9 +308,8 @@ import {
     batchDeployDevice,
     batchDeleteDevice,
 } from '@/api/device/instance';
-import { getImage, LocalStore } from '@/utils/comm';
-import { message } from 'jetlinks-ui-components';
-import Import from './Import/index.vue';
+import { getImage, LocalStore, onlyMessage } from '@/utils/comm';
+import Import from './Import/modal.vue';
 import Export from './Export/index.vue';
 import Process from './Process/index.vue';
 import Save from './Save/index.vue';
@@ -502,6 +503,17 @@ const columns = [
         hideInTable: true,
         search: {
             type: 'treeSelect',
+            // handleValue(v) {
+            //   return {
+            //     assetType: 'device',
+            //     targets: [
+            //       {
+            //         type: 'org',
+            //         id: v,
+            //       },
+            //     ],
+            //   }
+            // },
             options: () =>
                 new Promise((resolve) => {
                     queryOrgThree({}).then((resp: any) => {
@@ -514,13 +526,13 @@ const columns = [
                                 _list.push({
                                     ...item,
                                     id: JSON.stringify({
-                                        assetType: 'device',
-                                        targets: [
-                                            {
-                                                type: 'org',
-                                                id: item.id,
-                                            },
-                                        ],
+                                      assetType: 'device',
+                                      targets: [
+                                        {
+                                          type: 'org',
+                                          id: item.id,
+                                        },
+                                      ],
                                     }),
                                 });
                             });
@@ -596,6 +608,7 @@ const handleParams = (config: Record<string, any>) => {
     if (Object.keys(_terms).length) {
         const url = new URLSearchParams();
         Object.keys(_terms).forEach((key) => {
+            console.log(_terms[key])
             url.append(key, _terms[key]);
         });
         return url.toString();
@@ -670,10 +683,10 @@ const getActions = (
                         response = await _deploy(data.id);
                     }
                     if (response && response.status === 200) {
-                        message.success('操作成功！');
+                        onlyMessage('操作成功！');
                         instanceRef.value?.reload();
                     } else {
-                        message.error('操作失败！');
+                        onlyMessage('操作失败！', 'error');
                     }
                 },
             },
@@ -693,10 +706,10 @@ const getActions = (
                 onConfirm: async () => {
                     const resp = await _delete(data.id);
                     if (resp.status === 200) {
-                        message.success('操作成功！');
+                        onlyMessage('操作成功！');
                         instanceRef.value?.reload();
                     } else {
-                        message.error('操作失败！');
+                        onlyMessage('操作失败！', 'error');
                     }
                 },
             },
@@ -708,9 +721,36 @@ const getActions = (
     return actions;
 };
 
-const onSelectChange = (keys: string[]) => {
-    _selectedRowKeys.value = [...keys];
+const onSelectChange = (item: any,state: boolean) => {
+    const arr = new Set(_selectedRowKeys.value);
+    // console.log(item, state);
+    if (state) {
+        arr.add(item.id);
+    } else {
+        arr.delete(item.id);
+    }
+    _selectedRowKeys.value = [...arr.values()];
 };
+
+const selectAll = (selected: Boolean, selectedRows: any,changeRows:any) => {
+    if (selected) {
+            changeRows.map((i: any) => {
+                if (!_selectedRowKeys.value.includes(i.id)) {
+                    _selectedRowKeys.value.push(i.id)
+                }
+            })
+        } else {
+            const arr = changeRows.map((item: any) => item.id)
+            const _ids: string[] = [];
+            _selectedRowKeys.value.map((i: any) => {
+                if (!arr.includes(i)) {
+                    _ids.push(i)
+                }
+            })
+            _selectedRowKeys.value = _ids
+
+        }
+}
 
 const handleClick = (dt: any) => {
     if (isCheck.value) {
@@ -762,12 +802,12 @@ const syncDeviceStatus = () => {
 
 const delSelectedDevice = async () => {
     if (!_selectedRowKeys.value.length) {
-        message.error('请选择设备');
+        onlyMessage('请选择设备', 'error');
         return;
     }
     const resp = await batchDeleteDevice(_selectedRowKeys.value);
     if (resp.status === 200) {
-        message.success('操作成功！');
+        onlyMessage('操作成功！');
         _selectedRowKeys.value = [];
         instanceRef.value?.reload();
     }
@@ -775,12 +815,12 @@ const delSelectedDevice = async () => {
 
 // const activeSelectedDevice = async () => {
 //     if(!_selectedRowKeys.value.length){
-//         message.error('请选择设备')
+//         onlyMessage('请选择设备', 'error')
 //         return
 //     }
 //     const resp = await batchDeployDevice(_selectedRowKeys.value);
 //     if (resp.status === 200) {
-//         message.success('操作成功！');
+//         onlyMessage('操作成功！');
 //         _selectedRowKeys.value = [];
 //         instanceRef.value?.reload();
 //     }
@@ -788,12 +828,12 @@ const delSelectedDevice = async () => {
 
 const disabledSelectedDevice = async () => {
     if (!_selectedRowKeys.value.length) {
-        message.error('请选择设备');
+        onlyMessage('请选择设备', 'error');
         return;
     }
     const resp = await batchUndeployDevice(_selectedRowKeys.value);
     if (resp.status === 200) {
-        message.success('操作成功！');
+        onlyMessage('操作成功！');
         _selectedRowKeys.value = [];
         instanceRef.value?.reload();
     }
@@ -889,15 +929,26 @@ const handleSearch = (_params: any) => {
     // params.value = _params;
     const newParams = (_params?.terms as any[])?.map((item1) => {
         item1.terms = item1.terms.map((item2: any) => {
-            if (
+          if (item2.column === 'id$dim-assets') {
+            if (item2.termType === 'not') {
+              const oldValue = JSON.parse(item2.value)
+              oldValue.not = true
+              item2.value = JSON.stringify(oldValue)
+            }
+            delete item2.termType
+          }
+
+          if (
                 item2.column &&
                 ['classifiedId', 'accessId', 'accessProvider'].includes(
                     item2.column,
                 )
             ) {
+                const oldTermType = item2.termType
+                delete item2.termType
                 return {
                     ...item2,
-                    column: 'productId$product-info',
+                    column: `productId$product-info$${oldTermType}`,
                 };
             }
             return item2;

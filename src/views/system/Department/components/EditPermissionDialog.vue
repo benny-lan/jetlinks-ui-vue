@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import type { dictType, optionsType } from '../typing';
 import { updatePermission_api } from '@/api/system/department';
-import { message } from 'jetlinks-ui-components';
+import { onlyMessage } from '@/utils/comm';
 
 const emits = defineEmits(['confirm', 'update:visible']);
 const props = defineProps<{
@@ -38,6 +38,7 @@ const props = defineProps<{
     parentId: string;
     allPermission: dictType;
     assetType: 'product' | 'device';
+    defaultPermission: string[];
 }>();
 // 弹窗相关
 const loading = ref(false);
@@ -45,16 +46,18 @@ const confirm = () => {
     loading.value = true;
     updatePermission_api(props.assetType, props.parentId, form)
         .then(() => {
-            message.success('操作成功');
+            onlyMessage('操作成功');
             emits('confirm');
             emits('update:visible', false);
         })
         .finally(() => (loading.value = false));
 };
+
 const form = reactive({
     assetIdList: [...props.ids],
-    permission: [...props.permissionList],
+    permission: Array.isArray(props.defaultPermission) && props.defaultPermission?.length ? props.defaultPermission : ['read'],
 });
+
 const options = computed(() => {
     const result: optionsType = [];
     props.allPermission.forEach((item) => {

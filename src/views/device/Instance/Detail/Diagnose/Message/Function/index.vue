@@ -101,10 +101,12 @@
                 <j-col
                     :span="24"
                     v-if="
-                        modelRef.type === 'INVOKE_FUNCTION' && modelRef.function && modelRef.inputs.length
+                        modelRef.type === 'INVOKE_FUNCTION' &&
+                        modelRef.function &&
+                        modelRef.inputs.length
                     "
                 >
-                    <j-form-item
+                    <!-- <j-form-item
                         name="inputs"
                         label="参数列表"
                         :rules="{
@@ -113,7 +115,9 @@
                         }"
                     >
                         <EditTable v-model="modelRef.inputs" />
-                    </j-form-item>
+                    </j-form-item> -->
+                    <div>参数列表</div>
+                    <EditTable ref="inputsRef" v-model="modelRef.inputs" />
                 </j-col>
             </j-row>
         </j-form>
@@ -142,6 +146,8 @@ type Emits = {
 };
 const emit = defineEmits<Emits>();
 
+const inputsRef = ref<any>(null);
+
 const modelRef = reactive({
     type: undefined,
     properties: undefined,
@@ -164,49 +170,47 @@ const funcChange = (val: string) => {
                 id: item.id,
                 name: item.name,
                 value: undefined,
-                valueType: item?.valueType?.type,
+                valueType: item?.valueType,
+                required: item?.expands?.required,
             };
         });
         modelRef.inputs = list;
     }
 };
 
-const saveBtn = () => {
-    formRef.value.validate().then(async () => {
-        const values = toRaw(modelRef);
-        let _inputs: any[] = [];
+const saveBtn = async () => {
+    const _data = await formRef.value?.validate();
+    if (!_data) return;
+    const values = toRaw(modelRef);
+    if (values.type === 'READ_PROPERTY') {
+        await readProperties(instanceStore.current?.id || '', [
+            values.properties,
+        ]);
+    } else if (values.type === 'WRITE_PROPERTY') {
+        await settingProperties(instanceStore.current?.id || '', {
+            [values.properties || '']: values.propertyValue,
+        });
+    } else {
         if (modelRef.inputs.length) {
-            _inputs = modelRef.inputs.filter((i: any) => !i.value);
-            if (_inputs.length) {
+            const _inputs = await inputsRef.value?.onSave();
+            if (!_inputs) {
                 return;
             }
         }
 
-        if (values.type === 'INVOKE_FUNCTION') {
-            const list = (modelRef.inputs || []).filter((it: any) => !!it.value);
-            const obj = {};
-            list.map((it: any) => {
-                obj[it.id] = it.value;
-            });
-            await executeFunctions(
-                instanceStore.current.id || '',
-                values?.function || '',
-                {
-                    ...obj,
-                },
-            );
-        } else {
-            if (values.type === 'READ_PROPERTY') {
-                await readProperties(instanceStore.current?.id || '', [
-                    values.properties,
-                ]);
-            } else {
-                await settingProperties(instanceStore.current?.id || '', {
-                    [values.properties || '']: values.propertyValue,
-                });
-            }
-        }
-    });
+        const list = (modelRef?.inputs || [])?.filter((it: any) => !!it.value);
+        const obj = {};
+        list.map((it: any) => {
+            obj[it.id] = it.value;
+        });
+        await executeFunctions(
+            instanceStore.current.id || '',
+            values?.function || '',
+            {
+                ...obj,
+            },
+        );
+    }
 };
 
 defineExpose({ saveBtn });

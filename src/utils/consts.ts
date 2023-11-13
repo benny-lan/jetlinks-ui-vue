@@ -54,3 +54,10 @@ export const USER_CENTER_MENU_CODE = 'account-center'
 export const USER_CENTER_MENU_BUTTON_CODE = 'user-center-passwd-update'
 export const MESSAGE_SUBSCRIBE_MENU_CODE = 'message-subscribe'
 export const MESSAGE_SUBSCRIBE_MENU_BUTTON_CODE = 'message-subscribe-view'
+
+/**协议列表 */
+export const protocolList = [
+    { label: 'OPC_UA', value: 'OPC_UA', alias: 'opc-ua' },
+    { label: 'MODBUS_TCP', value: 'MODBUS_TCP', alias: 'Modbus/TCP' },
+    { label: 'COLLECTOR_GATEWAY', value: 'COLLECTOR_GATEWAY', alias: 'GATEWAY' },
+]

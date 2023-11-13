@@ -98,7 +98,9 @@ watchEffect(() => {
 });
 
 watchEffect(() => {
-  emit('change', { sendTo: props?.template?.template?.sendTo?.join(' ') });
+    if(props?.template?.template?.sendTo && Array.isArray(props?.template?.template?.sendTo) && props?.template?.template?.sendTo?.length) {
+        emit('change', { sendTo: props?.template?.template?.sendTo?.join(' ') });
+    }
 });
 
 const getType = (item: any) => {

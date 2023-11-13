@@ -3,10 +3,12 @@
     <div class="value-item-warp">
         <j-select
             v-if="typeMap.get(itemType) === 'select'"
+            :getPopupContainer="getPopupContainer"
             v-model:value="myValue"
             :options="options"
             allowClear
             style="width: 100%"
+            :mode="mode"
             @change='selectChange'
         />
         <j-time-picker
@@ -15,6 +17,7 @@
           allowClear
           valueFormat="HH:mm:ss"
           style="width: 100%"
+          :getPopupContainer="getPopupContainer"
           @change='timeChange'
         />
         <j-date-picker
@@ -24,6 +27,7 @@
             showTime
             valueFormat="YYYY-MM-DD HH:mm:ss"
             style="width: 100%"
+            :getPopupContainer="getPopupContainer"
             @change='dateChange'
         />
         <j-input-number
@@ -77,6 +81,7 @@
         />
         <j-input
             v-else
+            :placeholder="placeholder"
             allowClear
             type="text"
             v-model:value="myValue"
@@ -91,6 +96,7 @@
             cancel-text="取消"
             v-model:visible="modalVis"
             width="700px"
+            :getPopupContainer="getPopupContainer"
             @cancel="modalVis = false"
             @ok="handleItemModalSubmit"
             :zIndex='1100'
@@ -139,6 +145,19 @@ const props = defineProps({
         type: Array as PropType<DefaultOptionType[]>,
         default: () => [],
     },
+    // 多选框
+    mode: {
+        type: String as PropType<'multiple' | 'tags' | 'combobox' | ''>,
+        default: ''
+    },
+    placeholder: {
+        type: String,
+        default: () => '',
+    },
+    getPopupContainer: {
+        type: Function,
+        default: undefined
+    }
 });
 // type Props = {
 //     itemData?: Object;

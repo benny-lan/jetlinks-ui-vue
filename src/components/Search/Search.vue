@@ -1,22 +1,21 @@
 <template>
-  <AdvancedSearch
+  <j-advanced-search
     :target='target'
     :type='type'
-    :request='saveSearchHistory'
-    :historyRequest='getSearchHistory'
-    :deleteRequest='deleteSearchHistory'
+    :deleteRequest='(_target: string, id: string) => deleteSearchHistory(target, id)'
+    :historyRequest='() => getSearchHistory(target)'
+    :request='(data) => saveSearchHistory(data, target)'
     :columns='columns'
     :class='props.class'
     style='padding-top: 18px; padding-bottom: 18px;'
     @search='searchSubmit'
   />
-</template> 
+</template>
 
 <script setup lang='ts' name='ProSearch'>
 import { PropType } from 'vue'
 import { JColumnsProps } from 'components/Table/types'
 import { saveSearchHistory, getSearchHistory, deleteSearchHistory } from '@/api/comm'
-import { AdvancedSearch } from 'jetlinks-ui-components'
 
 interface Emit {
   (e: 'search', data: any): void

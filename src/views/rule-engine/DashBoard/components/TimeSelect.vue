@@ -16,6 +16,7 @@
             </j-radio-button>
         </j-radio-group>
         <j-range-picker
+            :show-time="{format:'HH:mm:ss'}"
             format="YYYY-MM-DD HH:mm:ss"
             valueFormat="YYYY-MM-DD HH:mm:ss"
             style="margin-left: 12px"
@@ -86,6 +87,8 @@ const getTimeByType = (type: string) => {
             return dayjs().subtract(29, 'days').valueOf();
         case 'year':
             return dayjs().subtract(365, 'days').valueOf();
+        case 'day':
+          return dayjs().subtract(24, 'hours').valueOf();
         default:
             return dayjs().startOf('day').valueOf();
     }

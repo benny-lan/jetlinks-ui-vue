@@ -31,22 +31,45 @@
                 :height="660"
                 @select='treeSelect'
                 defaultExpandAll
+                :show-icon="true"
+                :showLine="{ showLeafIcon: false }"
             >
                 <template #title="{ name, data }">
                     <Ellipsis class="tree-left-title">
                         {{ name }}
                     </Ellipsis>
+<!--                    <j-tag-->
+<!--                        class="tree-left-tag"-->
+<!--                        v-if="data.id !== '*'"-->
+<!--                        :color="-->
+<!--                          data?.uniformState?.value === 'normal' || data?.state?.value === 'disabled' ?-->
+<!--                          colorMap.get(data?.runningState?.value) :-->
+<!--                          colorMap.get(data?.uniformState?.value)-->
+<!--                        "-->
+<!--                        >{{-->
+<!--                        data?.uniformState?.value === 'normal' || data?.state?.value === 'disabled' ?-->
+<!--                            data?.runningState?.text :-->
+<!--                            data?.uniformState?.text-->
+<!--                      }}</j-tag-->
+<!--                    >-->
                     <j-tag
                         class="tree-left-tag"
                         v-if="data.id !== '*'"
-                        :color="colorMap.get(data?.runningState?.value)"
-                        >{{ data?.runningState?.text }}</j-tag
+                        :color="colorMap.get(data?.uniformState?.value)"
+                    >{{ data?.uniformState?.text }}</j-tag
                     >
                     <j-tag
                         class="tree-left-tag2"
                         v-if="data.id !== '*'"
-                        :color="colorMap.get(data?.state?.value)"
-                        >{{ data?.state?.text }}</j-tag
+                        :color="
+                          data?.state?.value === 'disabled' ? colorMap.get(data?.runningState?.value) :
+                          colorMap.get(data?.state?.value)
+                        "
+                        >
+                      {{
+                       data?.state?.value === 'disabled' ? data?.state?.text : data?.runningState?.text
+                      }}
+                    </j-tag
                     >
                     <span
                         v-if="data.id !== '*'"
@@ -71,6 +94,7 @@
                                         ? '启用'
                                         : '禁用',
                             }"
+                            :disabled="data?.runningState?.value === 'stopped' && data?.state?.value!== 'disabled'"
                             hasPermission="DataCollect/Collector:action"
                             :popConfirm="{
                                 title:
@@ -111,20 +135,19 @@
             </j-tree>
             <j-empty v-else description="暂无数据" />
         </j-spin>
-        <Save v-if="visible" :data="current" @change="saveChange" />
+        <Save v-if="visible" :channelListAll="channelListAll" :data="current" @change="saveChange" />
     </div>
 </template>
 
 <script setup lang="ts" name="TreePage">
 import {
-    queryCollector,
+    queryCollectorTree,
     queryChannelNoPaging,
     update,
     remove,
 } from '@/api/data-collect/collector';
 import Save from './Save/index.vue';
 import { onlyMessage } from '@/utils/comm';
-import { Store } from 'jetlinks-store';
 import _ from 'lodash';
 import { colorMap } from '../data.ts';
 
@@ -144,6 +167,7 @@ const searchValue = ref();
 const visible = ref(false);
 const current = ref({});
 const collectorAll = ref();
+const channelListAll = ref<any[]>([])
 
 const root = [
     {
@@ -190,6 +214,8 @@ const handlUpdate = async (data: any) => {
     });
     if (resp.status === 200) {
         handleSearch(params.value);
+        const _item = collectorAll.value.find((i: any) => i?.id === selectedKeys.value?.[0])
+        emits('change', _item)
         onlyMessage('操作成功', 'success');
     }
 };
@@ -218,20 +244,32 @@ const handleSearch = async (value: any) => {
     } else if (!!searchValue.value) {
         clickSearch = true;
         params.value = { ..._.cloneDeep(defualtParams) };
-        params.value.terms[1] = {
-            terms: [
-                {
-                    column: 'name',
-                    value: `%${searchValue.value}%`,
-                    termType: 'like',
-                },
-            ],
-        };
+        // params.value.terms[1] = {
+        //     terms: [
+        //         {
+        //             column: 'name',
+        //             value: `%${searchValue.value}%`,
+        //             termType: 'like',
+        //         },
+        //     ],
+        // };
+        params.value.terms = [
+            ...(params.value?.terms || []),
+            {
+                terms: [
+                    {
+                        column: 'name',
+                        value: `%${searchValue.value}%`,
+                        termType: 'like',
+                    },
+                ],
+            }
+        ];
     } else {
         !!value && (params.value = value);
     }
     spinning.value = true;
-    const res: any = await queryCollector(params.value);
+    const res: any = await queryCollectorTree(params.value);
     if (res.status === 200) {
         if (clickSearch) {
             defualtDataSource.value = res.result;
@@ -260,8 +298,8 @@ const handleSearch = async (value: any) => {
 };
 const getChannelNoPaging = async () => {
 
-    const res = await queryChannelNoPaging();
-    Store.set('channelListAll', res.result);
+    const res: any = await queryChannelNoPaging();
+    channelListAll.value = res.result;
 };
 
 const treeSelect = (keys: string, e: any) => {

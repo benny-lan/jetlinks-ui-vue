@@ -11,10 +11,12 @@ export const FormState: FormDataType = {
         endpoint: '',
         securityPolicy: 'None',
         securityMode: undefined,
-        certificate: undefined,
+        certId: undefined,
         authType: 'anonymous',
         username: '',
         password: '',
+        deviceId: undefined,
+        deviceName: undefined,
     },
     description: '',
 };
@@ -50,8 +52,18 @@ export const regDomain = new RegExp(
 );
 export const checkEndpoint = (_rule: Rule, value: string): Promise<any> =>
     new Promise(async (resolve, reject) => {
+        if(!value) return resolve('');
         const res: any = await validateField(value);
         return res.result.passed ? resolve('') : reject(res.result.reason);
+    });
+
+export const checkHost = (_rule: Rule, value: string): Promise<any> =>
+    new Promise(async (resolve, reject) => {
+        if(!value) return resolve('');
+        if(!(regIP.test(value) || regIPv6.test(value) || regDomain.test(value))) {
+            return reject('请输入正确格式的Modbus主机IP地址')
+        }
+        return resolve('')
     });
 export const FormValidate = {
     name: [
@@ -65,8 +77,9 @@ export const FormValidate = {
             message: '请输入Modbus主机IP',
         },
         {
-            pattern: regIP || regIPv6 || regDomain,
-            message: '请输入正确格式的Modbus主机IP地址',
+            validator: checkHost,
+            trigger: 'blur',
+            // message: '请输入正确格式的Modbus主机IP地址',
         },
     ],
     port: [
@@ -87,7 +100,7 @@ export const FormValidate = {
         },
         {
             validator: checkEndpoint,
-            // trigger: 'blur',
+            trigger: 'blur',
         },
     ],
 
@@ -103,7 +116,7 @@ export const FormValidate = {
             message: '请选择安全模式',
         },
     ],
-    certificate: [
+    certId: [
         {
             required: true,
             message: '请选择证书',

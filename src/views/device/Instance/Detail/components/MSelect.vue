@@ -1,11 +1,10 @@
 <template>
-    <j-select allowClear v-model:value="_value" @change="onChange" placeholder="请选择" style="width: 100%">
+    <j-select v-model:value="_value" :filter-option="filterOption" allowClear placeholder="请选择" show-search style="width: 100%" @change="onChange">
         <j-select-option
             v-for="item in list"
             :key="item.id"
             :value="item.id"
             :label="item.name"
-            :filter-option="filterOption"
             >{{ item.name }}</j-select-option
         >
     </j-select>

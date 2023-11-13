@@ -49,7 +49,7 @@
                                         <j-form-item
                                             :name="['table', index, 'value']"
                                             :rules="{
-                                                required: true,
+                                                required: record.required,
                                                 message: '该字段为必填字段',
                                             }"
                                             has-feedback
@@ -76,6 +76,7 @@
                             <j-space>
                                 <j-button
                                     type="primary"
+                                    :loading="loading"
                                     @click="handleExecute(func)"
                                 >
                                     执行
@@ -106,15 +107,16 @@
 
 <script setup lang="ts">
 import { ComponentInternalInstance } from 'vue';
-import { message } from 'jetlinks-ui-components';
 import { useInstanceStore } from '@/store/instance';
 import { execute } from '@/api/device/instance';
+import { onlyMessage } from '@/utils/comm';
 
 const instanceStore = useInstanceStore();
 const route = useRoute();
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 
 const activeKey = ref('');
+const loading = ref<boolean>(false);
 // 物模型数据
 const metadata = computed(() => JSON.parse(instanceStore.detail.metadata));
 const columns = ref([
@@ -172,6 +174,7 @@ const newFunctions = computed(() => {
                         ? tableItem['json']?.['properties'][0]
                         : undefined,
                 value: undefined,
+                required: tableItem.expands?.required
             });
         }
 
@@ -194,19 +197,25 @@ const handleExecute = async (func: any) => {
         .then(async () => {
             const obj = {};
             func.table.forEach((item: any) => {
-                if (item.type === 'object') {
+                if (item.type === 'object' && item.value) {
                     obj[item.id] = JSON.parse(item.value);
                 } else {
                     obj[item.id] = item.value;
                 }
             });
+            loading.value = true
             const { success, result } = await execute(
                 route.params.id as string,
                 func.id,
                 obj,
-            );
+            ).catch(() => {
+                loading.value = false
+            })
+            .finally(() => {
+                loading.value = false
+            })
             if (!success) return;
-            message.success('操作成功');
+            onlyMessage('操作成功');
             executeResult.value = result instanceof Array ? result[0] : result;
             proxy?.$forceUpdate();
         })

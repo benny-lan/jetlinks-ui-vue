@@ -1,6 +1,6 @@
 <template>
     <div>
-        <pro-search :columns="columns" target="search" @search="handleSearch" />
+        <pro-search :columns="columns" target="search-system" @search="handleSearch" />
         <j-pro-table
             ref="tableRef"
             model="TABLE"
@@ -189,7 +189,7 @@ const columns = [
         title: '操作',
         key: 'action',
         fixed: 'right',
-        width: 150,
+        width: 60,
         scopedSlots: true,
     },
 ];

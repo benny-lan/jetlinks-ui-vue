@@ -1,6 +1,6 @@
 <template>
     <j-spin :spinning="spinning">
-        <pro-search :columns="columns" target="search" @search="handleSearch" />
+        <pro-search :columns="columns" target="search-point" @search="handleSearch" />
         <FullPage>
             <j-scrollbar height="680">
                 <j-pro-table
@@ -16,12 +16,11 @@
                         selectedRowKeys: _selectedRowKeys,
                         onChange: onSelectChange,
                     }"
-                    @cancelSelect="cancelSelect"
                 >
                     <template #headerTitle>
                         <j-space>
                             <PermissionButton
-                                v-if="data?.provider == 'MODBUS_TCP'"
+                                v-if="['MODBUS_TCP', 'COLLECTOR_GATEWAY'].includes(data?.provider)"
                                 type="primary"
                                 @click="handlAdd"
                                 hasPermission="DataCollect/Collector:add"
@@ -330,6 +329,8 @@ import {
     batchDeletePoint,
     removePoint,
     readPoint,
+    getProviders,
+    getStates
 } from '@/api/data-collect/collector';
 import { onlyMessage } from '@/utils/comm';
 import PointCardBox from './components/PointCardBox/index.vue';
@@ -338,11 +339,12 @@ import BatchUpdate from './components/BatchUpdate/index.vue';
 import SaveModBus from './Save/SaveModBus.vue';
 import SaveOPCUA from './Save/SaveOPCUA.vue';
 import Scan from './Scan/index.vue';
-import { colorMap } from '../data.ts';
+import { colorMap } from '../data';
 import { cloneDeep, isNumber, throttle } from 'lodash-es';
 import { getWebSocket } from '@/utils/websocket';
 import { map } from 'rxjs/operators';
 import dayjs from 'dayjs';
+import { responsiveArray } from 'ant-design-vue/lib/_util/responsiveObserve';
 
 const props = defineProps({
     data: {
@@ -410,16 +412,14 @@ const columns = [
         key: 'provider',
         search: {
             type: 'select',
-            options: [
-                {
-                    label: 'OPC_UA',
-                    value: 'OPC_UA',
-                },
-                {
-                    label: 'MODBUS_TCP',
-                    value: 'MODBUS_TCP',
-                },
-            ],
+            options: async () =>{
+              const resp:any = await getProviders();
+              if(resp.success){
+                return resp.result.map((item: any) => ({ label: item.name, value: item.id }))
+              }else{
+                return []
+              }
+            }
         },
     },
     {
@@ -437,24 +437,16 @@ const columns = [
         key: 'runningState',
         search: {
             type: 'select',
-            options: [
-                {
-                    label: '运行中',
-                    value: 'running',
-                },
-                {
-                    label: '部分错误',
-                    value: 'partialError',
-                },
-                {
-                    label: '错误',
-                    value: 'failed',
-                },
-                {
-                    label: '已停止',
-                    value: 'stopped',
-                },
-            ],
+            options: async() =>{
+                const resq:any = await getStates();
+                if(resq.status === 200){
+                    return resq.result.map((item:any)=>(
+                        {label:item.text,value:item.value}
+                    ))
+                }else{
+                    return []
+                }
+            }
         },
     },
     {
@@ -551,7 +543,7 @@ const getQuantity = (item: Partial<Record<string, any>>) => {
 };
 const getAddress = (item: Partial<Record<string, any>>) => {
     const { address } = item.configuration?.parameter || '';
-    return !!address ? address + '(地址)' : '';
+    return (!!address || address === 0) ? address + '(地址)' : '';
 };
 const getScaleFactor = (item: Partial<Record<string, any>>) => {
     const { scaleFactor } = item.configuration?.codec?.configuration || '';

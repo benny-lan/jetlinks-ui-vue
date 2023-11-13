@@ -179,6 +179,7 @@
                                                 "
                                                 placeholder="请输入端口"
                                                 style="width: 100%"
+                                                :precision="0"
                                             />
                                         </j-col>
                                     </j-row>
@@ -284,6 +285,7 @@
                                                 "
                                                 placeholder="请输入端口"
                                                 style="width: 100%"
+                                                :precision="0"
                                             />
                                         </j-col>
                                     </j-row>
@@ -428,6 +430,10 @@
                                             required: true,
                                             message: '请输入心跳周期',
                                         },
+                                        {
+                                            pattern: /^[1-9]\d*$/,
+                                            message: '请输入1~10000的整数',
+                                        }
                                     ]"
                                 >
                                     <j-input-number
@@ -450,6 +456,10 @@
                                             required: true,
                                             message: '请输入注册间隔',
                                         },
+                                        {
+                                            pattern: /^[1-9]\d*$/,
+                                            message: '请输入1~10000的整数',
+                                        }
                                     ]"
                                 >
                                     <j-input-number
@@ -558,10 +568,9 @@
 </template>
 
 <script setup lang="ts">
-import { getImage } from '@/utils/comm';
-import { message } from 'jetlinks-ui-components';
+import { getImage, onlyMessage } from '@/utils/comm';
 import CascadeApi from '@/api/media/cascade';
-
+import { regIPv6 } from '@/utils/regular'
 const router = useRouter();
 const route = useRoute();
 
@@ -663,8 +672,10 @@ onMounted(() => {
     getDetail();
 });
 
-const regDomain =
-    /[j-zA-Z0-9][-j-zA-Z0-9]{0,62}(\.[j-zA-Z0-9][-j-zA-Z0-9]{0,62})+\.?/;
+const regDomain = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?:\.|$)){4}$/
+    // /[j-zA-Z0-9][-j-zA-Z0-9]{0,62}(\.[j-zA-Z0-9][-j-zA-Z0-9]{0,62})+\.?/;
+
+const ipv6 = new RegExp(/^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$/)
 /**
  * 上级SIP地址 字段验证
  * @param _
@@ -692,11 +703,11 @@ const checkHost = (host: string, port: string | number | undefined) => {
         return Promise.resolve();
     } else if (!host) {
         return Promise.reject(new Error('请输入IP 地址'));
-    } else if (host && !regDomain.test(host)) {
+    } else if (host && !regDomain.test(host) && !regIPv6.test(host)) {
         return Promise.reject(new Error('请输入正确的IP地址'));
     } else if (!port) {
         return Promise.reject(new Error('请输入端口'));
-    } else if ((host && Number(host) < 1) || Number(host) > 65535) {
+    } else if ((port && Number(port) < 1) || Number(port) > 65535) {
         return Promise.reject(new Error('端口请输入1~65535之间的正整数'));
     }
     return Promise.resolve();
@@ -732,8 +743,8 @@ const handleSubmit = () => {
                 id,
                 cascadeName,
                 proxyStream,
-                publicHost,
-                publicPort,
+                // publicHost,
+                // publicPort,
                 ...extraFormData
             } = formData.value;
             const params = {
@@ -743,17 +754,17 @@ const handleSubmit = () => {
                 sipConfigs: [
                     {
                         ...extraFormData,
-                        remotePublic: {
-                            host: publicHost,
-                            port: publicPort,
-                        },
+                        // remotePublic: {
+                        //     host: publicHost,
+                        //     port: publicPort,
+                        // },
                     },
                 ],
             };
             btnLoading.value = true;
             CascadeApi[id ? 'update' : 'save'](params)
                 .then(() => {
-                    message.success('操作成功');
+                    onlyMessage('操作成功');
                     router.back();
                 })
                 .finally(() => {

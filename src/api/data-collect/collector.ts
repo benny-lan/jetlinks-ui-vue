@@ -3,6 +3,9 @@ import server from '@/utils/request';
 export const queryCollector = (data: any) =>
     server.post(`/data-collect/collector/_query/no-paging?paging=false`, data);
 
+export const queryCollectorTree = (data: any) =>
+    server.post(`/data-collect/collector/_detail/no-paging?paging=false`, data);
+
 export const queryChannelNoPaging = () =>
     server.post(`/data-collect/channel/_query/no-paging`, {
         paging: false,
@@ -55,3 +58,9 @@ export const scanOpcUAList = (data: any) =>
             data?.nodeId || ''
         }`,
     );
+
+export const queryTypeList = () => server.get(`/data-collect/opc/data-types`);
+
+export const getProviders = () => server.get('/data-collect/channel/gateway/codec/providers')
+
+export const getStates = () => server.get('/dictionary/running-state/items')

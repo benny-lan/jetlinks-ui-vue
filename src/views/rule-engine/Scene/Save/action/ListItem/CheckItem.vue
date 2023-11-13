@@ -47,7 +47,8 @@ const formTouchOff = () => {
  */
 const checkDeviceDelete = async () => {
   const item = _data.value.branches![props.branchesName].then[props.thenName].actions[props.name].device
-  const proResp = await queryProductList({ terms: [{ terms: [{ column: 'id', termType: 'eq', value: item!.productId }]}]})
+  const proResp = await queryProductList({ terms: [{ column: 'id', termType: 'eq', value: item!.productId }]})
+
   if (proResp.success && (proResp.result as any)?.total === 0 && item && item.productId) { // 产品已删除
     _data.value.branches![props.branchesName].then[props.thenName].actions[props.name].device!.productId = undefined
     formTouchOff()
@@ -56,6 +57,7 @@ const checkDeviceDelete = async () => {
 
   const productDetail = proResp?.result?.data?.[0]
   let metadata = JSON.parse(productDetail?.metadata || '{}')
+
   if (item?.selector === 'fixed') {
     let hasDevice = false
     if (item!.selectorValues) {
@@ -65,7 +67,7 @@ const checkDeviceDelete = async () => {
 
       if (item!.selectorValues!.length === 1 && hasDevice) {
         const deviceDetail = deviceResp?.result?.data?.[0]
-        metadata = JSON.parse(deviceDetail?.metadata || '{}') // 只选中一个设备，以设备物模型为准
+        metadata = JSON.parse(deviceDetail?.deriveMetadata || productDetail?.metadata || '{}') // 只选中一个设备，以设备物模型为准
       }
     }
     if (!hasDevice) { // 某一个设备被删除
@@ -125,7 +127,8 @@ const checkDeviceDelete = async () => {
     if (item!.selectorValues && metadata?.tags?.length) {
       const values = (item!.selectorValues?.[0]?.value as any).map((item: any) => item.column)
       const tagKeys = new Set(values)
-      hasAllTags = metadata?.tags?.every((item: any) => tagKeys.has(item.id))
+      hasAllTags = [...tagKeys.values()].every((_key) => metadata?.tags.some((item: any) => item.id === _key))
+      // hasAllTags = metadata?.tags?.every((item: any) => tagKeys.has(item.id))
     }
     if (!hasAllTags) {
       _data.value.branches![props.branchesName].then[props.thenName].actions[props.name].device!.selectorValues = undefined
@@ -135,9 +138,10 @@ const checkDeviceDelete = async () => {
     }
   }
 
+
   if (item!.message!.messageType === 'READ_PROPERTY') {
     let hasProperties = false
-    if (item!.message!.properties && metadata.properties.length) {
+    if (item!.message!.properties && metadata.properties?.length) {
       const propertiesKey = item!.message!.properties?.[0]
       hasProperties = metadata.properties?.some((item: any) => item.id === propertiesKey)
     }
@@ -149,11 +153,10 @@ const checkDeviceDelete = async () => {
     }
 
   }
-
   if (item!.message!.messageType === 'WRITE_PROPERTY') {
     let hasProperties = false
-    if (item!.message!.properties && metadata.properties.length) {
-      const propertiesKey = Object.keys(item!.message!.properties!)?.[0]
+    const propertiesKey = Object.keys(item!.message!.properties!)?.[0]
+    if (item!.message!.properties && metadata.properties?.length) {
       hasProperties = metadata.properties?.some((item: any) => item.id === propertiesKey)
     }
     if (!hasProperties) {
@@ -162,9 +165,26 @@ const checkDeviceDelete = async () => {
       formTouchOff()
       return
     }
+    // 判断值-内置参数
+    const _value = item!.message!.properties?.[propertiesKey]
+
+    if(_value.source === 'upper') {
+      const _params = {
+        branch: props.thenName,
+        branchGroup: props.branchesName,
+        action: props.name - 1,
+      };
+      const option = (await getBuildInData(_params, _data.value))(_value?.value!, 'id')
+      if(!option) {
+        _data.value.branches![props.branchesName].then[props.thenName].actions[props.name].device!.message!.properties![propertiesKey] = undefined
+        _data.value.branches![props.branchesName].then[props.thenName].actions[props.name].device!.changeData = true
+        formTouchOff()
+        return
+      }
+    }
   }
 
-  if (item!.message!.messageType === 'INVOKE_FUNCTION') {
+  if (item!.message!.messageType === 'INVOKE_FUNCTION' && item!.message!.functionId && metadata.functions) {
     const functionId = item!.message!.functionId
     let hasFunctions = false
     if (functionId && metadata.functions.length) {
@@ -228,10 +248,10 @@ const checkNoticeDelete = async () => {
 
           if (itemType === 'user') { // 微信用户，钉钉用户
             let resp = undefined;
-            if (notifyType === 'dingTalk') {
-              resp = await noticeConfig.queryDingTalkUsers(item!.notifierId);
+            if (['dingTalk', 'weixin'].includes(notifyType)) {
+              resp = notifyType === 'dingTalk' ? await noticeConfig.queryDingTalkUsers(item!.notifierId) : await noticeConfig.queryWechatUsers(item!.notifierId);
             } else {
-              resp = await noticeConfig.queryWechatUsers(item!.notifierId);
+              hasUser = true
             }
 
             if (resp && resp.success) {
@@ -250,10 +270,10 @@ const checkNoticeDelete = async () => {
 
           if (itemType === 'org') { // 组织
             let resp = undefined;
-            if (notifyType === 'dingTalk') {
-              resp = await noticeConfig.dingTalkDept(item!.notifierId)
+            if (['dingTalk', 'weixin'].includes(notifyType)) {
+              resp = notifyType === 'dingTalk' ? await noticeConfig.dingTalkDept(item!.notifierId) : await noticeConfig.weChatDept(item!.notifierId)
             } else {
-              resp = await noticeConfig.weChatDept(item!.notifierId)
+              hasUser = true
             }
 
             if (resp && resp.success) {
@@ -296,7 +316,7 @@ const checkNoticeDelete = async () => {
 }
 
 const check = () => {
-  const _executor = _data.value.branches![props.branchesName].then[props.thenName].actions[props.name]?.executor
+  const _executor = _data.value.branches![props.branchesName].then[props.thenName].actions?.[props.name]?.executor
   if (_executor === 'device' && _data.value.branches![props.branchesName].then[props.thenName].actions[props.name]?.device) { // 设备输出，并且有值
     checkDeviceDelete()
   } else if (_executor === 'notify' && _data.value.branches![props.branchesName].then[props.thenName].actions[props.name]?.notify) {

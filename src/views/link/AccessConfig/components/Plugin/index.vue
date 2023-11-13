@@ -14,6 +14,7 @@
             @search="pluginSearch"
           />
           <PermissionButton
+            v-if='showAddBtn'
             type="primary"
             @click="addPlugin"
             hasPermission="link/plugin:add"
@@ -36,25 +37,25 @@
               <AccessCard
                 @checkedChange="AccessChange"
                 :checked="AccessCurrent"
-                :disabled='paramsId !== ":id"'
+                :disabled='!showAddBtn'
                 :data="{ ...item, type: 'plugin' }"
               >
                 <template #other>
                   <div class='plugin-other'>
                     <div class='plugin-id'>
-                      插件ID：
+                      <div class="plugin-text">插件ID：</div>
                       <div class='other-content'>
-                        <Ellipsis >
+                        <j-ellipsis>
                           {{ item.id }}
-                        </Ellipsis>
+                        </j-ellipsis>
                       </div>
                     </div>
                     <div class='plugin-version'>
-                      版本号：
+                     <div class="plugin-text"> 版本号：</div>
                       <div class='other-content'>
-                        <Ellipsis >
+                        <j-ellipsis>
                           {{ item.version }}
-                        </Ellipsis>
+                        </j-ellipsis>
                       </div>
                     </div>
                   </div>
@@ -90,7 +91,6 @@
                       {
                           max: 64,
                           message: '最多可输入64个字符',
-                          trigger: 'blur',
                       },
                   ]"
                   name='name'
@@ -122,6 +122,7 @@
                     :name='["configuration", item.name]'
                     :label='item.label'
                     :rules='item.rules'
+                    :required='!!item.type?.expands?.required'
                   >
                     <ValueItem v-model:modelValue='formData.configuration[item.name]' :itemType='item.type' />
                   </j-form-item>
@@ -186,6 +187,10 @@ const props = defineProps({
     type: Object,
     default: () => {},
   },
+  bindProduct: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const route = useRoute();
@@ -221,6 +226,10 @@ const queryPlugin = (params = {}) => {
   })
 }
 
+const showAddBtn = computed(() => {
+  return route.query.view === 'false' && !props.bindProduct
+})
+
 const getRules = (item: any) => {
   let typeName = '输入'
   let rules: any[] = []
@@ -229,7 +238,7 @@ const getRules = (item: any) => {
     typeName = '选择'
   }
 
-  if (item.required) {
+  if (item.type?.expands?.required) {
     rules.push(
         {
           required: true,
@@ -273,9 +282,7 @@ const pluginSearch = (val: string) => {
 }
 
 const AccessChange = (id: string) => {
-  if (!props.data.id) {
-    AccessCurrent.value = id;
-  }
+  AccessCurrent.value = id;
 };
 
 const addPlugin = () => {
@@ -327,10 +334,10 @@ const saveData = () => {
       loading.value = true
       const resp =
         paramsId === ':id'
-          ? await save(params)
-          : await update({ ...params, id: paramsId });
+          ? await save(params).catch(() => { success: false})
+          : await update({ ...params, id: paramsId }).catch(() => { success: false});
       loading.value = false
-      if (resp.status === 200) {
+      if (resp.success) {
         onlyMessage('操作成功', 'success');
         history.back();
         if ((window as any).onTabSaveSuccess) {
@@ -413,15 +420,19 @@ queryPlugin()
     color: rgba(0, 0, 0, 0.85);
     opacity: .45;
     display: flex;
+
+    .plugin-text {
+      white-space: nowrap;
+    }
   }
 
   .plugin-id {
     width: 50%;
-    .other-content {
-      display: flex;
-      width: 0;
-      flex-grow: 1;
-    }
+    // .other-content {
+    //   display: flex;
+    //   width: 0;
+    //   flex-grow: 1;
+    // }
   }
 }
 

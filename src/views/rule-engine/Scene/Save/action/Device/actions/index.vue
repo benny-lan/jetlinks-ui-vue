@@ -173,25 +173,31 @@ const propertySelect = (val: any, options?: any) => {
 const functionRules = [
     {
         validator(_: string, value: any) {
-            if (!value?.length && functions.value.length) {
-                return Promise.reject('请输入功能值');
-            } else {
-                const hasValue = value?.find(
-                    (item: { name: string; value: any }) => item.value === undefined,
-                );
-                if (hasValue) {
-                    const functionItem = functions.value?.find(
-                        (item: any) => item.id === hasValue.name,
+            const arr = functions.value.filter((i: any) => {
+                return i?.expands?.required
+            })
+            if(arr.length){
+                if(!value?.length) {
+                    return Promise.reject('请输入功能值');
+                } else {
+                    const hasValue = value?.find(
+                        (item: { name: string; value: any }) => item.value === undefined,
                     );
-                    return Promise.reject(
-                        functionItem?.name
-                            ? `请输入${functionItem.name}值`
-                            : '请输入功能值',
-                    );
+                    if (hasValue) {
+                        const functionItem = arr?.find(
+                            (item: any) => item.id === hasValue.name,
+                        );
+                        return Promise.reject(
+                            functionItem?.name
+                                ? `请输入${functionItem.name}值`
+                                : '请输入功能值',
+                        );
+                    }
                 }
             }
             return Promise.resolve();
         },
+        trigger: ['change', 'blur']
     },
 ];
 
@@ -262,7 +268,8 @@ watch(
     () => props.productDetail,
     (newVal) => {
         if (newVal?.id) {
-            if (props.values?.selector === 'fixed') {
+                console.log(props.values)
+            if (props.values?.selector === 'fixed' && props.values?.selectorValues?.length === 1) {
                 const id = props.values?.selectorValues?.[0]?.value;
                 if (id) {
                     detail(id).then((resp) => {
@@ -270,6 +277,7 @@ watch(
                             metadata.value = JSON.parse(
                                 resp.result?.metadata || '{}',
                             );
+                          console.log(metadata.value, resp.result?.metadata)
                         }
                     });
                 }

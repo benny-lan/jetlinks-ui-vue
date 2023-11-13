@@ -50,6 +50,7 @@
                                     :hasPermission="`link/AccessConfig:${
                                         id === ':id' ? 'add' : 'update'
                                     }`"
+                                    :loading="loading"
                                 >
                                     保存
                                 </PermissionButton>
@@ -104,6 +105,7 @@ const props = defineProps({
     },
 });
 
+const loading = ref(false);
 const channel = ref(props.provider.channel);
 
 const formState = ref<FormState>({
@@ -111,6 +113,7 @@ const formState = ref<FormState>({
     description: '',
 });
 const onFinish = async (values: any) => {
+    loading.value = true
     const params = {
         ...values,
         provider: 'fixed-media',
@@ -124,12 +127,15 @@ const onFinish = async (values: any) => {
 
         if (route.query.save) {
             // @ts-ignore
-            window?.onTabSaveSuccess(resp.result);
-            setTimeout(() => window.close(), 300);
+            if((window as any).onTabSaveSuccess){
+                (window as any).onTabSaveSuccess(resp.result);
+                setTimeout(() => window.close(), 300);
+            }
         } else {
             history.back();
         }
     }
+    loading.value = false
 };
 
 onMounted(() => {

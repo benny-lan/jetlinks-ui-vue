@@ -13,7 +13,6 @@
                       <j-scrollbar>
                         <j-tree
                           v-if="treeData.length !== 0"
-                          show-line
                           defaultExpandAll
                           multiple
                           draggable
@@ -71,17 +70,20 @@ import {
     getMaxDepth,
     mergeArr,
     findAllParentsAndChildren,
-    handleSorts
+    handleSorts,
+    handleSortsArr
 } from './utils';
 import BaseMenu from '@/views/init-home/data/baseMenu';
 import type { AntTreeNodeDropEvent } from 'ant-design-vue/es/tree';
 import { cloneDeep } from 'lodash';
 import { onlyMessage } from '@/utils/comm';
 import {
-    MESSAGE_SUBSCRIBE_MENU_CODE,
     USER_CENTER_MENU_CODE,
+    messageSubscribe
 } from '@/utils/consts';
-
+import { protocolList } from '@/utils/consts';
+import { getProviders } from '@/api/data-collect/channel';
+import { isNoCommunity } from '@/utils/utils';
 const selectedKeys: any = ref([]);
 const treeData = ref<any>([]);
 const systemMenu: any = ref([]);
@@ -111,6 +113,21 @@ const params = {
     ],
 };
 
+/**
+ * 查询支持的协议
+ */
+let filterProtocolList: any[] = [];
+const getProvidersFn = async () => {
+    if(!isNoCommunity){
+        return 
+    }else{
+        const res: any = await getProviders();
+        filterProtocolList = protocolList.filter((item) => {
+        return res.result?.find((val: any) => item.alias == val.id);
+    })
+    }
+}
+getProvidersFn();
 function filterTree(nodes: Array<any>, selectedKeys: Array<any>) {
     const filtered = [];
     for (let i = 0; i < nodes.length; i++) {
@@ -187,8 +204,7 @@ const onDragend = (info: AntTreeNodeDropEvent) => {
 onMounted(() => {
     getSystemPermission_api().then((resp: any) => {
         const filterBaseMenu = BaseMenu.filter(item => ![
-          USER_CENTER_MENU_CODE,
-          MESSAGE_SUBSCRIBE_MENU_CODE,
+          USER_CENTER_MENU_CODE,messageSubscribe
         ].includes(item.code))
         baseMenu.value = filterMenu(
             resp.result.map((item: any) => JSON.parse(item).id),
@@ -199,8 +215,7 @@ onMounted(() => {
                 systemMenu.value = resp.result?.filter(
                     (item: { code: string }) =>
                         ![
-                            USER_CENTER_MENU_CODE,
-                            MESSAGE_SUBSCRIBE_MENU_CODE,
+                            USER_CENTER_MENU_CODE,messageSubscribe
                         ].includes(item.code),
                 );
                 //初始化菜单
@@ -208,16 +223,28 @@ onMounted(() => {
                 const systemMenuData = initData(systemMenu.value);
                 selectedKeys.value = systemMenuData.checkedKeys;
 
-                const AllMenu = mergeArr(
-                    cloneDeep(filterBaseMenu),
+                const AllMenu = filterMenus(mergeArr(
+                    cloneDeep(baseMenu.value),
                     cloneDeep(systemMenu.value),
-                );
-
-                treeData.value = AllMenu;
+                ))
+                console.log(AllMenu);
+                // 处理排序
+                treeData.value = handleSortsArr(AllMenu);
             }
         });
     });
 });
+const filterMenus = (menus: any[]) => {
+    return menus.filter((item) => {
+        if (item.children) {
+            item.children = filterMenus(item.children);
+        }
+        if (!filterProtocolList.length && item.code == 'link/DataCollect') {
+            return false;
+        }
+        return item
+    });
+};
 </script>
 
 <style lang="less" scoped>

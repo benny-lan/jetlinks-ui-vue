@@ -50,24 +50,7 @@
                             >
                                 <template #other>
                                     <div class="other">
-                                        <j-tooltip placement="topLeft">
-                                            <div
-                                                v-if="
-                                                    (item.addresses || [])
-                                                        .length > 1
-                                                "
-                                            >
-                                                <div
-                                                    v-for="i in item.addresses ||
-                                                    []"
-                                                    :key="i.address"
-                                                    class="item"
-                                                >
-                                                    <j-badge
-                                                        :status="getColor(i)"
-                                                    />{{ i.address }}
-                                                </div>
-                                            </div>
+                                        <j-tooltip :title="addressesTip(item.addresses)" placement="top">
                                             <div
                                                 v-for="i in (
                                                     item.addresses || []
@@ -84,7 +67,7 @@
                                                         (item.addresses || [])
                                                             .length > 1
                                                     "
-                                                    >...</span
+                                                    >等{{ item.addresses.length }}条</span
                                                 >
                                             </div>
                                         </j-tooltip>
@@ -117,6 +100,7 @@
                         type="primary"
                         @click="addProcotol"
                         hasPermission="link/Protocol:add"
+                        :disabled="id !== ':id'"
                     >
                         <template #icon><AIcon type="PlusOutlined" /></template>
                         新增
@@ -652,6 +636,14 @@ watch(
         immediate: true,
     },
 );
+
+const addressesTip = (data:any)=>{
+    let tip:any = ''
+    data.forEach((item:any)=>{
+        tip =  tip + " " +item.address
+    })
+    return tip
+}
 </script>
 
 <style lang="less" scoped>

@@ -41,7 +41,7 @@
                                     />
                                 </j-form-item>
                             </j-col>
-                            <j-col :span="24">
+                            <j-col v-if="isNoCommunity" :span="24">
                                 <j-form-item
                                     name="shareCluster"
                                     :rules="Rules.shareCluster"
@@ -66,7 +66,7 @@
                                             )
                                         "
                                     >
-                                        <j-radio-button :value="true"
+                                        <j-radio-button :disabled="formData.type ==='MQTT_CLIENT'" :value="true"
                                             >共享配置</j-radio-button
                                         >
                                         <j-radio-button :value="false"
@@ -112,7 +112,7 @@
                                     collapsible="header"
                                 >
                                     <j-collapse-panel
-                                        :key="cluster.id"
+                                        :key="index + 1"
                                         :show-arrow="!formData.shareCluster"
                                     >
                                         <template #header v-if="!shareCluster">
@@ -209,7 +209,7 @@
                                                             />
                                                         </j-tooltip>
                                                     </template>
-                                                    <j-select
+                                                    <!-- <j-select
                                                         v-model:value="
                                                             cluster
                                                                 .configuration
@@ -237,7 +237,14 @@
                                                             )
                                                         "
                                                     >
-                                                    </j-select>
+                                                    </j-select> -->
+                                                    <LocalAddressSelect
+                                                        v-model:value="cluster.configuration.host"
+                                                        :serverId="cluster.serverId"
+                                                        :shareCluster="shareCluster"
+                                                        @change="(value) => changeHost(cluster.serverId, value, index)"
+                                                        @valueChange="(value) => changeHost(cluster.serverId, value, index, true)"
+                                                    />
                                                 </j-form-item>
                                             </j-col>
                                             <j-col
@@ -277,7 +284,7 @@
                                                                 .configuration
                                                                 .port
                                                         "
-                                                        :options="
+                                                         :options="
                                                             portOptionsIndex[
                                                                 index
                                                             ]
@@ -288,7 +295,18 @@
                                                         :filter-option="
                                                             filterPortOption
                                                         "
-                                                    />
+                                                    >
+                                                      <!-- <j-select-option
+                                                          v-for="i in getPortList( portOptionsIndex[
+                                                                index
+                                                            ], cluster
+                                                                .configuration
+                                                                .port)"
+                                                        :value="i.value"
+                                                      >
+                                                        {{ i.label }}
+                                                      </j-select-option> -->
+                                                    </j-select>
                                                 </j-form-item>
                                             </j-col>
                                             <j-col
@@ -890,6 +908,8 @@
                                                                         .script
                                                                 "
                                                                 language="javascript"
+                                                                :init="editorInit"
+                                                                :registrationTypescript="typescriptTip"
                                                             />
                                                         </div>
                                                     </j-form-item>
@@ -942,7 +962,7 @@
                                                     "
                                                 >
                                                     <j-form-item
-                                                        label="长度"
+                                                        label="字节长度"
                                                         :name="[
                                                             'cluster',
                                                             index,
@@ -1112,6 +1132,9 @@ import {
     supports,
     certificates,
     start,
+    resourceClusters,
+    resourceClustersById,
+    getTs
 } from '@/api/link/type';
 import {
     ParserConfiguration,
@@ -1128,7 +1151,10 @@ import {
 } from '../data';
 import { cloneDeep } from 'lodash-es';
 import type { FormData2Type, FormDataType } from '../type';
-import { Store } from 'jetlinks-store';
+import LocalAddressSelect from './LocalAddressSelect.vue';
+import { isNoCommunity } from '@/utils/utils';
+import { useTypeStore } from '@/store/type';
+import { storeToRefs } from 'pinia';
 
 const route = useRoute();
 const NetworkType = route.query.type as string;
@@ -1140,15 +1166,47 @@ const formRef1 = ref<FormInstance>();
 const formRef2 = ref<FormInstance>();
 const shareCluster = ref(true);
 
+const _typeStore = useTypeStore()
+const { configRef, resourcesClusters } = storeToRefs(_typeStore)
+
 const formData = ref<FormDataType>({
-    ...FormStates
+    ...FormStates,
 });
 const hostOptionsIndex: any = ref([]);
 const clustersListIndex: any = ref([]);
 const typeOptions = ref([]);
 const portOptionsIndex: any = ref([]);
-let portOptionsConst: any = [];
+// let portOptionsConst: any = [];
 const certIdOptions = ref([]);
+const configClustersList = ref<any[]>([]);
+
+const typescriptTip = reactive({
+  typescript: ''
+})
+
+const editorInit = (editor: any, monaco: any) => {
+  monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+    noSemanticValidation: true,
+    noSyntaxValidation: false,
+  });
+
+  // compiler options
+  monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+    allowJs: true,
+    checkJs: true,
+    allowNonTsExtensions: true,
+    target: monaco.languages.typescript.ScriptTarget.ESNext,
+    strictNullChecks: false,
+    strictPropertyInitialization: true,
+    strictFunctionTypes: true,
+    strictBindCallApply: true,
+    useDefineForClassFields: true,//permit class static fields with private name to have initializer
+    moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+    module: monaco.languages.typescript.ModuleKind.CommonJS,
+    typeRoots: ["types"],
+    lib: ["esnext"]
+  });
+}
 
 const dynamicValidateForm = reactive<{ cluster: FormData2Type[] }>({
     cluster: [{ ...cloneDeep(FormStates2), id: '1' }],
@@ -1178,7 +1236,13 @@ const filterPortOption = (input: string, option: any) => {
     return JSON.stringify(option.label).indexOf(input) >= 0;
 };
 
-const filterConfigByType = (data: any, type: string) => {
+// const getPortList = (list: any[], id: string) => {
+//   const keys = dynamicValidateForm?.cluster?.map?.(item => item.configuration?.port) || []
+// //   console.log(dynamicValidateForm?.cluster, id, keys)
+//   return (list || []).filter(item => item.value === id || !keys.includes(item.value) )
+// }
+
+const filterConfigByType = (data: any[], type: string) => {
     let _temp = type;
     if (TCPList.includes(type)) {
         _temp = 'TCP';
@@ -1197,7 +1261,7 @@ const filterConfigByType = (data: any, type: string) => {
     });
 };
 
-const getPortOptions = (portOptions: object, index = 0) => {
+const getPortOptions = (portOptions: any, index = 0) => {
     if (!portOptions) return;
     const type = formData.value.type;
     const host = dynamicValidateForm.cluster[index].configuration.host;
@@ -1221,46 +1285,75 @@ const changeType = (value: string) => {
     if (value !== 'MQTT_CLIENT') {
         const { configuration } = dynamicValidateForm.cluster[0];
         value && (configuration.host = '0.0.0.0');
+    }else if(isNoCommunity){
+        formData.value.shareCluster  = false
+        changeShareCluster(formData.value.shareCluster)
+    }
+    if(value ==='TCP_SERVER'){
+        getTs().then((res:any)=>{
+            if (res.status===200) {
+                typescriptTip.typescript = res.result
+            }
+        })
     }
 };
 
 const updateClustersListIndex = () => {
     const { cluster } = dynamicValidateForm;
     const filters = cluster?.map((item) => item.serverId);
-    const newConfigRef = Store.get('configRef')?.filter(
+    const newConfigRef = shareCluster.value ? (configRef.value || [])?.filter(
         (item: any) => !filters.includes(item.clusterNodeId),
-    );
+    ) : configClustersList.value?.filter(
+        (item: any) => !filters.includes(item.id),
+    )
     cluster.forEach((item, index) => {
-        !item.serverId &&
-            (clustersListIndex.value[index] = newConfigRef?.map((i: any) => ({
-                value: i.clusterNodeId,
-                lable: i.clusterNodeId,
-            })));
+        clustersListIndex.value[index] = newConfigRef?.map((i: any) => {
+            if(shareCluster.value){
+                return {
+                    value: i.clusterNodeId,
+                    label: i.clusterNodeId,
+                }
+            } else {
+                return {
+                    value: i.id,
+                    label: i.name,
+                }
+            }
+        })
+        if(item.serverId) {
+            clustersListIndex.value[index].push({
+                value: item.serverId,
+                label: item.serverId
+            })
+        }
     });
 };
 
-const changeServerId = (value: string | undefined, index: number) => {
+const changeServerId = async (value: string | undefined, index: number) => {
     const { configuration } = dynamicValidateForm.cluster[index];
     configuration.host = undefined;
     configuration.port = undefined;
-    const checked = cloneDeep(portOptionsConst).find(
-        (i: any) => i.clusterNodeId === value,
-    );
-    const checkedHost = [{ value: checked?.host, lable: checked?.host }];
-    hostOptionsIndex.value[index] = checked ? checkedHost : [];
-    updateClustersListIndex();
+    hostOptionsIndex.value[index] = [];
+    if(value){
+        updateClustersListIndex();
+    }
 };
 const changeHost = (
     serverId: string | undefined,
     value: string | undefined,
     index: number,
+    flag?: boolean
 ) => {
-    const { configuration } = dynamicValidateForm.cluster[index];
-    configuration.port = undefined;
-    const checked = cloneDeep(portOptionsConst).find(
-        (i: any) => i.clusterNodeId === serverId && i.host === value,
-    );
-    checked && getPortOptions([checked], index);
+    if(dynamicValidateForm.cluster?.[index]){
+        const { configuration } = dynamicValidateForm.cluster?.[index];
+        if(!flag){
+            configuration.port = undefined;
+        }
+        const checked = resourcesClusters.value?.[serverId || '']
+        if(checked){
+            getPortOptions(checked, index)
+        }
+    }
 };
 
 const changeParserType = (value: string | undefined, index: number) => {
@@ -1344,11 +1437,23 @@ const getCertificates = async () => {
 };
 
 const getResourcesCurrent = () => {
-    resourcesCurrent().then((resp) => {
+    resourcesCurrent().then((resp: any) => {
         if (resp.status === 200) {
-            portOptionsConst = resp.result;
-            Store.set('configRef', resp.result);
-            getPortOptions(portOptionsConst);
+            _typeStore.setConfigRef(resp.result || [])
+
+            const clusterNodeId = resp.result?.[0]?.clusterNodeId
+            const _resourcesClusters = cloneDeep(resourcesClusters.value || {})
+            _resourcesClusters[clusterNodeId] = resp.result
+            _typeStore.setResourcesClusters(_resourcesClusters)
+            getPortOptions(resp.result);
+        }
+    });
+};
+
+const getResourcesClusters = () => {
+    resourceClusters().then((resp) => {
+        if (resp.status === 200) {
+            configClustersList.value = resp.result as any[]
         }
     });
 };
@@ -1368,23 +1473,20 @@ const getDetail = () => {
                         ...cloneDeep(Configuration), //防止编辑时，表单字段不完善，导致输入/选择框新出现时找不到
                         ...configuration,
                     };
-
-                    const configRef = Store.get('configRef').filter(
-                        (item: any) => item.host === '0.0.0.0',
-                    );
-                    getPortOptions(configRef); //更新端口
                 } else {
                     dynamicValidateForm.cluster = cluster;
+                    // const arr = cluster.map((item: any) => item.configuration.serverId)
                     //遍历数据更新对应的本地端口
-                    setTimeout(() => {
-                        cluster.forEach((item: any, index: number) => {
-                            const { host } = item.configuration;
-                            let configRef = Store.get('configRef').filter(
-                                (item: any) => item.host === host,
-                            );
-                            getPortOptions(configRef, index);
-                        });
-                    }, 0);
+                    // setTimeout(() => {
+                    //     cluster.forEach((item: any, index: number) => {
+                    //         const { serverId } = item.configuration
+                    //         if(!resourcesClustersMap.get(serverId)){
+                    //             // await getResourcesClustersById(serverId)
+                    //         }
+                    //         const checked = resourcesClustersMap.get(serverId)
+                    //         getPortOptions(checked, index);
+                    //     });
+                    // }, 0);
                 }
 
                 if (dynamicValidateForm.cluster.length === 1) {
@@ -1400,6 +1502,9 @@ onMounted(() => {
     getSupports();
     getCertificates();
     getResourcesCurrent();
+    if(isNoCommunity){
+        getResourcesClusters();
+    }
     getDetail();
 });
 
@@ -1420,7 +1525,7 @@ watch(
     (value) => {
         formData.value.shareCluster = value;
         value
-            ? getPortOptions(Store.get('configRef'))
+            ? getPortOptions(configRef.value)
             : (portOptionsIndex.value[0] = []);
         updateClustersListIndex();
     },
@@ -1439,14 +1544,12 @@ watch(
     (value) => {
         if (value) {
             const { cluster } = dynamicValidateForm;
-          console.log('NetworkType',value)
             formData.value.type = value;
             cluster[0].configuration.host = '0.0.0.0';
         }
     },
     { deep: true, immediate: true },
 );
-
 </script>
 
 <style lang="less" scoped>

@@ -1,10 +1,5 @@
 <template>
   <ConfigProvider :locale='zhCN'>
-<!--    <router-view v-slot="{ Component }">-->
-<!--      <keep-alive>-->
-<!--        <component :is="Component" />-->
-<!--      </keep-alive>-->
-<!--    </router-view>-->
     <router-view />
   </ConfigProvider>
 </template>
@@ -19,13 +14,12 @@ import DefaultSetting from '../config/config'
 const system = useSystem();
 const {configInfo} = storeToRefs(system);
 
-watchEffect(() => {
-  const ico: any = document.querySelector('link[rel="icon"]');
-  if(ico !== null){
-    ico.href = configInfo.value?.front?.ico || DefaultSetting?.logo
+system.setDocumentTitle()
+ConfigProvider.config({
+  theme: {
+    primaryColor: "#315efb"
   }
 })
-
 </script>
 
 <style scoped>

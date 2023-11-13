@@ -6,16 +6,21 @@
             @search="(params:any)=>queryParams = {...params}"
             style='margin-bottom: 0;'
         />
-        <FullPage>
+        <FullPage :extraHeight="24">
             <j-pro-table
                 ref="tableRef"
                 :request="table.requestFun"
                 :gridColumn="2"
-                :params="queryParams"
                 :rowSelection="{
                     selectedRowKeys: tableData._selectedRowKeys,
-                    onChange:(keys:string[])=>tableData._selectedRowKeys = [...keys],
+                    onSelect: table.onSelect,
+                    onSelectAll: table.onSelectAll,
                     onSelectNone: table.cancelSelect
+                }"
+                :params="queryParams"
+                :scroll="{
+                    x:true,
+                    y:610,
                 }"
                 :columns="columns"
             >
@@ -88,25 +93,25 @@
                         </template>
                         <template #content>
                             <h3 class="card-item-content-title" style='margin-bottom: 18px;'>
-                              <Ellipsis style="width: calc(100% - 100px);"
-                              >
                                 {{ slotProps.name }}
-                              </Ellipsis>
                             </h3>
                             <j-row>
                                 <j-col :span="12">
                                     <div class="card-item-content-text">ID</div>
+                                    <Ellipsis style="width: calc(100% - 20px);">
                                     <div
                                         style="cursor: pointer"
                                         class="card-item-content-value"
                                     >
                                         {{ slotProps.id }}
                                     </div>
+                                    </Ellipsis>
                                 </j-col>
                                 <j-col :span="12">
                                     <div class="card-item-content-text">
                                         资产权限
                                     </div>
+                                    <Ellipsis style="width: calc(100% - 20px);">
                                     <div
                                         style="cursor: pointer"
                                         class="card-item-content-value"
@@ -118,6 +123,7 @@
                                             )
                                         }}
                                     </div>
+                                    </Ellipsis>
                                 </j-col>
                             </j-row>
                         </template>
@@ -191,6 +197,7 @@
                             v-for="i in table.getActions(slotProps, 'table')"
                             :hasPermission="i.permission"
                             type="link"
+                            :key="i.key"
                             :tooltip="i?.tooltip"
                             :pop-confirm="i.popConfirm"
                             @click="i.onClick"
@@ -212,6 +219,7 @@
                 :all-permission="tableData.permissionList"
                 asset-type="product"
                 @confirm="table.addConfirm"
+                @next="nextAction"
             />
             <EditPermissionDialog
                 v-if="dialogs.editShow"
@@ -221,12 +229,13 @@
                 :parent-id="parentId"
                 :all-permission="tableData.permissionList"
                 asset-type="product"
+                :defaultPermission="tableData.defaultPermission"
                 @confirm="table.refresh"
             />
             <NextDialog
                 v-if="dialogs.nextShow"
                 v-model:visible="dialogs.nextShow"
-                @confirm="emits('openDeviceBind')"
+                @confirm="nextConfirm"
             />
         </div>
     </div>
@@ -238,20 +247,19 @@ import PermissionButton from '@/components/PermissionButton/index.vue';
 import AddDeviceOrProductDialog from '../components/AddDeviceOrProductDialog.vue';
 import EditPermissionDialog from '../components/EditPermissionDialog.vue';
 import NextDialog from '../components/NextDialog.vue';
-import { getImage } from '@/utils/comm';
+import { getImage, onlyMessage } from '@/utils/comm';
 import {
     getDeviceOrProductList_api,
     getPermission_api,
     getPermissionDict_api,
     unBindDeviceOrProduct_api,
+    getBindingsPermission,
 } from '@/api/system/department';
 import { intersection } from 'lodash-es';
-
-import type { dictType } from '../typing.d.ts';
-import { message } from 'jetlinks-ui-components';
-
+import { useDepartmentStore } from '@/store/department';
 const permission = 'system/Department';
 
+const departmentStore = useDepartmentStore();
 const emits = defineEmits(['openDeviceBind']);
 const props = defineProps<{
     parentId: string;
@@ -296,7 +304,7 @@ const columns = [
         dataIndex: 'state',
         key: 'state',
         ellipsis: true,
-        width: '80px',
+        width: 80,
         search: {
             type: 'select',
             options: [
@@ -318,6 +326,7 @@ const columns = [
         dataIndex: 'action',
         key: 'action',
         fixed: 'right',
+        width: 100,
         scopedSlots: true,
     },
 ];
@@ -328,6 +337,7 @@ const tableData = reactive({
     _selectedRowKeys: [] as string[],
     selectedRows: [] as any[],
     permissionList: [] as any[],
+    defaultPermission: [] as string[]
 });
 const table = {
     init: () => {
@@ -384,22 +394,58 @@ const table = {
     },
     // 选中
     onSelectChange: (row: any) => {
-        const selectedRowKeys = tableData._selectedRowKeys;
-        const index = selectedRowKeys.indexOf(row.id);
+        const index = tableData._selectedRowKeys.indexOf(row.id);
 
         if (index === -1) {
-            selectedRowKeys.push(row.id);
+            tableData._selectedRowKeys.push(row.id);
             tableData.selectedRows.push(row);
         } else {
-            selectedRowKeys.splice(index, 1);
+            tableData._selectedRowKeys.splice(index, 1);
             tableData.selectedRows.splice(index, 1);
         }
     },
     // 取消全选
     cancelSelect: () => {
-        console.log(1111);
+        // console.log(1111);
         tableData._selectedRowKeys = [];
         tableData.selectedRows = [];
+    },
+    onSelect: (record: any, selected: boolean) => {
+        const arr = [...tableData._selectedRowKeys]
+        const _index = arr.findIndex(item => item === record?.id)
+        if (selected) {
+            if (!(_index > -1)) {
+                tableData._selectedRowKeys.push(record.id)
+                tableData.selectedRows.push(record)
+            }
+        } else {
+            if (_index > -1) { // 去掉数据
+                tableData._selectedRowKeys.splice(_index, 1)
+                tableData.selectedRows.splice(_index, 1)
+            }
+        }
+    },
+    onSelectAll: (selected: boolean, _: any[], changeRows: any) => {
+        if (selected) {
+            changeRows.map((i: any) => {
+                if (!tableData._selectedRowKeys.includes(i.id)) {
+                    tableData._selectedRowKeys.push(i.id)
+                    tableData.selectedRows.push(i)
+                }
+            })
+        } else {
+            const arr = changeRows.map((item: any) => item.id)
+            const _arr: string[] = [];
+            const _ids: string[] = [];
+            [...tableData.selectedRows].map((i: any) => {
+                if (!arr.includes(i?.id)) {
+                    _arr.push(i)
+                    _ids.push(i.id)
+                }
+            })
+            tableData._selectedRowKeys = _ids
+            tableData.selectedRows = _arr
+        }
     },
     // 获取并整理数据
     getData: (params: object, parentId: string) =>
@@ -495,30 +541,30 @@ const table = {
             };
         }
     },
-    clickEdit: (row?: any) => {
+    queryPermissionList: async (ids: string[]) => {
+        const resp: any = await getBindingsPermission('product', ids)
+        if(resp.status === 200){
+            const arr = resp.result.map((item: any) => {
+                return item?.permissionInfoList?.map((i: any) => i?.id)
+            })
+            return intersection(...arr)
+        }
+        return []
+    },
+    clickEdit: async (row?: any) => {
         const ids = row ? [row.id] : [...tableData._selectedRowKeys];
-        if (ids.length < 1) return message.warning('请勾选需要编辑的数据');
-
-        if (row || tableData.selectedRows.length === 1) {
-            const permissionList =
-                row?.permission || tableData.selectedRows[0].permission;
-            dialogs.selectIds = ids;
-            dialogs.permissList = permissionList;
-            dialogs.editShow = true;
-            return;
-        } else if (tableData.selectedRows.length === 0) return;
-        const permissionList = tableData.selectedRows.map(
+        if (ids.length < 1) return onlyMessage('请勾选需要编辑的数据', 'warning');
+        tableData.defaultPermission = row ? row?.permission : intersection(...tableData.selectedRows.map(
             (item) => item.permission,
-        );
-        const mixPermissionList = intersection(...permissionList) as string[];
-
+        )) as string[]
+        const _result = await table.queryPermissionList(ids)
         dialogs.selectIds = ids;
-        dialogs.permissList = mixPermissionList;
+        dialogs.permissList = _result as string[];
         dialogs.editShow = true;
     },
     clickUnBind: (row?: any) => {
         const ids = row ? [row.id] : [...tableData._selectedRowKeys];
-        if (ids.length < 1) return message.warning('请勾选需要解绑的数据');
+        if (ids.length < 1) return onlyMessage('请勾选需要解绑的数据', 'warning');
         const params = [
             {
                 targetType: 'org',
@@ -529,13 +575,14 @@ const table = {
         ];
         unBindDeviceOrProduct_api('product', params).then(() => {
             tableData._selectedRowKeys = [];
-            message.success('操作成功');
+            onlyMessage('操作成功');
             table.refresh();
         });
     },
     refresh: () => {
         nextTick(() => {
             tableRef.value.reload();
+            table.cancelSelect()
         });
     },
     addConfirm: () => {
@@ -568,10 +615,20 @@ watch(
         if (!val) tableData.selectedRows = [];
     },
 );
+let Temporary:any = '';
+
+const nextAction = (data:any) =>{
+    Temporary = data
+}
+const nextConfirm = () =>{
+    departmentStore.setProductId(Temporary);
+    emits('openDeviceBind')
+}
 </script>
 
 <style lang="less" scoped>
 .product-container {
+    :deep(.ant-table td) { white-space: nowrap; }
     :deep(.ant-table-tbody) {
         .ant-table-cell {
             .ant-space-item {

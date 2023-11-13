@@ -93,6 +93,17 @@
                 />
             </j-form-item>
             <j-form-item
+                v-if="formData.provider === 'COLLECTOR_GATEWAY'"
+                :name="['configuration','deviceId']"
+                :rules="[{ required: true, message: '请选择网关设备'}]"
+                label="选择网关设备"
+            >
+              <GateWayFormItem
+                  v-model:name="formData.configuration.deviceName"
+                  v-model:value="formData.configuration.deviceId"
+              />
+            </j-form-item>
+            <j-form-item
                 v-if="formData.provider === 'OPC_UA'"
                 label="安全模式"
                 :name="['configuration', 'securityMode']"
@@ -111,12 +122,12 @@
             <j-form-item
                 v-if="isSecurityMode"
                 label="证书"
-                :name="['configuration', 'certificate']"
-                :rules="FormValidate.certificate"
+                :name="['configuration', 'certId']"
+                :rules="FormValidate.certId"
             >
                 <j-select
                     style="width: 100%"
-                    v-model:value="formData.configuration.certificate"
+                    v-model:value="formData.configuration.certId"
                     :options="certificateList"
                     placeholder="请选择证书"
                     allowClear
@@ -197,6 +208,8 @@ import { FormValidate, FormState } from '../data';
 import type { FormInstance } from 'ant-design-vue';
 import type { FormDataType } from '../type.d';
 import { cloneDeep, isArray } from 'lodash-es';
+import { protocolList } from '@/utils/consts';
+import GateWayFormItem from "@/views/DataCollect/Channel/Save/GateWayFormItem.vue";
 
 const props = defineProps({
     data: {
@@ -221,7 +234,15 @@ const Options = ref({
 const formData = ref<FormDataType>(cloneDeep(FormState));
 
 const handleOk = async () => {
-    const params = await formRef.value?.validate();
+    const params: any = await formRef.value?.validate();
+    if (params?.provider === 'COLLECTOR_GATEWAY') {
+      params.configuration.deviceName = formData.value.configuration.deviceName
+    }
+
+    params.circuitBreaker = {
+      type: 'Ignore'
+    }
+
     loading.value = true;
     const response = !id
         ? await save(params).catch(() => {})
@@ -281,20 +302,16 @@ const getCertificateList = async () => {
 const getProvidersList = async () => {
     const resp: any = await getProviders();
     if (resp.status === 200) {
-        const list = [
-            { label: 'OPC UA', value: 'OPC_UA' },
-            { label: 'Modbus TCP', value: 'MODBUS_TCP' },
-        ];
         const arr = resp.result
             .filter(
-                (item: any) => item.id === 'modbus-tcp' || item.id === 'opc-ua',
+                (item: any) =>  ['GATEWAY', 'Modbus/TCP', 'opc-ua'].includes(item.name),
             )
-            .map((it: any) => (it?.id === 'opc-ua' ? 'OPC_UA' : 'MODBUS_TCP'));
-        const providers: any = list.filter((item: any) =>
-            arr.includes(item.value),
+            .map((it: any) => it.name);
+        const providers: any = protocolList.filter((item: any) =>
+            arr.includes(item.alias),
         );
         providersList.value = providers;
-        if (arr.includes('OPC_UA')) {
+        if (arr.includes('opc-ua')) {
             getOptionsList();
         }
     }
@@ -305,7 +322,9 @@ getCertificateList();
 watch(
     () => props.data,
     (value) => {
-        if (value.id) formData.value = value as FormDataType;
+        if (value.id) {
+          formData.value = value as FormDataType;
+        }
     },
     { immediate: true, deep: true },
 );

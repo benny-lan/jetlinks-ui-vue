@@ -37,9 +37,9 @@
 
 <script setup lang="ts">
 import { FormInstance } from 'ant-design-vue';
-import { message } from 'jetlinks-ui-components';
 import { saveRole_api } from '@/api/system/role';
 import { useMenuStore } from '@/store/menu';
+import { onlyMessage } from '@/utils/comm';
 const route = useRoute();
 const { jumpPage } = useMenuStore();
 
@@ -59,13 +59,15 @@ const confirm = () => {
         .then(() => saveRole_api(form.value))
         .then((resp) => {
             if (resp.status === 200) {
-                message.success('操作成功');
+                onlyMessage('操作成功');
                 emits('update:visible', false);
 
                 if (route.query.save) {
                     // @ts-ignore
-                    window?.onTabSaveSuccess(resp.result.id);
-                    setTimeout(() => window.close(), 300);
+                    if((window as any).onTabSaveSuccess){
+                        (window as any).onTabSaveSuccess(resp.result.id);
+                        setTimeout(() => window.close(), 300);
+                    }
                 } else jumpPage(`system/Role/Detail`, { id: resp.result.id });
             }
         })

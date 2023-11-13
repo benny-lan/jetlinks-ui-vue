@@ -147,17 +147,21 @@
                                             message: '请输入IP地址',
                                         },
                                         {
-                                            pattern:
-                                                /^([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])$/,
-                                            message: '请输入正确的IP地址',
+                                            validator:validateUrl,
+                                            trigger: 'change',
                                         },
+
                                     ]"
+                                    :validateFirst="true"
                                 >
                                     <j-input
                                         style="width: 105%"
                                         v-model:value="
                                             formState.hostPort.publicHost
                                         "
+                                        :max="65535"
+                                        :min="1"
+                                        :precision="0"
                                         placeholder="请输入IP地址"
                                     />
                                 </j-form-item>
@@ -165,12 +169,8 @@
                             <j-col :span="6">
                                 <j-form-item
                                     :name="['hostPort', 'publicPort']"
-                                    :rules="[
-                                        {
-                                            required: true,
-                                            message: '输入端口',
-                                        },
-                                    ]"
+                                    :rules="rules.publicPort"
+                                    :validateFirst="true"
                                 >
                                     <div class="form-label"></div>
 
@@ -182,6 +182,7 @@
                                         "
                                         :min="1"
                                         :max="65535"
+                                        :precision="0"
                                     />
                                 </j-form-item>
                             </j-col>
@@ -235,7 +236,6 @@
                                                     v-model:value="
                                                         cluster.clusterNodeId
                                                     "
-                                                    :options="clustersList"
                                                     placeholder="请选择节点名称"
                                                     allowClear
                                                     show-search
@@ -243,6 +243,9 @@
                                                         filterOption
                                                     "
                                                 >
+                                                  <j-select-option v-for="i in getClusterNodeIds(cluster.clusterNodeId)" :value="i.value">
+                                                      {{ i.label}}
+                                                  </j-select-option>
                                                 </j-select>
                                             </j-form-item>
                                         </j-col>
@@ -306,16 +309,20 @@
                                                 <div class="form-label"></div>
                                                 <j-select
                                                     v-model:value="cluster.port"
-                                                    :options="
-                                                        sipListIndex[index]
-                                                    "
                                                     placeholder="请选择端口"
                                                     allowClear
                                                     show-search
                                                     :filter-option="
                                                         filterOption
                                                     "
-                                                />
+                                                >
+                                                  <j-select-option
+                                                      v-for="i in getSipListOption(sipListIndex[index], cluster.port)"
+                                                    :value="i.value"
+                                                  >
+                                                    {{ i.label }}
+                                                  </j-select-option>
+                                                </j-select>
                                             </j-form-item>
                                         </j-col>
                                         <j-col :span="4">
@@ -332,12 +339,11 @@
                                                             '请输入公网 Host',
                                                     },
                                                     {
-                                                        pattern:
-                                                            /^([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])$/,
-                                                        message:
-                                                            '请输入正确的IP地址',
+                                                        validator:validateUrl,
+                                                        trigger: 'change',
                                                     },
                                                 ]"
+                                                :validateFirst="true"
                                             >
                                                 <template #label>
                                                     公网 Host
@@ -386,6 +392,7 @@
                                                     "
                                                     :min="1"
                                                     :max="65535"
+                                                    :precision="0"
                                                 />
                                             </j-form-item>
                                         </j-col>
@@ -447,23 +454,26 @@
                             </div>
                         </j-col>
                         <j-col :span="12">
-                            <div class="doc" style="height: 400px">
-                                <h1>接入方式</h1>
-                                <p>
-                                    {{ provider.name }}
-                                </p>
-                                <p>
-                                    {{ provider.description }}
-                                </p>
-                                <h1>消息协议</h1>
-                                <p>
-                                    {{
-                                        provider?.id === 'fixed-media'
-                                            ? 'URL'
-                                            : 'SIP'
-                                    }}
-                                </p>
-                            </div>
+                          <div style="height: 400px">
+                            <title-component data="配置概览" />
+                            <j-descriptions :column="1" :labelStyle="{ width: '80px'}">
+                              <j-descriptions-item label="接入方式">{{ provider.name }}</j-descriptions-item>
+                              <j-descriptions-item>
+                                <span style="color: #a3a3a3">{{ provider.description }}</span>
+                              </j-descriptions-item>
+                              <j-descriptions-item label="SIP 域">{{ formState.domain }}</j-descriptions-item>
+                              <j-descriptions-item label="SIP ID">{{ formState.sipId }}</j-descriptions-item>
+                              <j-descriptions-item>
+                                <!--               共享配置                 -->
+                                <template v-if="formState.shareCluster">
+                                  <a-badge :text="`${formState.hostPort.publicHost}:${formState.hostPort.publicPort}`" status="processing" />
+                                </template>
+                                <template v-else>
+                                  <a-badge v-for="i in dynamicValidateForm.cluster" :text="`${i.publicHost}:${i.publicPort}`" status="processing" />
+                                </template>
+                              </j-descriptions-item>
+                            </j-descriptions>
+                          </div>
                         </j-col>
                     </j-row>
                 </div>
@@ -501,7 +511,8 @@ import { getResourcesCurrent, getClusters } from '@/api/link/accessConfig';
 import { update, save } from '@/api/link/accessConfig';
 import { onlyMessage } from '@/utils/comm';
 import { isNumber } from 'lodash-es';
-
+import type { Rule } from 'ant-design-vue/es/form';
+import { testIpv4_6 } from '@/utils/validate';
 interface Form2 {
     clusterNodeId: string | undefined;
     port: string | undefined;
@@ -576,6 +587,25 @@ const dynamicValidateForm = reactive<{ cluster: Form2[] }>({
     cluster: [],
 });
 
+const rules = {
+  publicPort: [
+    {
+      required: true,
+      message: '输入端口',
+    }
+  ]
+}
+
+const  validateUrl=async (_rule: Rule, value: string) => {
+    if (!value) {
+        return Promise.reject('请输入IP地址');
+    } else {
+        if (!testIpv4_6(value)) {
+            return Promise.reject('请输入正确的IP地址');
+        }
+        return Promise.resolve();
+    }
+}
 const removeCluster = (item: Form2) => {
     let index = dynamicValidateForm.cluster.indexOf(item);
     if (index !== -1) {
@@ -654,8 +684,10 @@ const saveData = () => {
             onlyMessage('操作成功', 'success');
             if (route.query.save) {
                 // @ts-ignore
-                window?.onTabSaveSuccess(resp);
+               if((window as any).onTabSaveSuccess){
+                (window as any).onTabSaveSuccess(resp);
                 setTimeout(() => window.close(), 300);
+               }
             } else {
                 history.back();
             }
@@ -664,8 +696,9 @@ const saveData = () => {
 };
 
 const next = async () => {
+
     let data1: any = await formRef1.value?.validate();
-    if (!isNumber(data1.hostPort.port)) {
+    if (data1.hostPort?.port && !isNumber(data1.hostPort.port) && data1.shareCluster) {
         data1.hostPort.port = JSON.parse(data1.hostPort.port).port;
     }
     if (!data1?.shareCluster) {
@@ -717,6 +750,16 @@ const develop = () => {
         });
     }
 };
+
+const getClusterNodeIds = (id?: string) => {
+  const keys = dynamicValidateForm?.cluster?.map?.(item => item.clusterNodeId) || []
+  return clustersList.value.filter(item => item.value === id || !keys.includes(item.value) )
+}
+
+const getSipListOption = (list: any[], id: string) => {
+  const keys = dynamicValidateForm?.cluster?.map?.(item => item.port) || []
+  return (list || []).filter(item => item.value === id || !keys.includes(item.value) )
+}
 
 onMounted(() => {
     getResourcesCurrent().then((resp) => {

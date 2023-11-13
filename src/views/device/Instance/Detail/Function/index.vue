@@ -1,6 +1,6 @@
 <template>
     <j-empty
-        v-if="!metadata || (metadata && !metadata.functions.length)"
+        v-if="!metadata || (metadata && !metadata.functions?.length)"
         style="margin-top: 50px"
     >
         <template #description>
@@ -29,7 +29,7 @@ const menuStory = useMenuStore();
 const instanceStore = useInstanceStore();
 // const emits = defineEmits(['onJump']);
 
-const metadata = computed(() => JSON.parse(instanceStore.detail.metadata));
+const metadata = computed(() => JSON.parse(instanceStore.detail?.metadata || '{}'));
 
 const activeKey = ref('Simple');
 const tabs = {

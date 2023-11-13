@@ -1,125 +1,79 @@
 <template>
-    <SaveChild
-        v-if="childVisible"
-        @close-child-save="closeChildSave"
-        :childData="_current"
-    />
+    <SaveChild v-if="childVisible" :childData="_current" @close-child-save="closeChildSave" />
     <div v-else>
-        <pro-search
-            :columns="columns"
-            target="child-device"
-            @search="handleSearch"
-            class="device-child-device-search"
-        />
+        <pro-search :columns="columns" class="device-child-device-search" target="child-device" @search="handleSearch" />
         <!-- <j-divider /> -->
-        <JProTable
-            ref="childDeviceRef"
-            :columns="columns"
-            :request="query"
-            :bodyStyle="{
-                padding: 0
-            }"
-            :defaultParams="{
-                terms: [
-                    {
-                        column: 'parentId',
-                        value: detail?.id || '',
-                        termType: 'eq',
-                    },
-                ],
-            }"
-            :rowSelection="{
-                selectedRowKeys: _selectedRowKeys,
-                onChange: onSelectChange,
-            }"
-            @cancelSelect="cancelSelect"
-            :params="params"
-            :model="'TABLE'"
-        >
+        <JProTable ref="childDeviceRef" :bodyStyle="{
+            padding: 0
+        }" :columns="columns" :defaultParams="{
+    terms: [
+        {
+            column: 'parentId',
+            value: detail?.id || '',
+            termType: 'eq',
+        },
+    ],
+}" :model="'TABLE'" :params="params" :request="query" :rowSelection="{
+    selectedRowKeys: _selectedRowKeys,
+    onChange: onSelectChange,
+}">
             <template #rightExtraRender>
                 <j-space>
-                    <PermissionButton
-                        type="primary"
-                        v-if="
-                            detail?.accessProvider === 'official-edge-gateway'
-                        "
-                        hasPermission="device/Instance:update"
-                        @click="
-                            _current = {};
-                            childVisible = true;
-                        "
-                        >新增并绑定</PermissionButton
-                    >
-                    <PermissionButton
-                        type="primary"
-                        @click="visible = true"
-                        hasPermission="device/Instance:update"
-                    >
-                        绑定</PermissionButton
-                    >
-                    <PermissionButton
-                        type="primary"
-                        hasPermission="device/Instance:update"
-                        :popConfirm="{
-                            title: '确定解绑吗？',
-                            onConfirm: handleUnBind,
-                        }"
-                        >批量解除</PermissionButton
-                    >
+                    <PermissionButton v-if="detail?.accessProvider === 'official-edge-gateway'
+                        " hasPermission="device/Instance:update" type="primary" @click="
+        _current = {};
+    childVisible = true;
+    ">新增并绑定</PermissionButton>
+                    <PermissionButton hasPermission="device/Instance:update" type="primary" @click="visible = true">
+                        绑定</PermissionButton>
+                    <PermissionButton :popConfirm="{
+                        title: '确定解绑吗？',
+                        onConfirm: handleUnBind,
+                    }" hasPermission="device/Instance:update" type="primary">批量解除</PermissionButton>
                 </j-space>
             </template>
             <template #registryTime="slotProps">
                 {{
                     slotProps.registryTime
-                        ? moment(slotProps.registryTime).format(
-                              'YYYY-MM-DD HH:mm:ss',
-                          )
-                        : ''
+                    ? moment(slotProps.registryTime).format(
+                        'YYYY-MM-DD HH:mm:ss',
+                    )
+                    : ''
                 }}
             </template>
             <template #state="slotProps">
-                <j-badge
-                    :text="slotProps.state.text"
-                    :status="statusMap.get(slotProps.state.value)"
-                />
+                <j-badge :status="statusMap.get(slotProps.state.value)" :text="slotProps.state.text" />
             </template>
             <template #action="slotProps">
                 <j-space :size="16">
-                    <template
-                        v-for="i in getActions(slotProps, 'table')"
-                        :key="i.key"
-                    >
-                        <PermissionButton
-                            :disabled="i.disabled"
-                            :popConfirm="i.popConfirm"
-                            :tooltip="{
+                    <template v-for="i in getActions(slotProps, 'table')" :key="i.key">
+                        <PermissionButton v-if="i.key !== 'update' || detail.accessProvider === 'official-edge-gateway'"
+                            :disabled="i.disabled" :hasPermission="'device/Instance:' + i.key" :popConfirm="i.popConfirm" :tooltip="{
                                 ...i.tooltip,
-                            }"
-                            @click="i.onClick"
-                            type="link"
-                            style="padding: 0px"
-                            :hasPermission="'device/Instance:' + i.key"
-                        >
-                            <template #icon><AIcon :type="i.icon" /></template>
+                            }" style="padding: 0px" type="link"
+                            @click="i.onClick">
+                            <template #icon>
+                                <AIcon :type="i.icon" />
+                            </template>
                         </PermissionButton>
                     </template>
                 </j-space>
             </template>
         </JProTable>
-        <BindChildDevice v-if="visible" @change="closeBindDevice" />
+        <BindChildDevice v-if="visible" :parentIds="parentIds" @change="closeBindDevice" />
     </div>
 </template>
 
 <script setup lang="ts">
 import moment from 'moment';
 import type { ActionsType } from '@/components/Table';
-import { query, unbindDevice, unbindBatchDevice } from '@/api/device/instance';
+import { query, unbindDevice, unbindBatchDevice, queryByParent, deleteDeviceMapping } from '@/api/device/instance';
 import { useInstanceStore } from '@/store/instance';
 import { storeToRefs } from 'pinia';
-import { message } from 'ant-design-vue';
 import BindChildDevice from './BindChildDevice/index.vue';
 import { usePermissionStore } from '@/store/permission';
 import SaveChild from './SaveChild/index.vue';
+import { onlyMessage } from '@/utils/comm';
 
 const instanceStore = useInstanceStore();
 const { detail } = storeToRefs(instanceStore);
@@ -139,6 +93,7 @@ const params = ref<Record<string, any>>({});
 const _selectedRowKeys = ref<string[]>([]);
 const visible = ref<boolean>(false);
 const _current = ref({});
+const parentIds = ref<any[]>([instanceStore.detail.id])
 
 const columns = [
     {
@@ -240,9 +195,15 @@ const getActions = (data: Partial<Record<string, any>>): ActionsType[] => {
                         data.id,
                         {},
                     );
+                    if (instanceStore.current.accessProvider === 'official-edge-gateway') {
+                        const res = await deleteDeviceMapping(
+                            detail.value.id,
+                            { ids: [data.id] }
+                        )
+                    }
                     if (resp.status === 200) {
                         childDeviceRef.value?.reload();
-                        message.success('操作成功！');
+                        onlyMessage('操作成功！');
                     }
                 },
             },
@@ -280,13 +241,19 @@ const handleUnBind = async () => {
             detail.value.id,
             _selectedRowKeys.value,
         );
+        if (instanceStore.current.accessProvider === 'official-edge-gateway') {
+            const res = await deleteDeviceMapping(
+                detail.value.id,
+                { ids: [_selectedRowKeys.value] }
+            )
+        }
         if (resp.status === 200) {
-            message.success('操作成功！');
+            onlyMessage('操作成功！');
             cancelSelect();
             childDeviceRef.value?.reload();
         }
     } else {
-        message.warning('请勾选需要解绑的数据');
+        onlyMessage('请勾选需要解绑的数据', 'warning');
     }
 };
 
@@ -297,9 +264,19 @@ const closeBindDevice = (val: boolean) => {
     }
 };
 
+// const getChildren = async () => {
+//   const { id} = instanceStore.detail
+//   const data = await queryByParent(id)
+//   if (data.success) {
+//     parentIds.value.concat(data.result)
+//   }
+// }
 const closeChildSave = () => {
     childVisible.value = false;
 };
+onMounted(() => {
+    console.log(detail.value.accessProvider)
+})
 </script>
 
 <style lang="less">

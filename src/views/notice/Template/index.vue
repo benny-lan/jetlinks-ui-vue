@@ -207,12 +207,12 @@
 <script setup lang="ts">
 import TemplateApi from '@/api/notice/template';
 import type { ActionsType } from '@/views/device/Instance/typings';
-import { message } from 'jetlinks-ui-components';
 import { NOTICE_METHOD, MSG_TYPE } from '@/views/notice/const';
 import Debug from './Debug/index.vue';
 import Log from './Log/index.vue';
 import { downloadObject } from '@/utils/utils';
 import { useMenuStore } from 'store/menu';
+import { onlyMessage } from '@/utils/comm';
 
 const menuStory = useMenuStore();
 
@@ -229,6 +229,7 @@ const columns = [
         title: '模板名称',
         dataIndex: 'name',
         key: 'name',
+        ellipsis: true,
         search: {
             type: 'string',
         },
@@ -273,7 +274,7 @@ const columns = [
         title: '操作',
         key: 'action',
         fixed: 'right',
-        width: 250,
+        width: 200,
         scopedSlots: true,
     },
 ];
@@ -329,19 +330,19 @@ const beforeUpload = (file: any) => {
         const text = result.target?.result;
         console.log('text: ', text);
         if (!file.type.includes('json')) {
-            message.error('请上传json格式文件');
+            onlyMessage('请上传json格式文件', 'error');
             return false;
         }
         try {
             const data = JSON.parse(text || '{}');
             const { success } = await TemplateApi.update(data);
             if (success) {
-                message.success('操作成功');
+                onlyMessage('操作成功');
                 configRef.value.reload();
             }
             return true;
         } catch {
-            // message.error('请上传json格式文件');
+            // onlyMessage('请上传json格式文件', 'error');
         }
         return true;
     };
@@ -398,10 +399,10 @@ const getActions = (
                 onConfirm: async () => {
                     const resp = await TemplateApi.del(data.id);
                     if (resp.status === 200) {
-                        message.success('操作成功！');
+                        onlyMessage('操作成功！');
                         configRef.value?.reload();
                     } else {
-                        message.error('操作失败！');
+                        onlyMessage('操作失败！', 'error');
                     }
                 },
             },

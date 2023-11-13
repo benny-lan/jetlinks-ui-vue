@@ -43,6 +43,7 @@
                         :actions="getActions(slotProps, 'card')"
                         :status="slotProps.state?.value"
                         :statusText="slotProps.state?.text"
+                        @click="handleView(slotProps.id)"
                         :statusNames="{
                             online: 'processing',
                             offline: 'error',
@@ -63,7 +64,6 @@
                             <Ellipsis style="width: calc(100% - 100px)">
                                 <span
                                     style="font-size: 16px; font-weight: 600"
-                                    @click.stop="handleView(slotProps.id)"
                                 >
                                     {{ slotProps.name }}
                                 </span>
@@ -101,7 +101,7 @@
                                             :key="i"
                                         >
                                             <PermissionButton
-                                                :disabled="o.disabled"
+                                                :disabled="o.disabled || slotProps.state.value !== 'online'"
                                                 :popConfirm="o.popConfirm"
                                                 :tooltip="{
                                                     ...o.tooltip,
@@ -208,10 +208,9 @@
 <script lang="ts" setup>
 import { queryGatewayList, queryNoPagingPost } from '@/api/device/product';
 import { queryTree } from '@/api/device/category';
-import { message } from 'jetlinks-ui-components';
 import { ActionsType } from '@/views/device/Instance/typings';
 import { useMenuStore } from '@/store/menu';
-import { getImage } from '@/utils/comm';
+import { getImage, onlyMessage } from '@/utils/comm';
 import dayjs from 'dayjs';
 import { query, _delete, _deploy, _undeploy } from '@/api/device/instance';
 import { restPassword } from '@/api/edge/device';
@@ -440,10 +439,10 @@ const getActions = (
                         response = await _deploy(data.id);
                     }
                     if (response && response.status === 200) {
-                        message.success('操作成功！');
+                        onlyMessage('操作成功！');
                         edgeDeviceRef.value?.reload();
                     } else {
-                        message.error('操作失败！');
+                        onlyMessage('操作失败！', 'error');
                     }
                 },
             },
@@ -471,11 +470,11 @@ const getActions = (
             },
             icon: 'RedoOutlined',
             popConfirm: {
-                title: '确认重置密码为P@ssw0rd？',
+                title: '确认重置密码为Jetlinks123？',
                 onConfirm: async () => {
                     restPassword(data.id).then((resp: any) => {
                         if (resp.status === 200) {
-                            message.success('操作成功！');
+                            onlyMessage('操作成功！');
                             edgeDeviceRef.value?.reload();
                         }
                     });
@@ -499,10 +498,10 @@ const getActions = (
             onConfirm: async () => {
                 const resp = await _delete(data.id);
                 if (resp.status === 200) {
-                    message.success('操作成功！');
+                    onlyMessage('操作成功！');
                     edgeDeviceRef.value?.reload();
                 } else {
-                    message.error('操作失败！');
+                    onlyMessage('操作失败！', 'error');
                 }
             },
         },

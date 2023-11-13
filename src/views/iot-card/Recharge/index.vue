@@ -9,12 +9,7 @@
           :request="queryRechargeList"
           model="TABLE"
           :defaultParams="{
-                    pageSize: 10,
                     sorts: [{ name: 'createTime', order: 'desc' }],
-                }"
-          :pagination="{
-                    showSizeChanger: true,
-                    pageSizeOptions: ['10', '20', '50', '100'],
                 }"
           :params="params"
         >
@@ -118,6 +113,7 @@ const columns = [
         dataIndex: 'createTime',
         key: 'createTime',
         scopedSlots: true,
+        width: 200,
         search: {
             type: 'date',
         },
@@ -126,6 +122,7 @@ const columns = [
         title: '操作',
         key: 'action',
         fixed: 'right',
+        width: 60,
         scopedSlots: true,
     },
 ];

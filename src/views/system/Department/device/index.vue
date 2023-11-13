@@ -6,16 +6,24 @@
             @search="(params:any)=>queryParams = {...params}"
             style='margin-bottom: 0;'
         />
-        <FullPage>
+      <FullPage :extraHeight="24">
             <j-pro-table
                 ref="tableRef"
                 :request="table.requestFun"
                 :gridColumn="2"
-                :params="queryParams"
                 :rowSelection="{
+                    // selectedRowKeys: table._selectedRowKeys.value,
+                    // onChange:(keys:string[])=>table._selectedRowKeys.value = [...keys],
+                    // onSelectNone: table.cancelSelect
                     selectedRowKeys: table._selectedRowKeys.value,
-                    onChange:(keys:string[])=>table._selectedRowKeys.value = [...keys],
+                    onSelect: table.onSelect,
+                    onSelectAll: table.onSelectAll,
                     onSelectNone: table.cancelSelect
+                }"
+                :params="queryParams"
+                :scroll="{
+                    x:true,
+                    y:610,
                 }"
                 :columns="columns"
             >
@@ -89,25 +97,25 @@
                         </template>
                         <template #content>
                             <h3 class="card-item-content-title" style='margin-bottom: 18px;'>
-                              <Ellipsis style="width: calc(100% - 100px);"
-                              >
                                 {{ slotProps.name }}
-                              </Ellipsis>
                             </h3>
                             <j-row>
                                 <j-col :span="12">
                                     <div class="card-item-content-text">ID</div>
+                                    <Ellipsis style="width: calc(100% - 20px);">
                                     <div
                                         style="cursor: pointer"
                                         class="card-item-content-value"
                                     >
                                         {{ slotProps.id }}
                                     </div>
+                                    </Ellipsis>
                                 </j-col>
                                 <j-col :span="12">
                                     <div class="card-item-content-text">
                                         资产权限
                                     </div>
+                                    <Ellipsis style="width: calc(100% - 20px);">
                                     <div
                                         style="cursor: pointer"
                                         class="card-item-content-value"
@@ -119,6 +127,7 @@
                                             )
                                         }}
                                     </div>
+                                    </Ellipsis>
                                 </j-col>
                             </j-row>
                         </template>
@@ -163,13 +172,13 @@
                 </template>
                 <template #registryTime="slotProps">
                     <span>{{
-                        dayjs(slotProps.registryTime).format(
+                        slotProps.registryTime ? dayjs(slotProps.registryTime).format(
                             'YYYY-MM-DD YY:mm:ss',
-                        )
+                        ) : '-'
                     }}</span>
                 </template>
                 <template #action="slotProps">
-                    <j-space :size="16">
+                    <j-space>
                         <PermissionButton
                             v-for="i in table.getActions(slotProps, 'table')"
                             :hasPermission="i.permission"
@@ -204,6 +213,7 @@
                 :parent-id="props.parentId"
                 :all-permission="table.permissionList.value"
                 asset-type="device"
+                :defaultPermission="table.defaultPermission"
                 @confirm="table.refresh"
             />
         </div>
@@ -215,18 +225,18 @@ import PermissionButton from '@/components/PermissionButton/index.vue';
 
 import AddDeviceOrProductDialog from '../components/AddDeviceOrProductDialog.vue';
 import EditPermissionDialog from '../components/EditPermissionDialog.vue';
-import { getImage } from '@/utils/comm';
+import { getImage, onlyMessage } from '@/utils/comm';
 import {
     getDeviceList_api,
     getPermission_api,
     getPermissionDict_api,
     unBindDeviceOrProduct_api,
     getDeviceProduct_api,
+    getBindingsPermission,
 } from '@/api/system/department';
 import { intersection } from 'lodash-es';
 
-import type { dictType, optionsType } from '../typing';
-import { message } from 'jetlinks-ui-components';
+import type { dictType } from '../typing';
 import { useDepartmentStore } from '@/store/department';
 import dayjs from 'dayjs';
 
@@ -268,8 +278,12 @@ const columns = [
         search: {
             rename: 'productId$product-info',
             type: 'select',
-            handleValue(value: string) {
-                return `id in ${value.toString()}`;
+            handleValue(value: string, data: any) {
+                return value && value.length ? [{
+                    column: 'id',
+                    termType: data?.termType === 'not' ? 'nin' : 'in',
+                    value: `${value.toString()}`
+                }] : undefined;
             },
             options: () =>
                 new Promise((resolve) => {
@@ -294,7 +308,6 @@ const columns = [
         key: 'permission',
         ellipsis: true,
         scopedSlots: true,
-        width: 300,
     },
     {
         title: '注册时间',
@@ -302,7 +315,6 @@ const columns = [
         key: 'registryTime',
         ellipsis: true,
         scopedSlots: true,
-        width: 200,
         search: {
             type: 'date',
         },
@@ -321,6 +333,7 @@ const columns = [
             ],
         },
         scopedSlots: true,
+        width:80
     },
 
     {
@@ -328,6 +341,7 @@ const columns = [
         dataIndex: 'action',
         key: 'action',
         fixed: 'right',
+        width: 150,
         scopedSlots: true,
     },
 ];
@@ -338,6 +352,7 @@ const table = {
     _selectedRowKeys: ref<string[]>([]),
     selectedRows: [] as any[],
     permissionList: ref<dictType>([]),
+    defaultPermission: [] as string[],
 
     init: () => {
         table.getPermissionDict();
@@ -407,6 +422,43 @@ const table = {
     cancelSelect: () => {
         table._selectedRowKeys.value = [];
         table.selectedRows = [];
+    },
+    onSelect: (record: any, selected: boolean) => {
+        const arr = [...table._selectedRowKeys.value]
+        const _index = arr.findIndex(item => item === record?.id)
+        if (selected) {
+            if (!(_index > -1)) {
+                table._selectedRowKeys.value.push(record.id)
+                table.selectedRows.push(record)
+            }
+        } else {
+            if (_index > -1) { // 去掉数据
+                table._selectedRowKeys.value.splice(_index, 1)
+                table.selectedRows.splice(_index, 1)
+            }
+        }
+    },
+    onSelectAll: (selected: boolean, _: any[], changeRows: any) => {
+        if (selected) {
+            changeRows.map((i: any) => {
+                if (!table._selectedRowKeys.value.includes(i.id)) {
+                    table._selectedRowKeys.value.push(i.id)
+                    table.selectedRows.push(i)
+                }
+            })
+        } else {
+            const arr = changeRows.map((item: any) => item.id)
+            const _arr: string[] = [];
+            const _ids: string[] = [];
+            [...table.selectedRows].map((i: any) => {
+                if (!arr.includes(i?.id)) {
+                    _arr.push(i)
+                    _ids.push(i.id)
+                }
+            })
+            table._selectedRowKeys.value = _ids
+            table.selectedRows = _arr
+        }
     },
     // 获取并整理数据
     getData: (params: object, parentId: string) =>
@@ -494,28 +546,32 @@ const table = {
         departmentStore.setType(type);
         dialogs.addShow = true;
     },
-    clickEdit: (row?: any) => {
+    queryPermissionList: async (ids: string[]) => {
+        const resp: any = await getBindingsPermission('device', ids)
+        if(resp.status === 200){
+            const arr = resp.result.map((item: any) => {
+                return item?.permissionInfoList?.map((i: any) => i?.id)
+            })
+            return intersection(...arr)
+        }
+        return []
+    },
+    clickEdit: async (row?: any) => {
         const ids = row ? [row.id] : [...table._selectedRowKeys.value];
-        if (row || table.selectedRows.length === 1) {
-            const permissionList =
-                row?.permission || table.selectedRows[0].permission;
-            dialogs.selectIds = ids;
-            dialogs.permissList = permissionList;
-            dialogs.editShow = true;
-            return;
-        } else if (table.selectedRows.length === 0) return;
-        const permissionList = table.selectedRows.map(
-            (item) => item.permission,
-        );
-        const mixPermissionList = intersection(...permissionList) as string[];
+        if (ids.length < 1) return onlyMessage('请勾选需要编辑的数据', 'warning');
 
+        table.defaultPermission = row ? row?.permission : intersection(...table.selectedRows.map(
+            (item) => item.permission,
+        )) as string[]
+
+        const _result = await table.queryPermissionList(ids)
         dialogs.selectIds = ids;
-        dialogs.permissList = mixPermissionList;
+        dialogs.permissList = _result as string[];
         dialogs.editShow = true;
     },
     clickUnBind: (row?: any) => {
         const ids = row ? [row.id] : [...table._selectedRowKeys.value];
-        if (ids.length < 1) return message.warning('请勾选需要解绑的数据');
+        if (ids.length < 1) return onlyMessage('请勾选需要解绑的数据', 'warning');
         const params = [
             {
                 targetType: 'org',
@@ -525,13 +581,14 @@ const table = {
             },
         ];
         unBindDeviceOrProduct_api('device', params).then(() => {
-            message.success('操作成功');
+            onlyMessage('操作成功');
             table.refresh();
         });
     },
     refresh: () => {
         nextTick(() => {
             tableRef.value.reload();
+            table.cancelSelect()
         });
     },
 };

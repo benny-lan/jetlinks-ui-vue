@@ -67,9 +67,27 @@
                     "
                     >******</span
                 >
+                <span v-else-if="item.type.type === 'enum'">
+                    <Ellipsis>{{
+                         item.type.elements?.find((i)=>
+                            i.value ===  instanceStore.current?.configuration?.[
+                                item.property
+                            ] 
+                           )?.text || ''
+                    }}</Ellipsis>
+                    <j-tooltip
+                        v-if="isExit(item.property)"
+                        :title="`有效值:${
+                            instanceStore.current?.configuration?.[
+                                item.property
+                            ]
+                        }`"
+                        ><AIcon type="QuestionCircleOutlined"
+                    /></j-tooltip>
+                </span>
                 <span v-else>
                     <Ellipsis>{{
-                        instanceStore.current?.configuration?.[item.property] ||
+                           instanceStore.current?.configuration?.[item.property] ||
                         ''
                     }}</Ellipsis>
                     <j-tooltip
@@ -101,8 +119,8 @@ import {
     _deploy,
     configurationReset,
 } from '@/api/device/instance';
-import { message } from 'jetlinks-ui-components';
 import Save from './Save.vue';
+import { onlyMessage } from '@/utils/comm';
 
 const instanceStore = useInstanceStore();
 const visible = ref<boolean>(false);
@@ -132,7 +150,7 @@ const deployBtn = async () => {
     if (instanceStore.current.id) {
         const resp = await _deploy(instanceStore.current.id);
         if (resp.status === 200) {
-            message.success('操作成功');
+            onlyMessage('操作成功');
             instanceStore.refresh(instanceStore.current.id);
         }
     }
@@ -142,7 +160,7 @@ const resetBtn = async () => {
     if (instanceStore.current.id) {
         const resp = await configurationReset(instanceStore.current.id);
         if (resp.status === 200) {
-            message.success('恢复默认配置成功');
+            onlyMessage('恢复默认配置成功');
             instanceStore.refresh(instanceStore.current.id);
         }
     }

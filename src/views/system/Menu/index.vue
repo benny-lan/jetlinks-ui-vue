@@ -3,7 +3,7 @@
         <div class="menu-container">
             <pro-search
                 :columns="columns"
-                target="category"
+                target="system-menu"
                 @search="handleSearch"
             />
             <FullPage>
@@ -50,11 +50,11 @@
                                     <AIcon type="EditOutlined" />
                                 </j-button>
                             </j-tooltip>
-
                             <PermissionButton
                                 type="link"
                                 :hasPermission="`${permission}:add`"
                                 :tooltip="{ title: '新增子菜单' }"
+                                :disabled="slotProps.level >= 3"
                                 @click="table.addChildren(slotProps)"
                             >
                                 <AIcon type="PlusCircleOutlined" />
@@ -81,11 +81,11 @@
 <script setup lang="ts" name="Menu">
 import PermissionButton from '@/components/PermissionButton/index.vue';
 import { getMenuTree_api, delMenuInfo_api } from '@/api/system/menu';
-import { message } from 'jetlinks-ui-components';
 import dayjs from 'dayjs';
 import { useUserInfo } from '@/store/userInfo';
-import { MESSAGE_SUBSCRIBE_MENU_CODE, USER_CENTER_MENU_CODE } from '@/utils/consts'
+import { USER_CENTER_MENU_CODE,messageSubscribe } from '@/utils/consts'
 import { storeToRefs } from 'pinia';
+import { onlyMessage } from '@/utils/comm';
 
 const permission = 'system/Menu';
 
@@ -162,7 +162,7 @@ const columns = [
         key: 'action',
         fixed: 'right',
         scopedSlots: true,
-        width: 200,
+        width: 150,
     },
 ];
 const queryParams = ref({ terms: [] });
@@ -179,21 +179,17 @@ const table = reactive({
         //过滤非集成的菜单
         const item = {
             terms: [
-                {
-                    terms: [
-                        {
-                            column: 'owner',
-                            termType: 'eq',
-                            value: 'iot',
-                        },
-                        {
-                            column: 'owner',
-                            termType: 'isnull',
-                            value: '1',
-                            type: 'or',
-                        },
-                    ],
-                },
+              {
+                column: 'owner',
+                termType: 'eq',
+                value: 'iot',
+              },
+              {
+                column: 'owner',
+                termType: 'isnull',
+                value: '1',
+                type: 'or',
+              },
             ],
         };
         const params = {
@@ -212,7 +208,7 @@ const table = reactive({
         return {
             code: resp.message,
             result: {
-                data: resp.result?.filter((item: { code: string }) => ![USER_CENTER_MENU_CODE, MESSAGE_SUBSCRIBE_MENU_CODE].includes(item.code)),
+                data: resp.result?.filter((item: { code: string }) => ![USER_CENTER_MENU_CODE,messageSubscribe].includes(item.code)),
                 pageIndex: resp.pageIndex,
                 pageSize: resp.pageSize,
                 total: resp.total,
@@ -244,7 +240,7 @@ const table = reactive({
         delMenuInfo_api(row.id).then((resp: any) => {
             if (resp.status === 200) {
                 tableRef.value?.reload();
-                message.success('操作成功!');
+                onlyMessage('操作成功!');
             }
         });
     },

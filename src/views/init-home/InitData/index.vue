@@ -107,6 +107,7 @@
                                 v-model:value="modalForm.publicPort"
                                 placeholder="请输入公网端口"
                                 style="width: 100%"
+                                :precision="0"
                             />
                         </j-form-item>
                     </j-col>
@@ -117,7 +118,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getImage } from '@/utils/comm';
+import { getImage, onlyMessage } from '@/utils/comm';
 import {
     saveNetwork,
     getResourcesCurrent,
@@ -131,7 +132,7 @@ import {
 } from '@/api/initHome';
 import { modalState } from '../data/interface';
 import type { Rule } from 'ant-design-vue/es/form';
-import { message } from 'jetlinks-ui-components';
+import { testIpv4_6 } from '@/utils/validate';
 const formRef = ref();
 /**
  * 初始化数据状态
@@ -144,6 +145,10 @@ const visible = ref<boolean>(false);
 const modalForm = reactive<modalState>({
     host: '0.0.0.0',
 });
+const regDomain = new RegExp(
+        // /^https?:\/\/(([a-zA-Z0-9_-])+(\.)?)*(:\d+)?(\/((\.)?(\?)?=?&?[a-zA-Z0-9_-](\?)?)*)*$/i,
+      /^[a-zA-Z0-9]+([\-\.]{1}[a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/
+    )
 /**
  * 校验官网地址
  */
@@ -151,10 +156,7 @@ const validateUrl = async (_rule: Rule, value: string) => {
     if (!value) {
         return Promise.reject('请输入公网地址');
     } else {
-        var reg = new RegExp(
-            /^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$/,
-        );
-        if (!reg.test(value)) {
+        if (!testIpv4_6(value) && !regDomain.test(value)) {
             return Promise.reject('请输入正确的公网地址');
         }
         return Promise.resolve();
@@ -321,7 +323,7 @@ const saveCurrentData = () => {
 const { optionPorts, isSucessInit } = toRefs(initialization);
 const handelSave = () => {
     formRef.value.validate().then(() => {
-        message.success('保存成功');
+        onlyMessage('保存成功');
         flag.value = true;
         visible.value = false;
     });

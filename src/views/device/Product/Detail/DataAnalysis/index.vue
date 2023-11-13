@@ -25,6 +25,8 @@
                 style="height: 100%"
                 theme="vs"
                 v-model:modelValue="editorValue"
+                :init="editorInit"
+                :registrationTypescript="typescriptTip"
             />
         </div>
         <div class="bottom">
@@ -112,16 +114,25 @@ import PermissionButton from '@/components/PermissionButton/index.vue';
 import { useFullscreen } from '@vueuse/core';
 import { useProductStore } from '@/store/product';
 import {
-    productCode,
-    getProtocal,
-    testCode,
-    saveProductCode,
+  productCode,
+  getProtocal,
+  testCode,
+  saveProductCode, queryProductCodeTips,
 } from '@/api/device/instance';
-import { message } from 'jetlinks-ui-components';
 import { isBoolean } from 'lodash';
+import { onlyMessage } from '@/utils/comm';
 
 const defaultValue =
-    '//解码函数\r\nfunction decode(context) {\r\n    //原始报文\r\n    var buffer = context.payload();\r\n    // 转为json\r\n    // var json = context.json();\r\n    //mqtt 时通过此方法获取topic\r\n    // var topic = context.topic();\r\n\r\n    // 提取变量\r\n    // var topicVars = context.pathVars("/{deviceId}/**",topic)\r\n    //温度属性\r\n    var temperature = buffer.getShort(3) * 10;\r\n    //湿度属性\r\n    var humidity = buffer.getShort(6) * 10;\r\n    return {\r\n        "temperature": temperature,\r\n        "humidity": humidity\r\n    };\r\n}\r\n';
+    `//注册设备下行数据监听器,当平台下发指令给设备时,回调将被调用,用于构造下发给设备的报文
+      codec.onDownstream(function(ctx){
+
+      });
+
+      //注册设备上行数据监听器,当设备上行数据时,回调将被调用,用于解析设备上报的数据.
+      codec.onUpstream(function(ctx){
+
+      });
+    `;
 
 const el = ref<HTMLElement | null>(null);
 const { toggle } = useFullscreen(el);
@@ -135,6 +146,9 @@ const resultValue = ref<any>({});
 const loading = ref<boolean>(false);
 const isTest = ref<boolean>(false);
 const editorValue = ref<string>('');
+const typescriptTip = reactive({
+  typescript: ''
+})
 
 const resStyle = computed(() =>
     isBoolean(resultValue.value.success)
@@ -155,6 +169,30 @@ const result = computed(() =>
         : resultValue.value.reason,
 );
 
+const editorInit = (editor: any, monaco: any) => {
+  monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+    noSemanticValidation: true,
+    noSyntaxValidation: false,
+  });
+
+  // compiler options
+  monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+    allowJs: true,
+    checkJs: true,
+    allowNonTsExtensions: true,
+    target: monaco.languages.typescript.ScriptTarget.ESNext,
+    strictNullChecks: false,
+    strictPropertyInitialization: true,
+    strictFunctionTypes: true,
+    strictBindCallApply: true,
+    useDefineForClassFields: true,//permit class static fields with private name to have initializer
+    moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+    module: monaco.languages.typescript.ModuleKind.CommonJS,
+    typeRoots: ["types"],
+    lib: ["esnext"]
+  });
+}
+
 //获取topic
 const getTopic = async () => {
     const res: any = await getProtocal(
@@ -168,6 +206,16 @@ const getTopic = async () => {
         topicList.value = item;
     }
 };
+
+const queryCodeTips = () => {
+  queryProductCodeTips(productStore.current.id).then(res => {
+    if (res.success) {
+      typescriptTip.typescript = res.result
+    }
+  })
+}
+
+
 //获取产品解析规则
 const getProductCode = async () => {
     const res: any = await productCode(productStore.current.id);
@@ -202,7 +250,7 @@ const save = async () => {
     };
     const res = await saveProductCode(productStore.current.id, item);
     if (res.status === 200) {
-        message.success('保存成功');
+        onlyMessage('保存成功');
         getProductCode();
     }
 };
@@ -223,7 +271,7 @@ const debug = () => {
             });
             isTest.value = true;
         } else {
-            message.error('请输入topic');
+            onlyMessage('请输入topic', 'error');
         }
     } else {
         if (url.value !== '') {
@@ -240,7 +288,7 @@ const debug = () => {
             });
             isTest.value = true;
         } else {
-            message.error('请输入url');
+            onlyMessage('请输入url', 'error');
         }
     }
 };
@@ -248,6 +296,7 @@ const debug = () => {
 onMounted(() => {
     getProductCode();
     getTopic();
+  queryCodeTips()
 });
 </script>
 

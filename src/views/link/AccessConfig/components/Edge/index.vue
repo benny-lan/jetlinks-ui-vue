@@ -52,8 +52,8 @@
                             >
                                 <template #other>
                                     <div class="other">
-                                        <j-tooltip placement="topLeft">
-                                            <div
+                                        <j-tooltip :title="addressesTip(item.addresses)" placement="top">
+                                            <!-- <div
                                                 v-if="
                                                     (item.addresses || [])
                                                         .length > 1
@@ -69,7 +69,7 @@
                                                         :status="getColor(i)"
                                                     />{{ i.address }}
                                                 </div>
-                                            </div>
+                                            </div> -->
                                             <div
                                                 v-for="i in (
                                                     item.addresses || []
@@ -86,7 +86,7 @@
                                                         (item.addresses || [])
                                                             .length > 1
                                                     "
-                                                    >...</span
+                                                    >等{{ item.addresses.length }}条</span
                                                 >
                                             </div>
                                         </j-tooltip>
@@ -156,6 +156,7 @@
                                 :hasPermission="`link/AccessConfig:${
                                     id === ':id' ? 'add' : 'update'
                                 }`"
+                                :loading="loading"
                             >
                                 保存
                             </PermissionButton>
@@ -187,6 +188,7 @@
                 :hasPermission="`link/AccessConfig:${
                     id === ':id' ? 'add' : 'update'
                 }`"
+                :loading="loading"
             >
                 保存
             </PermissionButton>
@@ -223,6 +225,7 @@ const route = useRoute();
 const view = route.query.view as string;
 const id = route.params.id as string;
 
+const loading = ref(false)
 const props = defineProps({
     provider: {
         type: Object,
@@ -252,6 +255,7 @@ const networkList: any = ref([]);
 const allNetworkList: any = ref([]);
 
 const onFinish = async (values: any) => {
+    loading.value = true
     const providerId = props.provider.id;
     const params = {
         ...values,
@@ -264,12 +268,13 @@ const onFinish = async (values: any) => {
         id === ':id' ? await save(params) : await update({ ...params, id });
     if (resp.status === 200) {
         onlyMessage('操作成功', 'success');
-        history.back();        
-        if ((window as any).onTabSaveSuccess) {            
+        history.back();
+        if ((window as any).onTabSaveSuccess) {
             (window as any).onTabSaveSuccess(resp);
             setTimeout(() => window.close(), 300);
         }
     }
+    loading.value = false
 };
 
 const checkedChange = (id: string) => {
@@ -354,6 +359,14 @@ watch(
         immediate: true,
     },
 );
+
+const addressesTip = (data:any)=>{
+    let tip:any = ''
+    data.forEach((item:any)=>{
+        tip =  tip + " " +item.address
+    })
+    return tip
+}
 </script>
 
 <style lang="less" scoped>

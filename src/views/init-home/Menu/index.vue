@@ -12,8 +12,14 @@
 
 <script lang="ts" setup>
 import { getImage } from '@/utils/comm';
-import BaseMenu, { MESSAGE_SUBSCRIBE_MENU_DATA, USER_CENTER_MENU_DATA } from '../data/baseMenu'
+import BaseMenu, { USER_CENTER_MENU_DATA } from '../data/baseMenu'
 import { getSystemPermission, updateMenus } from '@/api/initHome';
+import { protocolList } from '@/utils/consts';
+import { getProviders } from '@/api/data-collect/channel';
+import {
+  systemVersion,
+} from '@/api/login'
+
 /**
  * 获取菜单数据
  */
@@ -21,34 +27,59 @@ const menuDatas = reactive({
     count: 0,
     current: undefined,
 });
+
+/**
+ * 查询支持的协议
+ */
+const getProvidersFn = async () => {
+    let version = ''
+    const req:any =await systemVersion()
+    if(req.success && req.result){
+        version = req.result.edition
+    }
+    if (version ==='community') {
+        return undefined
+    } else {
+        const res: any = await getProviders();
+        const ids = res.result?.map?.(item => item.id) || []
+        return protocolList.some(item => ids.includes(item.value))
+    }
+}
+
 /**
  * 获取当前系统权限信息
  */
 const getSystemPermissionData = async () => {
+    const hasProtocol = await getProvidersFn();
     const resp = await getSystemPermission();
     if (resp.status === 200) {
         const newTree = filterMenu(
             resp.result.map((item: any) => JSON.parse(item).id),
             BaseMenu,
+            hasProtocol
         );
         const _count = menuCount(newTree);
         menuDatas.current = newTree;
         menuDatas.count = _count;
     }
 };
+
 /**
  * 过滤菜单
  */
-const filterMenu = (permissions: string[], menus: any[]) => {
+const filterMenu = (permissions: string[], menus: any[], hasProtocol: boolean) => {
     return menus.filter((item) => {
         let isShow = false;
         if (item.showPage && item.showPage.length) {
-            isShow = item.showPage.every((pItem: any) => {
+            isShow = item.showPage.some((pItem: any) => {
                 return permissions.includes(pItem);
             });
         }
         if (item.children) {
-            item.children = filterMenu(permissions, item.children);
+            item.children = filterMenu(permissions, item.children, hasProtocol);
+        }
+        if (!hasProtocol && item.code == 'link/DataCollect') {
+            return false;
         }
         return isShow || !!item.children?.length;
     });
@@ -71,7 +102,8 @@ const menuCount = (menus: any[]) => {
 const initMenu = async () => {
     return new Promise(async (resolve) => {
       //  用户中心
-        const res = await updateMenus([...menuDatas.current!, USER_CENTER_MENU_DATA, MESSAGE_SUBSCRIBE_MENU_DATA]);
+        console.log([...menuDatas.current!, USER_CENTER_MENU_DATA]);
+        const res = await updateMenus([...menuDatas.current!, USER_CENTER_MENU_DATA]);
         if (res.status === 200) {
             resolve(true);
         } else {

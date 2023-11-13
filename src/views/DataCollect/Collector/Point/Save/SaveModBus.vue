@@ -44,6 +44,7 @@
             <j-form-item
                 label="地址"
                 :name="['pointKey']"
+                validateFirst
                 :rules="[
                     ...ModBusRules.pointKey,
                     {
@@ -57,7 +58,7 @@
                     placeholder="请输入地址"
                     v-model:value="formData.pointKey"
                     :min="0"
-                    :max="999999999"
+                    :max="999999"
                     :precision="0"
                 />
             </j-form-item>
@@ -131,7 +132,7 @@
                     style="width: 100%"
                     placeholder="请输入小数保留位数"
                     :min="0"
-                    :max="255"
+                    :max="65535"
                     :precision="0"
                     v-model:value="
                         formData.configuration.codec.configuration.scale
@@ -220,7 +221,8 @@
                     placeholder="请输入采集频率"
                     v-model:value="formData.configuration.interval"
                     addon-after="ms"
-                    :max="9999999999999998"
+                    :max="2147483648"
+                    :min="0"
                 />
             </j-form-item>
 
@@ -269,7 +271,7 @@ import {
 import { ModBusRules, checkProviderData } from '../../data.ts';
 import type { FormInstance } from 'ant-design-vue';
 import type { Rule } from 'ant-design-vue/lib/form';
-import { cloneDeep } from 'lodash-es';
+import {cloneDeep, omit} from 'lodash-es';
 
 const props = defineProps({
     data: {
@@ -341,9 +343,17 @@ const handleOk = async () => {
 
     // address是多余字段，但是react版本上使用到了这个字段
     params.configuration.parameter = {
-        ...params.configuration.parameter,
-        address: data?.pointKey,
+      ...params.configuration.parameter,
+      address: data?.pointKey,
     };
+
+    if (props.data.provider === 'COLLECTOR_GATEWAY') {
+      const configuration = cloneDeep(params.configuration)
+      params.configuration = {
+        configuration: configuration,
+        interval: params.interval
+      }
+    }
 
     loading.value = true;
     const response = !id
@@ -378,8 +388,7 @@ const changeWriteByteCount = (value: Array<string>) => {
     formData.value.configuration.parameter.writeByteCount = value[0];
 };
 const changeFunction = (value: string) => {
-    formData.value.accessModes =
-        value === 'InputRegisters' ? ['read'] : ['read', 'write'];
+    formData.value.accessModes = ['InputRegisters', 'DiscreteInputs'].includes(value) ? ['read'] : ['read', 'write'];
 };
 
 const checkProvider = (_rule: Rule, value: string): Promise<any> =>
@@ -438,22 +447,31 @@ watch(
 watch(
     () => props.data,
     (value) => {
-        if (value.id && value.provider === 'MODBUS_TCP') {
+        if (value.id && ['MODBUS_TCP', 'COLLECTOR_GATEWAY'].includes(value.provider)) {
             const _value: any = cloneDeep(value);
             const { writeByteCount, byteCount } =
-                _value.configuration.parameter;
+            props.data.provider === 'COLLECTOR_GATEWAY' ? _value.configuration.configuration.parameter: _value.configuration.parameter;
+
+          if (props.data.provider === 'COLLECTOR_GATEWAY') {
+            formData.value = {
+              ...omit(_value, ['configuration']),
+              ..._value.configuration,
+            }
+          } else {
             formData.value = _value;
-            if (!!_value.accessModes[0]?.value) {
-                formData.value.accessModes = value.accessModes.map(
-                    (i: any) => i.value,
-                );
-            }
-            if (!!_value.features[0]?.value) {
-                formData.value.features = value.features.map(
-                    (i: any) => i.value,
-                );
-            }
-            formData.value.nspwc = !!writeByteCount || !!byteCount;
+          }
+
+          if (!!_value.accessModes[0]?.value) {
+            formData.value.accessModes = value.accessModes.map(
+                (i: any) => i.value,
+            );
+          }
+          if (!!_value.features[0]?.value) {
+            formData.value.features = value.features.map(
+                (i: any) => i.value,
+            );
+          }
+          formData.value.nspwc = !!writeByteCount || !!byteCount;
         }
     },
     { immediate: true, deep: true },

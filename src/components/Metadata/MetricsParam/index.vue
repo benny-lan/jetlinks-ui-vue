@@ -21,7 +21,7 @@
                   { max: 64, message: '最多可输入64个字符' },
                   {
                     pattern: /^[a-zA-Z0-9_\-]+$/,
-                    message: 'ID只能由数字、字母、下划线、中划线组成',
+                    message: '标识只能由数字、字母、下划线、中划线组成',
                   },
                 ]">
                   <j-input v-model:value="_value[index].id" size="small" placeholder="请输入标识"></j-input>
@@ -114,11 +114,11 @@ const handleAdd = () => {
 
 const validateIndicator = (value: any) => {
   if (value?.range) {
-    if (!value?.value || !value?.value[0] || !value?.value[1]) {
+    if (!value?.value || (!value?.value[0] && value?.value[0] !== 0) || (!value?.value[1] && value?.value[1] !== 0)) {
       return Promise.reject(new Error('请输入指标值'));
     }
   } else {
-    if (!value?.value) {
+    if (!value?.value && value?.value !== 0) {
       return Promise.reject(new Error('请输入指标值'));
     }
   }

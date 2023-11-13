@@ -1,7 +1,7 @@
 <template>
   <j-upload
     name="file"
-    accept=".jar"
+    :fileList='list'
     :action="uploadFile"
     :headers="{
                 [TOKEN_KEY]: LocalStore.get(TOKEN_KEY),
@@ -11,10 +11,12 @@
     :before-upload="beforeUpload"
     :disabled='loading'
     :maxCount='1'
+    accept=".jar,.zip"
+    @remove='remove'
   >
     <div>
       <j-button>上传文件</j-button>
-      <span class='upload-tip'>格式要求：{文件名}.jar/{文件名}.zip</span>
+      <span class='upload-tip'>格式要求：.jar .zip</span>
     </div>
   </j-upload>
 
@@ -28,6 +30,7 @@ import { onlyMessage } from '@/utils/comm';
 import type { UploadChangeParam, UploadProps } from 'ant-design-vue';
 import { notification as Notification } from 'jetlinks-ui-components';
 import { useSystem } from '@/store/system';
+import {fileList} from "@/views/device/Instance/Detail/Running/Property/index";
 
 const emit = defineEmits(['update:modelValue', 'change']);
 
@@ -39,6 +42,10 @@ const props = defineProps({
   disabled: {
     type: Boolean,
     default: false
+  },
+  fileName: {
+    type: String,
+    default: undefined
   }
 });
 
@@ -47,35 +54,50 @@ const paths: string = useSystem().$state.configInfo.paths?.[
   ] as string;
 
 const value = ref(props.modelValue);
+const list = ref<any>(props.fileName ? [{ name: props.fileName}] : [])
 const loading = ref(false);
+const fileCache = ref()
+
+const remove = () => {
+  list.value = []
+  emit('update:modelValue', '');
+  emit('change', {});
+}
 
 const beforeUpload: UploadProps['beforeUpload'] = (file, fl) => {
+
   const arr = file.name.split('.');
   const isFile = ['jar', 'zip'].includes(arr[arr.length - 1]); // file.type === 'application/zip' || file.type === 'application/javj-archive'
   if (!isFile) {
     onlyMessage('请上传.jar,.zip格式的文件', 'error');
     loading.value = false;
+    return false
   }
+  console.log(fl)
+  list.value = fl
   return isFile;
 };
 const handleChange = async (info: UploadChangeParam) => {
   loading.value = true;
+  console.log(info)
   if (info.file.status === 'done') {
     loading.value = false;
-    console.log(info.file)
     const result = info.file.response?.result;
     const f = result.accessUrl;
     onlyMessage('上传成功！', 'success');
     value.value = f;
+    fileCache.value = info.fileList
     emit('update:modelValue', result.version);
     emit('change', result);
   } else {
     if (info.file.error) {
+      list.value = fileCache.value
       Notification.error({
         // key: '403',
         message: '系统提示',
-        description: '系统未知错误，请反馈给管理员',
+        description: info.file.response?.message,
       });
+      // emit('update:modelValue', { err:'file_upload_error'});
       loading.value = false;
     } else if (info.file.response) {
       loading.value = false;
