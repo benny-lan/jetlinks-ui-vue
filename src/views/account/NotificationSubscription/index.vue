@@ -23,7 +23,7 @@
                 </template>
 
                 <template #alarmConfigName="slotProps">
-                    {{ slotProps.topicConfig.alarmConfigName }}
+                    {{ slotProps.topicConfig?.alarmConfigName }}
                 </template>
                 <template #state="slotProps">
                     <BadgeStatus

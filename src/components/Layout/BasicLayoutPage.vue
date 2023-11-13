@@ -64,7 +64,7 @@ const layoutConf = reactive({
     siderWidth: layout.value.siderWidth,
     logo: DefaultSetting.layout.logo,
     title: DefaultSetting.layout.title,
-    menuData: [menu.siderMenus, AccountMenu],
+    menuData: [...menu.siderMenus, AccountMenu],
     // menuData: menu.siderMenus,
     splitMenus: true,
 });
@@ -77,6 +77,7 @@ watchEffect(() => {
 
 const components = computed(() => {
   const componentName = route.matched[route.matched.length - 1]?.components?.default?.name
+  console.log(componentName, route.matched, route.matched[route.matched.length - 1])
   if (componentName !== 'BasicLayoutPage') {
     return route.matched[route.matched.length - 1]?.components?.default
   }

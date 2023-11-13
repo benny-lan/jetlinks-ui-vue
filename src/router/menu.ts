@@ -20,12 +20,12 @@ export const AccountMenu = {
     children: [
         {
             path: '/account/center',
-            name: 'account/center',
-            code: 'account/center',
+            name: 'account/Center',
+            code: 'account/Center',
             meta: {
                 title: '基本设置',
                 icon: '',
-                hideInMenu: false
+                // hideInMenu: false
             },
             component: () => import('@/views/account/Center/index.vue')
         },
@@ -36,7 +36,7 @@ export const AccountMenu = {
             meta: {
                 title: '通知订阅',
                 icon: '',
-                hideInMenu: false
+                // hideInMenu: false
             },
             component: () => import('@/views/account/NotificationSubscription/index.vue')
         },
@@ -47,7 +47,7 @@ export const AccountMenu = {
             meta: {
                 title: '通知记录',
                 icon: '',
-                hideInMenu: false
+                // hideInMenu: false
             },
             component: () => import('@/views/account/NotificationRecord/index.vue')
         },

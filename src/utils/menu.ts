@@ -255,7 +255,7 @@ const findSaveRouteItem = (item: any, components: any) => {
 
 export const handleMenus = (menuData: any[], components: any, level: number = 1) => {
   if (menuData && menuData.length) {
-    return menuData.map(item => {
+    return menuData.filter(item => item.code !== 'account-center').map(item => {
       const { isApp, appUrl } = hasAppID(item) // 是否为第三方程序
       const meta = handleMeta(item, isApp)
       const route: any = {

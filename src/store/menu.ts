@@ -109,11 +109,11 @@ export const useMenuStore = defineStore({
           //   resultData = filterCommunityMenus(resultData)
           // }
           const components = getAsyncRoutesMap()
-          const menusData = handleMenus(cloneDeep(resultData), components)
+          const menusData = handleMenus(cloneDeep([...resultData]), components)
           permission.handlePermission(resultData)
           const silderMenus = handleSiderMenu(cloneDeep(resultData))
           // const { menusData, silderMenus } = filterAsyncRouter(resultData)
-          handleMenusMap(cloneDeep([...menusData, AccountMenu]), this.handleMenusMapById)
+          handleMenusMap(cloneDeep([...menusData]), this.handleMenusMapById)
           menusData.push({
             path: '/',
             redirect: menusData[0]?.path,
@@ -121,8 +121,9 @@ export const useMenuStore = defineStore({
               hideInMenu: true
             }
           })
+          console.log(menusData)
           // console.log(menusData)
-          // menusData.push(AccountMenu)
+          menusData.push(AccountMenu)
           this.siderMenus = silderMenus
           res(menusData)
         }
