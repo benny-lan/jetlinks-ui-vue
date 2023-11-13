@@ -1,16 +1,16 @@
 <template>
     <j-select
         :disabled="disabled"
-        :value="_value"
         placeholder="请选择"
+        :value="_value"
         show-search
         @change="productChange"
     >
         <j-select-option
             v-for="item in _options"
             :key="item?.id"
-            :label="item.name"
             :value="item.id"
+            :label="item.name"
             >{{ item.name }}</j-select-option
         >
     </j-select>

@@ -3,10 +3,10 @@
     :confirmLoading="loading"
     :mask-closable="false"
     :visible="true"
-    :width="800"
     title="设备ID映射"
-    @cancel="handleCancel"
+    :width="800"
     @ok="handleOk"
+    @cancel="handleCancel"
   >
     <InklingDevice
       v-model:value='checkKey'

@@ -3,14 +3,14 @@
         <div :style="borderStyle" class="upload-image-border">
             <j-upload
                 :action="FILE_UPLOAD"
-                :before-upload="beforeUpload"
-                :headers="{
-                    'X-Access-Token': LocalStore.get(TOKEN_KEY),
-                }"
                 :show-upload-list="false"
                 class="avatar-uploader"
                 list-type="picture-card"
+                :before-upload="beforeUpload"
                 name="file"
+                :headers="{
+                    'X-Access-Token': LocalStore.get(TOKEN_KEY),
+                }"
                 v-bind="props"
             >
                 <div :style="props.style" class="upload-image-content">
@@ -21,9 +21,9 @@
                     </template>
                     <template v-else>
                         <AIcon
+                            type="LoadingOutlined"
                             v-if="loading"
                             style="font-size: 20px"
-                            type="LoadingOutlined"
                         />
                     </template>
                 </div>
@@ -37,9 +37,9 @@
   <ImageCropper
     v-if="cropperVisible"
     :img="cropperImg"
-    title="更改图标"
     @cancel="cropperVisible = false"
     @ok="saveImage"
+    title="更改图标"
   />
 </template>
 

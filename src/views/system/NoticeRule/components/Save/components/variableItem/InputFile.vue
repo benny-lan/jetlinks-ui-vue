@@ -1,22 +1,22 @@
 <template>
     <j-input
-        v-model:value="url"
         allowClear
         placeholder="请上传文件"
+        v-model:value="url"
         @change="onChange"
     >
         <template #addonAfter>
             <j-upload
-                :accept="'image/jpeg,image/png'"
                 :action="`${BASE_API_PATH}/file/static`"
+                :showUploadList="false"
+                :accept="'image/jpeg,image/png'"
                 :disabled="loading"
                 :headers="{
                     [TOKEN_KEY]: LocalStore.get(TOKEN_KEY),
                 }"
-                :showUploadList="false"
                 name="file"
-                @beforeUpload="handleBeforeUpload"
                 @change="handleChange"
+                @beforeUpload="handleBeforeUpload"
             >
                 <j-button style="height: 30px" type="link">
                     <AIcon v-if="loading" type="LoadingOutlined" />

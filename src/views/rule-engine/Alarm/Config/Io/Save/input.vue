@@ -12,9 +12,9 @@
         <j-form layout="vertical" :model="inputData" ref="formRef">
             <j-form-item label="状态">
                 <j-switch
-                    v-model:checked="inputData.status"
                     checked-children="启用"
                     un-checked-children="启用"
+                    v-model:checked="inputData.status"
                 ></j-switch>
             </j-form-item>
             <j-form-item

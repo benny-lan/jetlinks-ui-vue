@@ -79,10 +79,10 @@
                         </Guide>
                         <FullPage v-if="flowData.length !== 0">
                             <LineChart
-                                :chartData="flowData"
                                 :showX="true"
                                 :showY="true"
                                 style="min-height: 490px"
+                                :chartData="flowData"
                             />
                         </FullPage>
                         <div class="empty-body" v-else>

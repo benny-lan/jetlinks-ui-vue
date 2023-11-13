@@ -12,12 +12,12 @@
                     <div class="tree">
                         <j-tree
                             v-if="leftData.treeData.length > 0"
-                            v-model:selectedKeys="leftData.selectedKeys"
-                            :show-icon="true"
                             :showLine="{ showLeafIcon: false }"
                             :tree-data="leftData.treeData"
+                            v-model:selectedKeys="leftData.selectedKeys"
                             defaultExpandAll
                             @select="onSelect"
+                            :show-icon="true"
                         >
                             <template #title="{ dataRef }">
                                 <Ellipsis>
@@ -34,8 +34,8 @@
                                             {{ dataRef.title }}
                                         </span>
                                         <AIcon
-                                            style="color: #1d39c4"
                                             type="PlusOutlined"
+                                            style="color: #1d39c4"
                                             @click="addTable"
                                         />
                                     </div>
@@ -74,8 +74,8 @@
                                         ]"
                                     >
                                         <j-input
-                                            v-model:value="record.name"
                                             :disabled="record.old_id"
+                                            v-model:value="record.name"
                                             placeholder="请输入名称"
                                         />
                                     </j-form-item>
@@ -95,8 +95,8 @@
                                         ]"
                                     >
                                         <j-input
-                                            v-model:value="record.type"
                                             :disabled="record.old_id"
+                                            v-model:value="record.type"
                                             placeholder="请输入类型"
                                         />
                                     </j-form-item>
@@ -105,8 +105,8 @@
                                     <j-form-item :name="['data', index, 'length']">
                                         <j-input-number
                                             v-model:value="record.length"
-                                            :max="99999"
                                             :min="0"
+                                            :max="99999"
                                             style="width: 100%"
                                         />
                                     </j-form-item>
@@ -115,8 +115,8 @@
                                     <j-form-item :name="['data', index, 'scale']">
                                         <j-input-number
                                             v-model:value="record.scale"
-                                            :max="99999"
                                             :min="0"
+                                            :max="99999"
                                             style="width: 100%"
                                         />
                                     </j-form-item>
@@ -154,15 +154,15 @@
                                 </template>
                                 <template v-else-if="column.key === 'action'">
                                     <PermissionButton
-                                        :danger="true"
                                         :disabled="record.status"
+                                        :tooltip="{ title: '删除' }"
+                                        hasPermission="system/DataSource:delete"
+                                        :danger="true"
                                         :popConfirm="{
                                             title: `确认删除`,
                                             onConfirm: () =>
                                                 clickDel(record, index),
                                         }"
-                                        :tooltip="{ title: '删除' }"
-                                        hasPermission="system/DataSource:delete"
                                         type="link"
                                     >
                                         <AIcon type="DeleteOutlined" />

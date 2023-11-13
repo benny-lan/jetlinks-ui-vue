@@ -54,7 +54,7 @@ export const USER_CENTER_MENU_CODE = 'account-center'
 export const USER_CENTER_MENU_BUTTON_CODE = 'user-center-passwd-update'
 export const MESSAGE_SUBSCRIBE_MENU_CODE = 'message-subscribe'
 export const MESSAGE_SUBSCRIBE_MENU_BUTTON_CODE = 'message-subscribe-view'
-
+export const messageSubscribe  = 'message-subscribe'
 /**协议列表 */
 export const protocolList = [
     { label: 'OPC_UA', value: 'OPC_UA', alias: 'opc-ua' },

@@ -7,15 +7,15 @@
             <DataTableEnum v-if="formData.type === 'enum'" v-model:value="formData" placement="topRight" />
             <DataTableBoolean v-else-if="formData.type === 'boolean'" v-model:value="formData" placement="topRight" />
             <DataTableDouble
-                v-else-if="['float', 'double'].includes(formData.type)"
                 v-model:value="formData"
+                v-else-if="['float', 'double'].includes(formData.type)"
                 :options="options"
                 placement="topRight"
             />
             <DataTableArray
                 v-else-if="formData.type === 'array'"
-                v-model:value="formData.unit"
                 placement="topRight"
+                v-model:value="formData.unit"
             />
             <DataTableFile v-else-if="formData.type === 'file'" v-model:value="formData.fileType" placement="topRight"/>
             <DataTableDate v-else-if="formData.type === 'date'" v-model:value="formData.date" placement="topRight"/>

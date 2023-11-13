@@ -8,9 +8,9 @@
                 <div>
                     <j-tooltip :title="!action ? '暂无权限，请联系管理员' : ''">
                         <j-switch
-                            :checked="checked"
                             :disabled="!action"
                             @change="onSwitchChange"
+                            :checked="checked"
                         />
                     </j-tooltip>
                 </div>
@@ -53,38 +53,38 @@
                             <j-dropdown>
                                 <div class="box-item-img">
                                     <img
+                                        style="width: 100%"
                                         :src="
                                             iconMap.get(
                                                 slotProps?.channelProvider,
                                             )
                                         "
-                                        style="width: 100%"
                                     />
                                 </div>
                                 <template
+                                    #overlay
                                     v-if="
                                         slotProps?.channelProvider !==
                                         'inside-mail'
                                     "
-                                    #overlay
                                 >
                                     <j-menu mode="">
                                         <j-menu-item>
                                             <PermissionButton
-                                                :hasPermission="true"
                                                 type="link"
                                                 @click="onView(slotProps)"
+                                                :hasPermission="true"
                                             >
                                                 查看
                                             </PermissionButton>
                                         </j-menu-item>
                                         <j-menu-item>
                                             <PermissionButton
+                                                type="link"
+                                                @click="onEdit(slotProps)"
                                                 :hasPermission="[
                                                     'system/NoticeRule:update',
                                                 ]"
-                                                type="link"
-                                                @click="onEdit(slotProps)"
                                             >
                                                 编辑
                                             </PermissionButton>
@@ -113,8 +113,8 @@
 
                 <j-tooltip :title="!add ? '暂无权限，请联系管理员' : ''">
                     <j-button
-                        :disabled="!add"
                         class="box-item-add"
+                        :disabled="!add"
                         @click="onAdd"
                     >
                         <AIcon type="PlusOutlined" />
@@ -124,25 +124,25 @@
         </div>
     </j-spin>
     <Save
-        v-if="visible"
         :data="current"
-        :loading="loading"
-        :name="data.name"
+        v-if="visible"
         :provider="provider"
         @close="visible = false"
+        :loading="loading"
         @save="onSave"
+        :name="data.name"
     />
     <Detail
-        v-if="detailVisible"
         :data="current"
+        v-if="detailVisible"
         @close="detailVisible = false"
     />
     <Auth
         v-if="authVisible"
         :data="data?.grant?.role?.idList"
-        :name="data.name"
         @close="authVisible = false"
         @save="onAuthSave"
+        :name="data.name"
     />
 </template>
 

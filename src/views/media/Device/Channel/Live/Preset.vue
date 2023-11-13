@@ -1,35 +1,35 @@
 <template>
     <j-table
+        size="small"
         :columns="columns"
         :dataSource="dataSource"
         :pagination="false"
         :scroll="share ? { y: 560} :{ y: 200 }"
-        size="small"
     >
         <template #bodyCell="{ column, record }">
             <template v-if="column.dataIndex === 'actions'">
                 <j-button
-                    v-if="!record.flag"
-                    :disabled="loading"
                     style="padding: 0"
                     type="link"
+                    v-if="!record.flag"
+                    :disabled="loading"
                     @click="onSetting(record)"
                     >设置</j-button
                 >
                 <template v-else>
                     <j-space>
                         <j-button
-                            :disabled="loading"
                             danger
-                            style="padding: 0"
                             type="link"
+                            :disabled="loading"
+                            style="padding: 0"
                             @click="onDelete(record)"
                             >删除</j-button
                         >
                         <j-button
+                            type="link"
                             :disabled="loading"
                             style="padding: 0"
-                            type="link"
                             @click="onInvoke(record)"
                             >调用</j-button
                         >
@@ -38,8 +38,8 @@
             </template>
             <template v-else-if="column.dataIndex === 'name'">
                 <j-input
-                    v-model:value="record[column.dataIndex]"
                     :disabled="record.flag"
+                    v-model:value="record[column.dataIndex]"
                 />
             </template>
             <template v-else>

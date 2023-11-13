@@ -2,10 +2,10 @@
     <div class="metadata-source">
         <j-select
             v-model:value="myValue"
-            :disabled="disabled"
-            :get-popup-container="(node) => fullRef || node"
             :options="PropertySource"
             placeholder="请选择来源"
+            :disabled="disabled"
+            :get-popup-container="(node) => fullRef || node"
             @change="onChange"
         >
         </j-select>
@@ -25,10 +25,10 @@
                     <div style="padding: 0 10px">
                         <VirtualRule
                             v-if="visible"
+                            :value="value"
                             ref="virtualRuleRef"
                             :dataSource="dataSource"
                             :source="myValue"
-                            :value="value"
                         />
                     </div>
                 </j-scrollbar>
@@ -59,10 +59,10 @@
                                     <div style="padding: 0 10px">
                                         <VirtualRule
                                             v-if="visible"
+                                            :value="value"
                                             ref="virtualRuleRef"
                                             :dataSource="dataSource"
                                             :source="myValue"
-                                            :value="value"
                                         />
                                     </div>
                                 </j-scrollbar>

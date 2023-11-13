@@ -1,23 +1,24 @@
 <template>
     <j-data-table
         ref="tableRef"
-        :columns="columns"
         :data-source="dataSource"
+        :columns="columns"
         :height="560"
         :searchProps="{
           placeholder: '请输入搜索名称'
         }"
         serial
-        @change="(data) => dataSourceCache = data"
         @editStatus="editStatusChange"
+        @change="(data) => dataSourceCache = data"
     >
         <template #expand>
           <PermissionButton
-              v-if="!showSave"
-              key="add"
-              :disabled="hasOperate('add', type)"
               :hasPermission="`${permission}:update`"
+              v-if="!showSave"
+              type="primary"
+              key="add"
 
+              :disabled="hasOperate('add', type)"
               :tooltip="{
                     placement: hasOperate('add', type) ? 'topRight' : 'top',
                     title: hasOperate('add', type)
@@ -25,19 +26,19 @@
                         : '新增',
                         getPopupContainer: getPopupContainer,
                 }"
-              placement="topRight"
-              type="primary"
               @click="handleAddClick()"
+              placement="topRight"
           >
             新增
           </PermissionButton>
           <PermissionButton
               v-else
-              key="update"
               :disabled="hasOperate('add', type) || !editStatus"
+              key="update"
               :hasPermission="`${permission}:update`"
               :loading="loading"
 
+              placement="topRight"
               :tooltip="{
                     title: hasOperate('add', type)
                         ? '当前的存储方式不支持新增'
@@ -45,9 +46,8 @@
                     placement: hasOperate('add', type) ? 'topRight' : 'top',
                     getPopupContainer: getPopupContainer,
                 }"
-              placement="topRight"
-              type="primary"
               @click="handleSaveClick()"
+              type="primary"
           >
             保存
           </PermissionButton>
@@ -122,65 +122,67 @@
             </j-button> -->
           <!-- </j-tooltip> -->
           <OtherSetting
-              :id="data.record.id"
               v-model:value="data.record.expands"
+              :id="data.record.id"
               :disabled="target === 'device' && productNoEdit.id?.includes?.(data.record.id)"
-              :has-permission="`${permission}:update`"
               :record="data.record"
+              :type="data.record.valueType.type"
+              :has-permission="`${permission}:update`"
               :tooltip="target === 'device' && productNoEdit.id?.includes?.(data.record.id) ? {
                 title: '继承自产品物模型的数据不支持删除',
               } : undefined"
-              :type="data.record.valueType.type"
           />
 
         </template>
         <template #action="{data}">
           <j-space>
             <PermissionButton
-                key="edit"
-                :disabled="!!operateLimits('add', type)"
                 :has-permission="`${permission}:update`"
+                style="padding: 0"
+                key="edit"
+                type="link"
+                :disabled="!!operateLimits('add', type)"
+                @click="copyItem(data.record, data.index)"
                 :tooltip="{
                   title: operateLimits('add', type) ? '当前的存储方式不支持复制' : '复制',
                   getPopupContainer: getPopupContainer,
                 }"
-                style="padding: 0"
-                type="link"
-                @click="copyItem(data.record, data.index)"
             >
               <AIcon type="CopyOutlined" />
             </PermissionButton>
             <PermissionButton
-                key="edit"
-                :disabled="!!operateLimits('add', type)"
                 :has-permission="`${permission}:update`"
+                style="padding: 0"
+                key="edit"
+                type="link"
+                :disabled="!!operateLimits('add', type)"
+                @click="handleAddClick(null, data.index)"
                 :tooltip="{
                   title: operateLimits('add', type) ? '当前的存储方式不支持新增' : '新增',
                   getPopupContainer: getPopupContainer,
                 }"
-                style="padding: 0"
-                type="link"
-                @click="handleAddClick(null, data.index)"
             >
               <AIcon type="PlusSquareOutlined" />
             </PermissionButton>
             <PermissionButton
-                key="edit"
                 :has-permission="true"
+                style="padding: 0"
+                key="edit"
+                type="link"
+                @click="showDetail(data.record)"
                 :tooltip="{
                   title: '详情',
                   getPopupContainer: getPopupContainer,
                 }"
-                style="padding: 0"
-                type="link"
-                @click="showDetail(data.record)"
             >
               <AIcon type="FileSearchOutlined" />
             </PermissionButton>
             <PermissionButton
-                key="delete"
                 :disabled="target === 'device' && productNoEdit.id?.includes?.(data.record.id)"
                 :has-permission="`${permission}:update`"
+                key="delete"
+                danger
+                style="padding: 0"
                 :pop-confirm="{
                   placement: 'topRight',
                   title: showLastDelete ? '这是最后一条数据了，确认删除？' : '确认删除？',
@@ -189,14 +191,12 @@
                     },
                     getPopupContainer: getPopupContainer
                   }"
+                type="link"
                 :tooltip="{
                   placement: 'topRight',
                   getPopupContainer: getPopupContainer,
                   title: target === 'device' && productNoEdit.id?.includes?.(data.record.id) ? '继承自产品物模型的数据不支持删除' :'删除',
                 }"
-                danger
-                style="padding: 0"
-                type="link"
             >
               <AIcon type="DeleteOutlined" />
             </PermissionButton>

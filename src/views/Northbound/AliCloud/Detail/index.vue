@@ -27,12 +27,12 @@
                                             >{{ _error }}</span
                                         >
                                         <PermissionButton
-                                            :hasPermission="'device/Product:action'"
                                             :popConfirm="{
                                                 title: '确认启用',
                                                 onConfirm: onActiveProduct,
                                             }"
                                             size="small"
+                                            :hasPermission="'device/Product:action'"
                                         >
                                             立即启用
                                         </PermissionButton>

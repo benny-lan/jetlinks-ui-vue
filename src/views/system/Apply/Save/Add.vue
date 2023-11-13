@@ -1,8 +1,8 @@
 <template>
     <j-modal
         :width="810"
-        title="选择应用类型"
         visible
+        title="选择应用类型"
         @cancel="emit('close')"
         @ok="onSave"
     >

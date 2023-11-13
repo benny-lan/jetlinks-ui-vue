@@ -6,9 +6,9 @@
       </j-ellipsis>
     </div>
     <j-popconfirm-modal
-        :get-popup-container="(node) => fullRef || node"
         :show-cancel="false"
         body-style="width: 300px"
+        :get-popup-container="(node) => fullRef || node"
         @confirm="confirm"
     >
       <template #content>

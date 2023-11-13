@@ -12,12 +12,12 @@
                     <j-collapse v-model:activeKey="activeKey" :bordered="false" expand-icon-position="right">
                         <template #expandIcon="{ isActive }">
                             <AIcon
+                                type="CaretRightOutlined"
                                 :style="{
                                     transform: `rotate(${
                                         isActive ? 90 : 0
                                     }deg)`,
                                 }"
-                                type="CaretRightOutlined"
                             />
                         </template>
                         <j-collapse-panel
@@ -37,9 +37,9 @@
                                 >
                                     <Item
                                         :data="child"
+                                        @refresh="onRefresh"
                                         :isLast="index === item.children?.length"
                                         :provider="item.provider"
-                                        @refresh="onRefresh"
                                     />
                                 </template>
                             </div>

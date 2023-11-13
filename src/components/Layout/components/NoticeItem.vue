@@ -1,11 +1,11 @@
 <template>
     <div class="list-items">
         <div
+            class="list-item"
+            @click="onMove"
             :style="{
                 transform: `translate(${num}px, 0)`,
             }"
-            class="list-item"
-            @click="onMove"
         >
             <div class="list-item-left">
                 <div class="header">

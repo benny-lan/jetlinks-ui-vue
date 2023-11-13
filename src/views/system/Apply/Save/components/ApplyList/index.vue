@@ -2,23 +2,23 @@
     <div :disabled="disabled" :value="_value" class="radio-container">
         <div
             v-for="item in options"
-            :key="item.value"
-            :class="{ active: item.value === _value }"
             :value="item.value"
+            :key="item.value"
             class="radio-container-item"
             @click="onChange(item.value)"
+            :class="{ active: item.value === _value }"
         >
             <div v-if="type === 'edit'">
                 <MUpload
+                    :defaultValue="defaultImg[item.value]"
                     :borderStyle="{
                         width: '64px',
                         height: '64px',
                         border: 'none',
                     }"
-                    :defaultValue="defaultImg[item.value]"
                     :disabled="!(item.value === _value)"
-                    :modelValue="urlValue[item.value]"
                     accept="image/jpeg,image/png"
+                    :modelValue="urlValue[item.value]"
                     @change="(_url) => onImgChange(_url, item.value)"
                 />
             </div>

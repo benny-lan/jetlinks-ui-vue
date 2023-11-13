@@ -23,11 +23,11 @@
                                             <div>其他：以场景联动维度告警，某场景下的多个设备异常仅发送一条告警。</div>
                                         </template>
                                         <AIcon
+                                            type="QuestionCircleOutlined"
                                             style="
                                                 color: rgb(136, 136, 136);
                                                 font-size: 12px;
                                             "
-                                            type="QuestionCircleOutlined"
                                         />
                                     </j-tooltip>
                                 </j-space>

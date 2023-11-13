@@ -2,15 +2,15 @@
     <div style="padding: 50px 200px">
         <j-form
             v-if="variableDefinitions.length"
-            ref="formRef"
             :layout="'vertical'"
+            ref="formRef"
             :model="modelRef"
         >
             <j-form-item
-                v-for="item in variableDefinitions"
-                :key="item.id"
                 :label="item?.name"
                 :name="`${item?.id}`"
+                v-for="item in variableDefinitions"
+                :key="item.id"
                 :rules="[
                     {
                         required: getType(item) !== 'file' ? true : false,
@@ -21,9 +21,9 @@
                 ]"
             >
                 <Tag
+                    :notify="notify"
                     v-if="getType(item) === 'tag'"
                     v-model:value="modelRef[item.id]"
-                    :notify="notify"
                 />
                 <InputFile
                     v-else-if="getType(item) === 'file'"
@@ -35,9 +35,9 @@
                 />
                 <BuildIn
                     v-else
-                    v-model:value="modelRef[item.id]"
                     :item="item"
                     :providerId="props.notify?.providerId"
+                    v-model:value="modelRef[item.id]"
                 />
             </j-form-item>
         </j-form>

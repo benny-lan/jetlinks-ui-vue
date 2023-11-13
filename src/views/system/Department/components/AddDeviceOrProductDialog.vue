@@ -38,11 +38,11 @@
         >
             <template #headerTitle>
                 <pro-search
-                    :columns="searchColumns"
                     style="width: 75%; margin-bottom: 0;"
+                    :columns="searchColumns"
                     target="category-bind-modal"
-                    type="simple"
                     @search="search"
+                    type="simple"
                 />
             </template>
             <template #card="slotProps">

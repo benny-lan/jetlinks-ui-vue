@@ -20,22 +20,22 @@
             <div class="media-live-video">
                 <div
                     :class="mediaToolClass"
-                    @mouseenter="showTool = true"
                     @mouseleave="mouseleave"
+                    @mouseenter="showTool = true"
                 >
                     <div v-if="type !== 'share'" class="tool-item">
                         <template v-if="isRecord === 0">
                             <j-dropdown
                                 trigger="click"
-                                @click="showToolLock = true"
                                 @visibleChange="visibleChange"
+                                @click="showToolLock = true"
                             >
                                 <div>开始录像</div>
                                 <template #overlay>
                                     <j-menu @click="recordStart">
                                         <j-menu-item
-                                            v-if="_type"
                                             key="true"
+                                            v-if="_type"
                                         >
                                             <span style="padding-right: 12px"
                                                 >本地存储</span
@@ -84,8 +84,8 @@
                 <LivePlayer
                     ref="player"
                     :live="true"
-                    :protocol="mediaType"
                     :url="url"
+                    :protocol="mediaType"
                     autoplay
                 />
             </div>
@@ -105,8 +105,8 @@
                                     <template #overlay>
                                         <j-menu @click="onMenuChange">
                                             <j-menu-item
-                                                v-for="item in speedList"
                                                 :key="item.value"
+                                                v-for="item in speedList"
                                             >
                                                 {{ item.label }}
                                             </j-menu-item>

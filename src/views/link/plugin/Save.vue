@@ -21,8 +21,8 @@
                   title='若不填写，系统将自动生成唯一ID'
                 >
                     <AIcon
-                      style='margin-left: 2px'
                       type='QuestionCircleOutlined'
+                      style='margin-left: 2px'
                     />
                 </j-tooltip>
             </span>

@@ -27,8 +27,8 @@
                                     v-model:value="record[column.dataIndex]"
                                     placeholder="请选择"
                                     allowClear
-                                    :options="channelList"
                                     :filter-option="filterOption"
+                                    :options="channelList"
                                     show-search
                                     @select="(_, option) => { record.provider = option.provider }"
                                 >

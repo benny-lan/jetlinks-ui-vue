@@ -18,9 +18,9 @@
         <j-form :layout="'vertical'">
           <j-form-item label='选择导入方式' required>
             <j-card-select
+              :value="[importData.type]"
               :column='typeOptions.length'
               :options="typeOptions"
-              :value="[importData.type]"
               @change='typeChange'
             >
               <template #image='{image}'>
@@ -45,8 +45,8 @@
   <j-modal
     :maskClosable="false"
     :visible="importVisible"
-    title="导入完成"
     width="400px"
+    title="导入完成"
     @cancel='importCancel'
     @ok='importCancel'
   >

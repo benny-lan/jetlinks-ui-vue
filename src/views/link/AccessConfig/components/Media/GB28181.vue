@@ -332,6 +332,7 @@
                                                     index,
                                                     'publicHost',
                                                 ]"
+                                                :validateFirst="true"
                                                 :rules="[
                                                     {
                                                         required: true,
@@ -343,7 +344,6 @@
                                                         trigger: 'change',
                                                     },
                                                 ]"
-                                                :validateFirst="true"
                                             >
                                                 <template #label>
                                                     公网 Host

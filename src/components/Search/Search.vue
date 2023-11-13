@@ -2,9 +2,9 @@
   <j-advanced-search
     :target='target'
     :type='type'
+    :request='(data) => saveSearchHistory(data, target)'
     :deleteRequest='(_target: string, id: string) => deleteSearchHistory(target, id)'
     :historyRequest='() => getSearchHistory(target)'
-    :request='(data) => saveSearchHistory(data, target)'
     :columns='columns'
     :class='props.class'
     style='padding-top: 18px; padding-bottom: 18px;'

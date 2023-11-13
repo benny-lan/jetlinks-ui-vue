@@ -5,7 +5,7 @@ export const InitLicense = '/init-license'
 export const NotificationSubscriptionCode = 'account/NotificationSubscription'
 export const NotificationRecordCode = 'account/NotificationRecord'
 export const OauthPath = '/oauth'
-
+export const VideoSharePath = '/media/device/Share'
 export const AccountMenu = {
     path: '/account',
     component: () => import('@/components/Layout/BasicLayoutPage.vue'),

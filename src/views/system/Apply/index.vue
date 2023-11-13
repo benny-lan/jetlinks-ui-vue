@@ -104,9 +104,9 @@
                                                 >
                                                     <j-tooltip :title="o?.tooltip?.title">
                                                         <j-button
-                                                            :disabled="o.disabled"
                                                             type="link"
                                                             @click="o.onClick"
+                                                            :disabled="o.disabled"
                                                         >
                                                             <AIcon :type="o.icon" />
                                                             <span>{{
@@ -185,8 +185,8 @@
             <MenuDialog
                 v-if="dialogVisible && current.provider !== 'third-party'"
                 v-model:visible="dialogVisible"
-                :data="current"
                 mode="edit"
+                :data="current"
                 @refresh="table.refresh"
             />
           <ThirdMenu

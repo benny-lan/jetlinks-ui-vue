@@ -5,45 +5,45 @@
                 { label: '手动输入', value: 'fixed' },
                 { label: '内置参数', value: 'upper' },
             ]"
-            :value="value?.source"
             style="width: 120px"
+            :value="value?.source"
             @change="sourceChange"
         />
         <template v-if="source === 'upper'">
             <j-tree-select
                 v-model:value="upperKey"
-                :fieldNames="{ label: 'name', value: 'id' }"
                 :treeData="builtInList"
                 placeholder="请选择参数"
                 style="width: calc(100% - 120px)"
+                :fieldNames="{ label: 'name', value: 'id' }"
                 @change="(val) => itemOnChange(undefined, val)"
             >
             </j-tree-select>
         </template>
         <template v-else>
             <j-date-picker
-                v-if="item.type === 'date'"
                 :value="value.value"
                 allowClear
+                v-if="item.type === 'date'"
                 format="YYYY-MM-DD HH:mm:ss"
                 style="width: calc(100% - 120px)"
                 valueFormat='YYYY-MM-DD HH:mm:ss'
                 @change="(_, dateString) => itemOnChange(dateString)"
             />
             <j-input-number
-                v-else-if="item.type === 'number'"
-                :placeholder="`请输入${item.name}`"
                 :value="value.value"
                 allowClear
                 style="width: calc(100% - 120px)"
+                v-else-if="item.type === 'number'"
+                :placeholder="`请输入${item.name}`"
                 @change="itemOnChange"
             />
             <j-input
-                v-else
-                :placeholder="`请输入${item.name}`"
                 :value="value.value"
                 allowClear
                 style="width: calc(100% - 120px)"
+                v-else
+                :placeholder="`请输入${item.name}`"
                 @change="(e) => itemOnChange(e.target.value)"
             />
         </template>

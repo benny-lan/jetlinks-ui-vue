@@ -1,10 +1,10 @@
 <template>
     <div class="notice-info-container">
         <j-tabs
-            v-if="tabs.length"
             v-model:activeKey="activeKey"
             :destroyInactiveTabPane="true"
             @change="onChange"
+            v-if="tabs.length"
         >
             <j-tab-pane v-for="item in tabs" :key="item.key">
                 <template #tab>

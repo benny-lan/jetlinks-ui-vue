@@ -5,17 +5,17 @@
       </div>
         <DataTableArray
             v-if="type === 'array'"
-            v-model:value="data.elementType"
             placement="bottomRight"
+            v-model:value="data.elementType"
             @confirm="valueChange"
         />
         <DataTableObject
             v-else-if="type === 'object'"
             v-model:value="data.properties"
-            :columns="columns"
-            :onAdd="addItem"
             placement="bottomRight"
+            :columns="columns"
             @confirm="valueChange"
+            :onAdd="addItem"
         >
           <template #valueType="{ data }">
             <span>{{ TypeStringMap[data.record.valueType?.type] }}</span>
@@ -28,14 +28,14 @@
         <DataTableBoolean v-else-if="type === 'boolean'"  v-model:value="data"  placement="bottomRight" @confirm="valueChange"/>
         <DataTableDouble
             v-else-if="['float', 'double'].includes(type)"
+            placement="bottomRight"
             v-model:value="data"
             :options="unitOptions"
-            placement="bottomRight"
             @confirm="valueChange"
         />
         <DataTableInteger
-            v-else-if="['int', 'long'].includes(type)"
             v-model:value="data.unit"
+            v-else-if="['int', 'long'].includes(type)"
             :options="unitOptions"
             placement="bottomRight"
             @confirm="valueChange"
@@ -44,8 +44,8 @@
         <DataTableDate v-else-if="type === 'date'"  v-model:value="data.date" placement="bottomRight" @confirm="valueChange"/>
         <DataTableString
             v-else-if="['string', 'password'].includes(type)"
-            v-model:value="data.maxLength"
             placement="bottomRight"
+            v-model:value="data.maxLength"
             @confirm="valueChange"
         />
     </div>

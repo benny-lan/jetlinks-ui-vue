@@ -94,7 +94,7 @@ export const useMenuStore = defineStore({
           name, params, query, state: { params }
         })
     },
-    handleMenusMapById(item: { code: string, path: string}) {
+    handleMenusMapById(item: { name: string, path: string}) {
       const { name, path } = item
       this.menus[name] = {path}
     },
@@ -104,22 +104,16 @@ export const useMenuStore = defineStore({
         const resp = await queryOwnThree({ paging: false, terms: defaultOwnParams })
         if (resp.success) {
           const permission = usePermissionStore()
-          permission.permissions = {}
-          const { menusData, silderMenus } = filterAsyncRouter(resp.result)
-
-          // 是否存在通知订阅
-          const hasMessageSub = resp.result.some((item: { code: string }) => item.code === MESSAGE_SUBSCRIBE_MENU_CODE)
-          if (!hasMessageSub) {
-            AccountMenu.children = AccountMenu.children.filter((item: { code: string }) => ![NotificationSubscriptionCode, NotificationRecordCode].includes(item.code) )
-          }
-          this.menus = findCodeRoute([...resp.result, AccountMenu])
-          Object.keys(this.menus).forEach((item) => {
-            const _item = this.menus[item]
-            if (_item.buttons?.length) {
-              permission.permissions[item] = _item.buttons
-            }
-          })
-
+          let resultData = resp.result
+          // if (!isNoCommunity) {
+          //   resultData = filterCommunityMenus(resultData)
+          // }
+          const components = getAsyncRoutesMap()
+          const menusData = handleMenus(cloneDeep(resultData), components)
+          permission.handlePermission(resultData)
+          const silderMenus = handleSiderMenu(cloneDeep(resultData))
+          // const { menusData, silderMenus } = filterAsyncRouter(resultData)
+          handleMenusMap(cloneDeep([...menusData, AccountMenu]), this.handleMenusMapById)
           menusData.push({
             path: '/',
             redirect: menusData[0]?.path,
@@ -127,8 +121,9 @@ export const useMenuStore = defineStore({
               hideInMenu: true
             }
           })
-          menusData.push(AccountMenu)
-          this.siderMenus = silderMenus.filter((item: { name: string }) => ![USER_CENTER_MENU_CODE, MESSAGE_SUBSCRIBE_MENU_CODE].includes(item.name))
+          // console.log(menusData)
+          // menusData.push(AccountMenu)
+          this.siderMenus = silderMenus
           res(menusData)
         }
       })

@@ -1,11 +1,11 @@
 <template>
     <j-select
-        :disabled="shareCluster"
-        :options="options"
         :value="host"
-        allowClear
+        :disabled="shareCluster"
         placeholder="请选择本地地址"
+        :options="options"
         show-search
+        allowClear
         @change="changeHost"
     >
     </j-select>

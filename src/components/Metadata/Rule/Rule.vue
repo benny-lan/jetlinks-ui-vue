@@ -65,8 +65,8 @@
   </j-popconfirm-modal>
   <Modal
     v-if="visible"
-    @cancel="ruleCancel"
     @ok="ruleOk"
+    @cancel="ruleCancel"
   />
 </template>
 

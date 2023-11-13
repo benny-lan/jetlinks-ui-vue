@@ -12,9 +12,9 @@
         />
         <DataTableObject
             v-else-if="type === 'object'"
-            :columns="columns"
             :value="_valueType.properties"
             placement="bottomRight"
+            :columns="columns"
             @confirm="(data) => {valueChange(data, 'object')}"
         >
             <template #valueType="{ data }">
@@ -28,15 +28,15 @@
         <DataTableBoolean v-else-if="type === 'boolean'" v-model:value="_valueType" placement="bottomRight" @confirm="(data) => {valueChange(data, 'boolean')}" />
         <DataTableDouble
             v-else-if="['float', 'double'].includes(type)"
-            v-model:value="_valueType"
             :options="unitOptions"
+            v-model:value="_valueType"
             placement="bottomRight"
             @confirm="(data) => {valueChange(data, 'float')}"
         />
         <DataTableInteger
             v-else-if="['int', 'long'].includes(type)"
-            v-model:value="_valueType.unit"
             :options="unitOptions"
+            v-model:value="_valueType.unit"
             placement="bottomRight"
             @confirm="(data) => {valueChange(data, 'int')}"
         />

@@ -2,15 +2,15 @@
     <div class="header">
         <pro-search
             :columns="columns"
-            style="padding-bottom: 0"
-            target="action-notice-template"
             type="simple"
+            style="padding-bottom: 0"
             @search="handleSearch"
+            target="action-notice-template"
         />
         <PermissionButton
-            :hasPermission="['notice/Template:add']"
             type="primary"
             @click="onAdd"
+            :hasPermission="['notice/Template:add']"
         >
             新增
         </PermissionButton>
@@ -23,29 +23,29 @@
         <JProTable
             ref="tableRef"
             :alertRender="false"
+            :columns="columns"
             :bodyStyle="{
                 padding: 0,
             }"
-            :columns="columns"
-            :gridColumn="3"
-            :noPagination="true"
             :params="params"
             :request="(e) => handleData(e)"
+            model="CARD"
+            :gridColumn="3"
+            :noPagination="true"
             :rowSelection="{
                 selectedRowKeys: _selectedRowKeys,
                 onChange: onSelectChange,
             }"
-            model="CARD"
         >
             <template #card="slotProps">
                 <CardBox
+                    :showStatus="false"
+                    :value="slotProps"
                     :actions="[]"
                     :active="_selectedRowKeys.includes(slotProps.id)"
-                    :showStatus="false"
-                    :showTool="false"
-                    :value="slotProps"
                     v-bind="slotProps"
                     @click="handleClick"
+                    :showTool="false"
                 >
                     <template #img>
                         <slot name="img">

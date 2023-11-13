@@ -95,6 +95,11 @@
                         :itemType="
                             property.valueType?.type || property.type || 'int'
                         "
+                        :placeholder="
+                            property.valueType?.type === 'array'
+                                ? '多个数据用英文,分割'
+                                : ''
+                        "
                         :options="
                             property.valueType?.type === 'enum'
                                 ? (property?.valueType?.elements || []).map(
@@ -118,17 +123,12 @@
                                   ]
                                 : undefined
                         "
-                        :placeholder="
-                            property.valueType?.type === 'array'
-                                ? '多个数据用英文,分割'
-                                : ''
-                        "
                     />
                 </j-form-item>
             </j-col>
             <j-col
-                v-if="modelRef.messageType === 'INVOKE_FUNCTION'"
                 :span="24"
+                v-if="modelRef.messageType === 'INVOKE_FUNCTION'"
                 class="inputs"
             >
                 <j-form-item

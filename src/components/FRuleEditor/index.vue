@@ -1,13 +1,13 @@
 <template>
     <j-modal
-        :destroyOnClose="true"
-        :getContainer="(node) => fullRef || node"
-        :mask-closable="false"
         :zIndex="1030"
-        title="编辑规则"
+        :destroyOnClose="true"
         visible
         width="70vw"
+        :getContainer="(node) => fullRef || node"
+        :mask-closable="false"
         @cancel="handleCancel"
+        title="编辑规则"
     >
         <div v-if="virtualRule?.windowType && virtualRule?.windowType !== 'undefined'" class="header">
             <div class="header-item">
@@ -28,21 +28,21 @@
                 </div>
                 <div style="margin-top: 10px;">
                     <Editor
-                        key="advance"
                         ref="editor"
+                        key="advance"
+                        mode="advance"
                         v-model:value="_value"
                         :tips="tips"
-                        mode="advance"
                     />
                 </div>
             </div>
             <div class="right">
                 <Debug
-                    :id="id"
                     :virtualRule="{
                         ...virtualRule,
                         script: _value,
                     }"
+                    :id="id"
                     @success="onSuccess"
                 />
             </div>

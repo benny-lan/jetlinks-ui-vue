@@ -8,11 +8,11 @@
     <j-input-number
         v-else-if="type === 'int'"
         v-model:value="myValue"
+        :precision="0"
         :max="2147483647"
         :min="-2147483648"
-        :precision="0"
-        placeholder="请输入"
         style="width: 100%"
+        placeholder="请输入"
         @change="change"
     />
     <j-input-number
@@ -36,21 +36,21 @@
     />
     <j-select
         v-else-if="type === 'boolean'"
+        placeholder="请选择"
         v-model:value="myValue"
+        style="width: 100%"
         :get-popup-container="(node) => fullRef || node"
         :options="options"
-        placeholder="请选择"
-        style="width: 100%"
         @change="change"
     />
     <j-date-picker
         v-else-if="type === 'date' "
         v-model:value="myValue"
+        show-time
         :get-popup-container="(node) => fullRef || node"
+        style="width: 100%"
         format="YYYY-MM-DD HH:mm:ss"
         placeholder="请选择"
-        show-time
-        style="width: 100%"
         valueFormat="YYYY-MM-DD HH:mm:ss"
         @change="change"
     />

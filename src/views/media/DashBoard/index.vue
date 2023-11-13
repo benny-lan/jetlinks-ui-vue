@@ -37,8 +37,8 @@
             <j-col :span="24" class="dash-board-bottom">
                 <full-page>
                     <Card
-                        :chartData="chartData"
                         title="播放数量(人次)"
+                        :chartData="chartData"
                         @change="getPlayCount"
                     />
                 </full-page>

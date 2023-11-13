@@ -7,9 +7,9 @@
 ]" label="读写类型" name="type">
   <j-select
       v-model:value="myValue"
+      mode="multiple"
       :disabled="disabled"
       :options="options"
-      mode="multiple"
       placeholder="请选择读写类型"
       @change="onChange"
   />

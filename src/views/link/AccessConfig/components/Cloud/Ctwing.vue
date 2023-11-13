@@ -144,10 +144,10 @@
                                         <j-image :src="img4" width="100%" />
                                     </div>
                                     <j-descriptions
-                                        :column="1"
-                                        :labelStyle="{ width: '100px' }"
                                         bordered
                                         size="small"
+                                        :column="1"
+                                        :labelStyle="{ width: '100px' }"
                                     >
                                         <j-descriptions-item label="参数"
                                             >说明</j-descriptions-item

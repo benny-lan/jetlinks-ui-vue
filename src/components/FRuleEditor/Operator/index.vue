@@ -2,20 +2,20 @@
     <div class="operator-box">
         <div class="left">
             <j-input-search
+                @search="search"
                 allow-clear
                 placeholder="搜索关键字"
-                @search="search"
             />
             <div class="tree">
               <j-scrollbar>
 
 
                 <j-tree
-                    :field-names="{ title: 'name', key: 'id' }"
                     :show-icon="true"
+                    :field-names="{ title: 'name', key: 'id' }"
+                    auto-expand-parent
                     :showLine="{ showLeafIcon: false }"
                     :tree-data="data"
-                    auto-expand-parent
                     @select="selectTree"
                 >
                     <template #title="node">
@@ -54,8 +54,8 @@
                                                 title="实时值的上一有效值"
                                             >
                                                 <j-button
-                                                    type="text"
                                                     @click="lastClick(node)"
+                                                    type="text"
                                                 >
                                                     上一值
                                                 </j-button>

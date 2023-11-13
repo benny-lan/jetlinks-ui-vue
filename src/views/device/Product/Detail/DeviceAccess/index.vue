@@ -79,8 +79,8 @@
                     <j-select
                       v-model:value='productData.id'
                       :options='productTypes'
-                      placeholder='请选择产品类型'
                       @change='productTypeChange'
+                      placeholder='请选择产品类型'
                     />
                   </j-form-item>
 

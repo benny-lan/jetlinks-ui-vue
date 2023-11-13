@@ -3,8 +3,8 @@
       :getContainer="getPopupContainer"
       :maskClosable="false"
       title="事件详情"
-      visible
       width="650px"
+      visible
       @cancel="cancel"
       @ok="ok"
   >

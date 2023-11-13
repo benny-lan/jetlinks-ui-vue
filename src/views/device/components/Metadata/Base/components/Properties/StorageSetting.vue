@@ -11,12 +11,12 @@
         <ValueItem
             v-else-if="column.dataIndex === 'value'"
             v-model:modelValue="configValue.value[record.property]"
-            :get-popup-container="(node) => fullRef || node"
             :itemType="record.type?.type"
             :options="(record?.type?.elements || []).map((a:any) => ({
                    label: a.text,
                    value: a.value,
             }))"
+            :get-popup-container="(node) => fullRef || node"
         />
       </template>
     </j-table>

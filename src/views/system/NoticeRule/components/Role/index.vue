@@ -3,16 +3,16 @@
         <template v-if="type !== 'add'">
             <j-input-search
                 allowClear
-                placeholder="请输入名称"
                 @search="onSearch"
+                placeholder="请输入名称"
             />
             <div class="role-alert">
                 <j-alert type="info">
                     <template #message>
                         <div class="header">
                             <j-checkbox
-                                :checked="checked"
                                 :indeterminate="indeterminate"
+                                :checked="checked"
                                 @change="onSelectAll"
                                 >全选</j-checkbox
                             >
@@ -39,9 +39,9 @@
                         <div style="justify-content: space-between; display: flex; align-items: center;">
                             <j-input-search
                                 allowClear
+                                @search="onSearch"
                                 placeholder="请输入名称"
                                 style="width: 300px"
-                                @search="onSearch"
                             />
                             <j-space>
                                 <template v-if="_selectedRowKeys.length">
@@ -59,8 +59,8 @@
                                 </template>
 
                                 <j-checkbox
-                                    :checked="checked"
                                     :indeterminate="indeterminate"
+                                    :checked="checked"
                                     @change="onSelectAll"
                                     >全选</j-checkbox
                                 >
@@ -73,19 +73,19 @@
         <j-scrollbar :height="gridColumn <= 2 ? '320px' : '250px'">
             <j-pro-table
                 ref="tableRef"
+                :columns="columns"
                 :alertRender="false"
                 :bodyStyle="{ padding: 0 }"
-                :columns="columns"
-                :defaultParams="{
-                    sorts: [{ name: 'createTime', order: 'desc' }],
-                }"
                 :gridColumn="gridColumn"
                 :params="params"
                 :request="queryRoleList"
+                model="CARD"
+                :defaultParams="{
+                    sorts: [{ name: 'createTime', order: 'desc' }],
+                }"
                 :rowSelection="{
                     selectedRowKeys: _selectedRowKeys,
                 }"
-                model="CARD"
             >
                 <template #card="slotProps">
                     <div class="card">

@@ -1,16 +1,24 @@
 <template>
     <j-modal
+        visible
         :width="1000"
         cancelText="取消"
         okText="确定"
         title="选择触发场景"
-        visible
         @cancel="closeModal"
         @ok="saveCorrelation"
     >
         <pro-search :columns="columns" @search="handleSearch" />
         <div style="height: 500px; overflow-y: auto">
             <JProTable
+                :gridColumns="[1, 1, 1]"
+                :request="query"
+                :rowSelection="{
+                    selectedRowKeys: _selectedRowKeys,
+                    onSelectNone: onSelectChange,
+                    // onChange: onChange,
+                }"
+                model="CARD"
                 :defaultParams="{
                     sorts: [
                         {
@@ -20,27 +28,19 @@
                     ],
                     terms,
                 }"
-                :gridColumns="[1, 1, 1]"
                 :params="params"
-                :request="query"
-                :rowSelection="{
-                    selectedRowKeys: _selectedRowKeys,
-                    onSelectNone: onSelectChange,
-                    // onChange: onChange,
-                }"
-                model="CARD"
             >
                 <template #card="slotProps">
                     <CardBox
                         :active="_selectedRowKeys.includes(slotProps.id)"
-                        :disabled="slotProps.state?.value === 'disable'"
                         :status="slotProps.state?.value"
+                        :disabled="slotProps.state?.value === 'disable'"
+                        :statusText="slotProps.state?.text"
+                        :value="slotProps"
                         :statusNames="{
                             started: 'processing',
                             disable: 'error',
                         }"
-                        :statusText="slotProps.state?.text"
-                        :value="slotProps"
                         @click="handleClick"
                     >
                         <template #type>

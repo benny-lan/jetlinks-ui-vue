@@ -3,8 +3,8 @@
         <div style="width: 150px">
             <j-tabs
                 v-model="activeKey"
-                :tabBarStyle="{ width: '100%' }"
                 tab-position="left"
+                :tabBarStyle="{ width: '100%' }"
                 @change="onTabChange"
             >
                 <j-tab-pane v-for="func in newFunctions" :key="func.id">
@@ -22,14 +22,14 @@
                     <JMonacoEditor
                         :ref="`monacoEditor${current.id}`"
                         v-model="current.json"
-                        style="height: 400px"
                         theme="vs-dark"
+                        style="height: 400px"
                     />
                     <div class="editor-btn">
                         <j-space>
                             <j-button
-                                :loading="loading"
                                 type="primary"
+                                :loading="loading"
                                 @click="handleExecute(current)"
                             >
                                 执行

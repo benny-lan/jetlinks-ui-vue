@@ -1,9 +1,9 @@
 <template>
     <j-select
         v-model:value="value"
-        :get-popup-container="(node) => fullRef || node"
         :options="options"
         :placeholder="placeholder"
+        :get-popup-container="(node) => fullRef || node"
         @change="change"
     />
   </template>

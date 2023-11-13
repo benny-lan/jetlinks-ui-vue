@@ -6,8 +6,8 @@
             </div>
             <j-input-group compact>
                 <j-input
-                    ref="urlRef"
                     v-model:value="url"
+                    ref="urlRef"
                     style="width: calc(100% - 50px)"
                 />
                 <j-tooltip title="复制">

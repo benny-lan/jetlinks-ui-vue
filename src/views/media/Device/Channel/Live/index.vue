@@ -3,8 +3,8 @@
     <j-modal
         v-model:visible="_vis"
         title="播放"
-        :class="{share: type === 'share'}"
         :destroyOnClose="true"
+        :class="{share: type === 'share'}"
         :maskClosable="false"
         @ok="_vis = false"
         :width="type === 'share'? '100%' : _type ? 1200 : 900"
@@ -45,8 +45,8 @@
                                 <template #overlay>
                                     <j-menu @click="recordStart">
                                         <j-menu-item
-                                            v-if="_type"
                                             key="true"
+                                            v-if="_type"
                                         >
                                             <span style="padding-right: 12px"
                                                 >本地存储</span
@@ -116,8 +116,8 @@
                                     <template #overlay>
                                         <j-menu @click="onMenuChange">
                                             <j-menu-item
-                                                v-for="item in speedList"
                                                 :key="item.value"
+                                                v-for="item in speedList"
                                             >
                                                 {{ item.label }}
                                             </j-menu-item>

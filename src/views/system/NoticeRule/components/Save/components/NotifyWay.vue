@@ -2,10 +2,10 @@
     <j-spin :spinning="loading">
         <div class="notify-type-warp">
             <div
-                v-for="item in options"
                 :key="item.id"
-                :class="{ active: notifyType === item.value }"
+                v-for="item in options"
                 class="notify-type-item"
+                :class="{ active: notifyType === item.value }"
                 @click="onSelect(item.value, item.label)"
             >
                 <div class="notify-type-item-image">

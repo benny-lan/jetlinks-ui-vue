@@ -18,35 +18,35 @@
                     </j-tooltip>
                     <div v-if="permissionStore.hasPermission('device/Product:action')" style="margin: -5px 0 0 20px">
                             <j-popconfirm
+                                title="确认禁用"
+                                @confirm="handleUndeploy"
                                 v-if="productStore.current.state === 1"
                                 :disabled="!permissionStore.hasPermission('device/Product:action')"
                                 cancelText="取消"
                                 okText="确定"
-                                title="确认禁用"
-                                @confirm="handleUndeploy"
                             >
                                 <j-switch
                                     :checked="productStore.current.state === 1"
-                                    :disabled="!permissionStore.hasPermission('device/Product:action')"
                                     checked-children="正常"
                                     un-checked-children="禁用"
+                                    :disabled="!permissionStore.hasPermission('device/Product:action')"
                                 />
                             </j-popconfirm>
                             <j-popconfirm
+                                title="确认启用"
+                                @confirm="handleDeploy"
                                 v-if="productStore.current.state === 0"
                                 :disabled="!permissionStore.hasPermission('device/Product:action')"
                                 cancelText="取消"
                                 okText="确定"
-                                title="确认启用"
-                                @confirm="handleDeploy"
                             >
                                 <j-switch
-                                    :disabled="!permissionStore.hasPermission('device/Product:action')"
                                     :unCheckedValue="
                                         productStore.current.state === 0
                                     "
                                     checked-children="正常"
                                     un-checked-children="禁用"
+                                    :disabled="!permissionStore.hasPermission('device/Product:action')"
                                 />
                             </j-popconfirm>
                     </div>
@@ -56,18 +56,18 @@
                                 <j-switch
                                     v-if="productStore.current.state === 1"
                                     :checked="productStore.current.state === 1"
-                                    :disabled="!permissionStore.hasPermission('device/Product:action')"
                                     checked-children="正常"
                                     un-checked-children="禁用"
+                                    :disabled="!permissionStore.hasPermission('device/Product:action')"
                                 />
                                 <j-switch
                                     v-if="productStore.current.state === 0"
-                                    :disabled="!permissionStore.hasPermission('device/Product:action')"
                                     :unCheckedValue="
                                         productStore.current.state === 0
                                     "
                                     checked-children="正常"
                                     un-checked-children="禁用"
+                                    :disabled="!permissionStore.hasPermission('device/Product:action')"
                                 />
                             </j-tooltip>
                     </div>

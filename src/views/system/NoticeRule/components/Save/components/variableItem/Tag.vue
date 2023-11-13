@@ -1,7 +1,7 @@
 <template>
     <j-select
-        v-model:value="keys"
         :options="tagsList"
+        v-model:value="keys"
         placeholder="请选择标签"
         style="width: 100%"
         @change="onChange"

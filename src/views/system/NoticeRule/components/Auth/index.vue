@@ -1,8 +1,8 @@
 <template>
     <j-modal
         :width="540"
-        title="权限控制"
         visible
+        title="权限控制"
         @cancel="emit('close')"
         @ok="onSave"
     >

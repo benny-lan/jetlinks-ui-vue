@@ -18,17 +18,17 @@
                             <div>任意属性值更新时将触发下方计算规则</div>
                         </template>
                         <AIcon
-                            style="margin-left: 2px"
                             type="QuestionCircleOutlined"
+                            style="margin-left: 2px"
                         />
                     </j-tooltip>
                 </template>
                 <j-select
                     v-model:value="formData.virtualRule.triggerProperties"
-                    max-tag-count="responsive"
                     mode="multiple"
                     placeholder="请选择触发属性"
                     show-search
+                    max-tag-count="responsive"
                 >
                     <j-select-option
                         :disabled="
@@ -41,13 +41,13 @@
                         >任意属性</j-select-option
                     >
                     <j-select-option
-                        v-for="item in options"
-                        :key="item?.id"
                         :disabled="
                             formData.virtualRule?.triggerProperties?.includes(
                                 '*',
                             )
                         "
+                        v-for="item in options"
+                        :key="item?.id"
                         >{{ item?.name }}</j-select-option
                     >
                 </j-select>
@@ -58,20 +58,20 @@
                 required
             >
                 <Rule
-                    :id="value.id"
                     v-model:value="formData.virtualRule.script"
-                    :aggList="aggList"
                     :propertiesOptions="options"
                     :virtualRule="_virtualRule.virtualRule"
+                    :id="value.id"
+                    :aggList="aggList"
                 />
             </j-form-item>
             <j-form-item
+                label="窗口"
                 :name="['virtualRule', 'windowType']"
                 :rules="[{
                     required: true,
                     message: '请选择窗口类型'
                 }]"
-                label="窗口"
             >
                 <j-select
                     v-model:value="formData.virtualRule.windowType"
@@ -80,8 +80,8 @@
                         { label: '时间窗口', value: 'time' },
                         { label: '频次窗口', value: 'num' },
                     ]"
-                    placeholder="请选择窗口类型"
                     show-search
+                    placeholder="请选择窗口类型"
                     @select="windowTypeChange"
                 />
             </j-form-item>
@@ -89,12 +89,12 @@
                 v-if="formData.virtualRule?.windowType !== 'undefined'"
             >
                 <j-form-item
+                    label="聚合函数"
                     :name="['virtualRule', 'aggType']"
                     :rules="[{
                         required: true,
                         message: '请选择聚合函数'
                     }]"
-                    label="聚合函数"
                 >
                     <j-select
                         v-model:value="formData.virtualRule.aggType"
@@ -109,6 +109,7 @@
                             : '窗口长度(次)'
                     "
                     :name="['virtualRule', 'window', 'span']"
+                    required
                     :rules="[
                         {
                             required: true,
@@ -119,7 +120,6 @@
                             message: '请输入1-999999之间的正整数',
                         },
                     ]"
-                    required
                 >
                     <j-input-number
                         v-model:value="formData.virtualRule.window.span"
@@ -136,6 +136,7 @@
                             : '步长(次)'
                     "
                     :name="['virtualRule', 'window', 'every']"
+                    required
                     :rules="[
                         {
                             required: true,
@@ -146,14 +147,13 @@
                             message: '请输入1-999999之间的正整数',
                         },
                     ]"
-                    required
                 >
                     <j-input-number
+                        placeholder="请输入步长"
                         v-model:value="formData.virtualRule.window.every"
+                        style="width: 100%"
                         :max="999999"
                         :min="1"
-                        placeholder="请输入步长"
-                        style="width: 100%"
                     />
                 </j-form-item>
             </template>

@@ -1,11 +1,11 @@
 <template>
   <j-popconfirm-modal
-      :disabled="disabled"
-      :get-popup-container="(node) => fullRef || node"
       body-style="padding-top:4px;width:600px;"
       placement="bottomRight"
-      @cancel="cancel"
+      :disabled="disabled"
+      :get-popup-container="(node) => fullRef || node"
       @confirm="confirm"
+      @cancel="cancel"
       @visibleChange="visibleChange"
   >
     <template v-if="visible" #content>
@@ -23,12 +23,12 @@
                 <value-item
                     v-else-if="column.dataIndex === 'value'"
                     v-model:modelValue="configValue[record.property]"
-                    :get-popup-container="(node) => fullRef || node"
                     :itemType="item.properties[index].type?.type"
                     :options="(item.properties[index].type?.elements || []).map((a:any) => ({
                            label: a.text,
                            value: a.value,
                     }))"
+                    :get-popup-container="(node) => fullRef || node"
                 />
               </template>
             </j-table>

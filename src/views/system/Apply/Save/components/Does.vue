@@ -155,8 +155,8 @@
                 小程序开放平台:
                 <a
                     href="https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-login/code2Session.html"
-                    rel="noopener noreferrer"
                     target="_blank"
+                    rel="noopener noreferrer"
                 >
                     https://developers.weixin.qq.com/miniprogram/dev/OpenApiDoc/user-login/code2Session.html
                 </a>

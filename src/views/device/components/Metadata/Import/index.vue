@@ -1,18 +1,18 @@
 <template>
     <j-modal
+        :mask-closable="false"
+        title="导入物模型"
         v-model:visible="_visible"
         :confirm-loading="loading"
-        :mask-closable="false"
-        destroy-on-close
-        title="导入物模型"
         @cancel="close"
         @ok="handleImport"
+        destroy-on-close
     >
         <div class="import-content">
             <p class="import-tip">
                 <AIcon
-                    style="margin-right: 5px"
                     type="ExclamationCircleOutlined"
+                    style="margin-right: 5px"
                 />
                 <template v-if="type === 'product'">
                     导入的物模型会覆盖原来的属性、功能、事件、标签，请谨慎操作。
@@ -25,14 +25,14 @@
         <j-form ref="formRef" :model="formModel" layout="vertical">
             <j-form-item
                 v-if="type === 'product'"
+                label="导入方式"
+                name="type"
                 :rules="[
                     {
                         required: true,
                         message: '请选择导入方式',
                     },
                 ]"
-                label="导入方式"
-                name="type"
             >
                 <j-select v-model:value="formModel.type">
                     <j-select-option value="copy">拷贝产品</j-select-option>
@@ -47,12 +47,12 @@
                         message: '请选择产品',
                     },
                 ]"
-                label="选择产品"
                 name="copy"
+                label="选择产品"
             >
                 <j-select
-                    v-model:value="formModel.copy"
                     :options="productList"
+                    v-model:value="formModel.copy"
                     option-filter-prop="label"
                     placeholder="请选择产品"
                     showSearch
@@ -66,8 +66,8 @@
                         message: '请选择物模型类型',
                     },
                 ]"
-                label="物模型类型"
                 name="metadata"
+                label="物模型类型"
             >
                 <j-select v-model:value="formModel.metadata">
                     <j-select-option value="jetlinks"
@@ -86,8 +86,8 @@
                         message: '请选择导入类型',
                     },
                 ]"
-                label="导入类型"
                 name="metadataType"
+                label="导入类型"
             >
                 <j-select v-model:value="formModel.metadataType" @change="formModel.import = undefined">
                     <j-select-option value="file">文件上传</j-select-option>
@@ -99,14 +99,14 @@
                     formModel.type === 'import' &&
                     formModel.metadataType === 'file'
                 "
+                label="文件上传"
+                name="import"
                 :rules="[
                     {
                         required: true,
                         message: '请上传文件',
                     },
                 ]"
-                label="文件上传"
-                name="import"
             >
                 <!-- <j-input v-model:value="formModel.upload">
                     <template #addonAfter>
@@ -128,12 +128,12 @@
                 </j-input> -->
                 <j-upload
                     v-model:file-list="fileList"
-                    :action="FILE_UPLOAD"
                     :before-upload="beforeUpload"
-                    :headers="{ 'X-Access-Token': getToken() }"
-                    :show-upload-list="false"
                     accept=".json"
+                    :action="FILE_UPLOAD"
+                    :headers="{ 'X-Access-Token': getToken() }"
                     @change="fileChange"
+                    :show-upload-list="false"
                 >
                     <j-button>
                         <template #icon><AIcon type="UploadOutlined" /></template>
@@ -143,10 +143,6 @@
                 <div style="margin-left: 10px; color: rgba(0, 0, 0, .6);">支持扩展名：.json</div>
             </j-form-item>
             <j-form-item
-                v-if="
-                    (type === 'device' || formModel.type === 'import') &&
-                    formModel.metadataType === 'script'
-                "
                 :rules="[
                     {
                         required: true,
@@ -154,14 +150,18 @@
                     },
                 ]"
                 name="import"
+                v-if="
+                    (type === 'device' || formModel.type === 'import') &&
+                    formModel.metadataType === 'script'
+                "
             >
                 <template #label>
                     <j-space>
                         物模型
                         <j-tooltip title="在编辑器中编写物模型脚本">
                             <AIcon
-                                style="color: rgb(136, 136, 136)"
                                 type="QuestionCircleOutlined"
+                                style="color: rgb(136, 136, 136)"
                             />
                         </j-tooltip>
                     </j-space>

@@ -47,9 +47,9 @@
                   :hasPermission="`link/AccessConfig:${
                                     id === ':id' ? 'add' : 'update'
                                 }`"
-                  :loading="loading"
                   html-type="submit"
                   type="primary"
+                  :loading="loading"
               >
                 保存
               </PermissionButton>

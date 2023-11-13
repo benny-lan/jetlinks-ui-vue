@@ -104,8 +104,8 @@
                             mode="multiple"
                             style="width: calc(100% - 40px)"
                             placeholder="请选择角色"
-                            :disabled="form.data.username === 'admin'"
                             :options="_roleOptions"
+                            :disabled="form.data.username === 'admin'"
                         ></j-select>
 
                         <PermissionButton

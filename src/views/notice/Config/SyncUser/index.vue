@@ -30,8 +30,8 @@
                         :fieldNames="{ title: 'name', key: 'id' }"
                         :selectedKeys="[deptId]"
                         @select="onTreeSelect"
-                        :show-icon="true"
                         :showLine="{ showLeafIcon: false }"
+                        :show-icon="true"
                     >
                     </j-tree>
                     <j-empty v-if="!deptTreeData.length" />

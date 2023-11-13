@@ -3,10 +3,10 @@
         v-bind="layoutConf"
         v-model:collapsed="basicLayout.collapsed"
         v-model:openKeys="basicLayout.openKeys"
-        :breadcrumb="{ routes: breadcrumbs }"
         :headerHeight='layout.headerHeight'
-        :pure="basicLayout.pure"
         :selectedKeys="basicLayout.selectedKeys"
+        :breadcrumb="{ routes: breadcrumbs }"
+        :pure="basicLayout.pure"
         @backClick='routerBack'
     >
         <template #breadcrumbRender="slotProps">
@@ -64,7 +64,7 @@ const layoutConf = reactive({
     siderWidth: layout.value.siderWidth,
     logo: DefaultSetting.layout.logo,
     title: DefaultSetting.layout.title,
-    menuData: menu.siderMenus,
+    menuData: [menu.siderMenus, AccountMenu],
     // menuData: menu.siderMenus,
     splitMenus: true,
 });

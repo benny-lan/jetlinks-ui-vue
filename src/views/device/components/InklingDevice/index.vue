@@ -6,10 +6,10 @@
           <j-advanced-search
             v-if='!spinning'
             :columns='columns'
-            class='device-inkling'
-            target='device-inkling'
             type='simple'
             @search='handleSearch'
+            class='device-inkling'
+            target='device-inkling'
           />
         </div>
         <div v-if='multiple' class='multiple'>
@@ -83,6 +83,7 @@
         <div class='device-list-pagination'>
           <j-pagination
             v-if='showPage'
+            :total='pageData.total'
             :current='pageData.pageIndex + 1'
             :pageSize='pageData.pageSize'
             :show-total='() => {
@@ -90,7 +91,6 @@
               const MaxSize = (pageData.pageIndex + 1) * pageData.pageSize;
               return `第 ${minSize} - ${MaxSize > pageData.total ? pageData.total : MaxSize } 条/总共 ${pageData.total} 条`;
             }'
-            :total='pageData.total'
             @change='pageChange'
           />
         </div>

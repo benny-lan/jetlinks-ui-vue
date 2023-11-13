@@ -21,8 +21,8 @@
                     }
                 }"
                 :fieldNames="{ key: 'id', title: 'name' }"
-                :show-icon="true"
                 :showLine="{ showLeafIcon: false }"
+                :show-icon="true"
             />
         </div>
     </div>

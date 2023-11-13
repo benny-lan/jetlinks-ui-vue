@@ -4,8 +4,8 @@
             小度智能家居开放平台：
             <a
                 href="https://dueros.baidu.com/dbp/bot/index#/iotopenplatform"
-                rel="noopener noreferrer"
                 target="_blank"
+                rel="noopener noreferrer"
             >
                 https://dueros.baidu.com/dbp/bot/index#/iotopenplatform
             </a>
@@ -22,16 +22,16 @@
             </div>
             <div class="image">
                 <j-image
-                    :src="getImage('/cloud/dueros-doc.jpg')"
                     width="100%"
+                    :src="getImage('/cloud/dueros-doc.jpg')"
                 />
                 <div class="desc">新建DuerOS</div>
             </div>
             <j-descriptions
-                :column="1"
-                :labelStyle="{ width: '100px' }"
                 bordered
                 size="small"
+                :column="1"
+                :labelStyle="{ width: '100px' }"
             >
                 <j-descriptions-item label="参数">说明</j-descriptions-item>
                 <j-descriptions-item label="授权地址"
@@ -55,16 +55,16 @@
             </j-descriptions>
             <div class="image">
                 <j-image
-                    :src="getImage('/cloud/dueros-doc1.png')"
                     width="100%"
+                    :src="getImage('/cloud/dueros-doc1.png')"
                 />
                 <div class="desc">新建应用</div>
             </div>
             <j-descriptions
-                :column="1"
-                :labelStyle="{ width: '100px' }"
                 bordered
                 size="small"
+                :column="1"
+                :labelStyle="{ width: '100px' }"
             >
                 <j-descriptions-item label="参数">说明</j-descriptions-item>
                 <j-descriptions-item label="appId">

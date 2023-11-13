@@ -12,15 +12,15 @@
                 :columns="columns"
                 :request="table.requestFun"
                 :params="queryParams"
+                :scroll="{
+                    x:true,
+                    y:610,
+                }"
                 :rowSelection="{
                     selectedRowKeys: table._selectedRowKeys,
                     onSelect: table.onSelectChange,
                     onSelectAll: selectAll,
                     onSelectNone: () => table._selectedRowKeys = []
-                }"
-                :scroll="{
-                    x:true,
-                    y:610,
                 }"
                 model="TABLE"
             >
@@ -237,12 +237,12 @@ const selectAll = (selected: Boolean, selectedRows: any,changeRows:any) => {
             const arr = changeRows.map((item: any) => item.id)
             const _ids: string[] = [];
             table._selectedRowKeys.map((i: any) => {
-                if (!arr.includes(i)) {
+                if (!arr.includes(i)) {   
                     _ids.push(i)
                 }
             })
             table._selectedRowKeys = _ids;
-        }
+        }     
 }
 watch(
     () => props.parentId,

@@ -10,10 +10,10 @@
   </DataTableArray>
   <DataTableObject
       v-else-if="type === 'object' && showOther"
-      :columns="columns"
-      :onAdd="objectAdd"
       :value="myValue.properties"
       placement="topRight"
+      :columns="columns"
+      :onAdd="objectAdd"
       @confirm="valueChange"
   >
     <template #valueType="{ data }">
@@ -42,9 +42,9 @@
   </DataTableBoolean>
   <DataTableDouble
       v-else-if="['float', 'double'].includes(type)"
-      v-model:value="myValue"
       :options="unitOptions"
       :showUnit="false"
+      v-model:value="myValue"
       placement="topRight"
       @confirm="valueChange"
   >
@@ -52,8 +52,8 @@
   </DataTableDouble>
   <DataTableInteger
       v-else-if="['int', 'long'].includes(type)  && showOther"
-      v-model:value="myValue.unit"
       :options="unitOptions"
+      v-model:value="myValue.unit"
       placement="topRight"
       @confirm="valueChange"
   >

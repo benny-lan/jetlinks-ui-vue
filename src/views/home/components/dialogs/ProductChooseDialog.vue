@@ -17,9 +17,9 @@
                 <j-select
                     v-model:value="form.productId"
                     style="width: 100%"
-                    placeholder="请选择产品"
-                    :options="productList"
                     show-search
+                    :options="productList"
+                    placeholder="请选择产品"
                 >
                 </j-select>
             </j-form-item>

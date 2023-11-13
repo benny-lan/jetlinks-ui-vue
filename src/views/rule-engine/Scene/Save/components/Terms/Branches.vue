@@ -35,12 +35,12 @@
                 <WhenItem
                   v-for='(item, index) in whenData'
                   :key='item.key'
+                  :name='index'
+                  :showDeleteBtn='whenData.length !== 1'
                   :branchName='name'
                   :data='item'
                   :isFirst='index === 0'
                   :isLast='index === whenData.length -1'
-                  :name='index'
-                  :showDeleteBtn='whenData.length !== 1'
                 />
 
               </div>

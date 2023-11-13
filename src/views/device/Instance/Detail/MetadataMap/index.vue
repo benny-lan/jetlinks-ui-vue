@@ -3,17 +3,17 @@
         <div class="left">
             <j-space style="margin-bottom: 24px">
                 <j-select
+                    show-search
+                    @change="onSearchChange"
                     allow-clear
                     placeholder="请选择属性名称"
-                    show-search
                     style="width: 250px"
-                    @change="onSearchChange"
                 >
                     <j-select-option
-                        v-for="item in dataSourceCache"
                         :key="item?.id"
-                        :label="item.name"
+                        v-for="item in dataSourceCache"
                         :value="item?.id"
+                        :label="item.name"
                         >{{ item?.name }}</j-select-option
                     >
                 </j-select>
@@ -25,7 +25,6 @@
                 <j-scrollbar height="100%">
                     <j-table
                         :columns="columns"
-                        :customRow="customRow"
                         :data-source="dataSource"
                         :pagination="false"
                         :rowSelection="{
@@ -34,6 +33,7 @@
                             columnWidth: 0,
                         }"
                         rowKey="id"
+                        :customRow="customRow"
                     >
                         <template #headerCell="{ column }">
                             <template v-if="column.dataIndex === 'original'">
@@ -57,8 +57,8 @@
                                     </span>
                                     <j-tag
                                         v-if="filterValue !== undefined"
-                                        closable
                                         color="#87d068"
+                                        closable
                                         @close="onClose"
                                         ><AIcon
                                             type="ArrowUpOutlined"
@@ -93,20 +93,20 @@
                             <template v-if="column.dataIndex === 'original'">
                                 <j-select
                                     v-model:value="record.original"
-                                    allowClear
-                                    placeholder="请选择"
                                     style="width: 100%"
+                                    allowClear
                                     @change="(id) => onChange(record, id)"
+                                    placeholder="请选择"
                                 >
                                     <j-select-option
                                         v-for="(item, index) in targetOptions"
                                         :key="index + '_' + item.id"
+                                        :value="item.value"
                                         :disabled="
                                             selectedOriginalKeys.includes(
                                                 item.id,
                                             )
                                         "
-                                        :value="item.value"
                                     >
                                         {{ item.label }} ({{
                                             item.id

@@ -11,7 +11,6 @@
                 <j-scrollbar height="100%">
                     <j-table
                         :columns="columns"
-                        :customRow="customRow"
                         :data-source="dataSource"
                         :pagination="false"
                         :rowSelection="{
@@ -20,6 +19,7 @@
                             columnWidth: 0,
                         }"
                         rowKey="id"
+                        :customRow="customRow"
                     >
                         <template #headerCell="{ column }">
                             <template v-if="column.dataIndex === 'plugin'">
@@ -43,8 +43,8 @@
                                     </span>
                                     <j-tag
                                         v-if="filterValue !== undefined"
-                                        closable
                                         color="#87d068"
+                                        closable
                                         @close="onClose"
                                         ><AIcon
                                             type="ArrowUpOutlined"
@@ -79,17 +79,17 @@
                             <template v-if="column.dataIndex === 'plugin'">
                                 <j-select
                                     v-model:value="record.plugin"
-                                    allowClear
                                     style="width: 100%"
+                                    allowClear
                                     @change="(id) => pluginChange(record, id)"
                                 >
                                     <j-select-option
                                         v-for="(item, index) in pluginOptions"
                                         :key="index + '_' + item.id"
+                                        :value="item.value"
                                         :disabled="
                                             selectedPluginKeys.includes(item.id)
                                         "
-                                        :value="item.value"
                                         ><j-tooltip
                                             :title="
                                                 selectedPluginKeys.includes(

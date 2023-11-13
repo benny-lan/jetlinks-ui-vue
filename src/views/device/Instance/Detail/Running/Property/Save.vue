@@ -9,19 +9,19 @@
     >
         <j-alert
             message="当数据来源为设备时，填写的值将下发到设备"
-            showIcon
             type="warning"
+            showIcon
         />
         <j-form
-            ref="formRef"
-            :model="modelRef"
             :rules="rules"
             layout="vertical"
+            ref="formRef"
+            :model="modelRef"
             style="margin-top: 20px"
         >
             <j-form-item
-                :label="data?.name || '自定义属性'"
                 name="propertyValue"
+                :label="data?.name || '自定义属性'"
             >
                 <ValueItem
                     v-model:modelValue="modelRef.propertyValue"

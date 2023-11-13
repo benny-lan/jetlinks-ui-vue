@@ -1,10 +1,10 @@
 <template>
     <j-modal
-        :bodyStyle="{ padding: 0 }"
         :width="1056"
-        title="配置通知方式"
         visible
+        :bodyStyle="{ padding: 0 }"
         @cancel="emit('close')"
+        title="配置通知方式"
     >
         <div style="background-color: #f8f9fc; padding: 25px 100px">
             <j-steps :current="current" size="small" @change="onChange">
@@ -32,31 +32,31 @@
         <div style="margin: 20px">
             <template v-if="current === 0">
                 <NotifyWay
-                    v-model:name="showName"
                     :value="formModel.channelProvider"
+                    v-model:name="showName"
                     @change="onWayChange"
                 />
             </template>
             <template v-if="current === 1">
                 <NotifyConfig
-                    :notifyType="formModel.channelProvider"
                     :value="formModel.channelConfiguration.notifierId"
+                    :notifyType="formModel.channelProvider"
                     @change="onConfigChange"
                 />
             </template>
             <template v-if="current === 2">
                 <NotifyTemplate
+                    :value="formModel.channelConfiguration.templateId"
                     :notifierId="formModel.channelConfiguration.notifierId"
                     :notifyType="formModel.channelProvider"
-                    :value="formModel.channelConfiguration.templateId"
                     @change="onTemplateChange"
                 />
             </template>
             <template v-if="current === 3">
                 <VariableDefinitions
                     ref="variableRef"
-                    :notify="formModel"
                     :value="formModel.channelConfiguration.variables"
+                    :notify="formModel"
                     :variableDefinitions="_variableDefinitions"
                 />
             </template>
@@ -80,6 +80,8 @@
                             layout="vertical"
                         >
                             <j-form-item
+                                label="名称"
+                                name="name"
                                 :rules="[
                                     { required: true, message: '请输入名称' },
                                     {
@@ -87,8 +89,6 @@
                                         message: '最多可输入8个字符',
                                     },
                                 ]"
-                                label="名称"
-                                name="name"
                             >
                                 <j-input
                                     v-model:value="formModel.name"
@@ -107,16 +107,16 @@
                 >
                 <j-button v-else @click="onPrev">上一步</j-button>
                 <j-button
-                    v-if="current !== stepList.length - 1"
                     type="primary"
                     @click="onNext"
+                    v-if="current !== stepList.length - 1"
                     >下一步</j-button
                 >
                 <j-button
-                    v-else
                     :loading="loading"
                     type="primary"
                     @click="onSave"
+                    v-else
                     >确认</j-button
                 >
             </j-space>

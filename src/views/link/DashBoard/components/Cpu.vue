@@ -44,8 +44,8 @@
                   <ServerList
                       v-if="serverOptions.length > 1"
                       v-model:value="serverActive"
-                      :color="colorCpu"
                       :options="serverOptions"
+                      :color="colorCpu"
                   />
                 </template>
             </div>

@@ -14,6 +14,9 @@
         paddingLeft: 0
       }'
       :columns='columns'
+      :gridColumn='2'
+      :params='params'
+      :request='queryProductList'
       :defaultParams="{
         terms: [
              {
@@ -28,17 +31,14 @@
          ],
          sorts: [{ name: 'createTime', order: 'desc' }]
       }"
-      :gridColumn='2'
       :gridColumns='[2,2,2]'
-      :params='params'
-      :request='queryProductList'
       model='CARD'
     >
       <template #card="slotProps">
         <CardBox
+          :statusNames="{ 1: 'processing', 0: 'error',  }"
           :active="rowKey === slotProps.id"
           :status="slotProps.state"
-          :statusNames="{ 1: 'processing', 0: 'error',  }"
           :statusText="slotProps.state === 1 ? '正常' : '禁用'"
           :value='slotProps'
           @click="handleClick"

@@ -1,11 +1,11 @@
 <template>
   <j-select
       v-model:value="myValue"
-      :get-popup-container="(node) => fullRef || node"
       :options="[
           { label: '固定值', value: 'false' },
           { label: '范围值', value: 'true' },
       ]"
+      :get-popup-container="(node) => fullRef || node"
       @select="select"
   />
 </template>

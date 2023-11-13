@@ -11,16 +11,16 @@
                 ref="tableRef"
                 :request="table.requestFun"
                 :gridColumn="2"
+                :params="queryParams"
+                :scroll="{
+                    x:true,
+                    y:610,
+                }"
                 :rowSelection="{
                     selectedRowKeys: tableData._selectedRowKeys,
                     onSelect: table.onSelect,
                     onSelectAll: table.onSelectAll,
                     onSelectNone: table.cancelSelect
-                }"
-                :params="queryParams"
-                :scroll="{
-                    x:true,
-                    y:610,
                 }"
                 :columns="columns"
             >

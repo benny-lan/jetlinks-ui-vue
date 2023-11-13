@@ -25,8 +25,8 @@
                 style="height: 100%"
                 theme="vs"
                 v-model:modelValue="editorValue"
-                :init="editorInit"
                 :registrationTypescript="typescriptTip"
+                :init="editorInit"
             />
         </div>
         <div class="bottom">

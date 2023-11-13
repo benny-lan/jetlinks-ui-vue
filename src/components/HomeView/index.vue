@@ -1,13 +1,13 @@
 <template>
     <div class="view-content">
         <div
+            class="select-item"
             v-for="item in list"
             :key="item.id"
+            @click="onChange(item.id)"
             :class="{
                 active: currentView === item.id,
             }"
-            class="select-item"
-            @click="onChange(item.id)"
         >
             <img :src="getImage(`/home/home-view/${item.id}${currentView === item.id ? '-active' : ''}.png`)" alt="" />
         </div>

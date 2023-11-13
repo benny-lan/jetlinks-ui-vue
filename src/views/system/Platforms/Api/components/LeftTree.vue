@@ -8,8 +8,8 @@
             @select="clickSelectItem"
             v-model:selected-keys="selectedKeys"
             class="left-tree-container"
-            :show-icon="true"
             :showLine="{ showLeafIcon: false }"
+            :show-icon="true"
         >
             <template #title="{ name }">
                 {{ name }}

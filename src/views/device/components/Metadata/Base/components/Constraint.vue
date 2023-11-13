@@ -1,11 +1,11 @@
 <template>
   <j-select
     v-model:value="myValue"
+    style="width: 100%;"
     :options="[
         { label: '不必填', value: 'false'},
         { label: '必填', value: 'true'},
     ]"
-    style="width: 100%;"
     @change="change"
   >
 

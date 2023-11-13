@@ -37,28 +37,28 @@
                 ]"
             >
                 <ApplyList
-                    v-model:photoUrl="form.data.logoUrl"
-                    :disabled="!!routeQuery.id || !!routeQuery?.provider"
                     v-model:value="form.data.provider"
+                    v-model:photoUrl="form.data.logoUrl"
                     :options="typeOptions"
+                    :disabled="!!routeQuery.id || !!routeQuery?.provider"
                 />
             </j-form-item>
             <j-row>
                 <j-col :span="joinOptions.length >= 3 ? 24 : 6 * joinOptions.length">
                     <j-form-item
+                        label="接入方式"
+                        name="integrationModes"
                         :rules="[
                             {
                                 required: true,
                                 message: '请选择接入方式',
                             },
                         ]"
-                        label="接入方式"
-                        name="integrationModes"
                     >
                             <j-check-button
                                 v-model:value="form.data.integrationModes"
-                                :multiple="true"
                                 :options="joinOptions"
+                                :multiple="true"
                             />
                     </j-form-item>
                 </j-col>
@@ -93,18 +93,18 @@
                     <template v-if="item === 'page'">
                         <j-form-item
                             :name="['page', 'baseUrl']"
+                            class="resetLabel"
                             :rules="[
                                 {
                                     required: true,
                                     message: '请输入接入地址',
                                 },
                             ]"
-                            class="resetLabel"
                         >
                             <template #label>
                                 <FormLabel
-                                    required
                                     text="接入地址"
+                                    required
                                     tooltip="填写访问其它平台的地址"
                                 />
                             </template>
@@ -114,6 +114,7 @@
                             />
                         </j-form-item>
                         <j-form-item
+                            label="路由方式"
                             :name="['page', 'routeType']"
                             :rules="[
                                 {
@@ -121,7 +122,6 @@
                                     message: '请选择路由方式',
                                 },
                             ]"
-                            label="路由方式"
                         >
                             <j-select v-model:value="form.data.page.routeType">
                                 <j-select-option value="hash"
@@ -151,6 +151,7 @@
                     <!-- API客户端 -->
                     <template v-if="item === 'apiClient'">
                         <j-form-item
+                            class="resetLabel"
                             :name="['apiClient', 'baseUrl']"
                             :rules="[
                                 {
@@ -158,12 +159,11 @@
                                     message: '请输入接口地址',
                                 },
                             ]"
-                            class="resetLabel"
                         >
                             <template #label>
                                 <FormLabel
-                                    required
                                     text="接口地址"
+                                    required
                                     tooltip="访问Api服务的地址"
                                 />
                             </template>
@@ -176,6 +176,7 @@
                             v-if="form.data.provider === 'internal-standalone'"
                         >
                             <j-form-item
+                                class="resetLabel"
                                 :name="[
                                     'apiClient',
                                     'authConfig',
@@ -188,12 +189,11 @@
                                         message: '请输入授权地址',
                                     },
                                 ]"
-                                class="resetLabel"
                             >
                                 <template #label>
                                     <FormLabel
-                                        required
                                         text="授权地址"
+                                        required
                                         tooltip="认证授权地址"
                                     />
                                 </template>
@@ -206,6 +206,7 @@
                                 />
                             </j-form-item>
                             <j-form-item
+                                class="resetLabel"
                                 :name="[
                                     'apiClient',
                                     'authConfig',
@@ -218,12 +219,11 @@
                                         message: '请输入token地址',
                                     },
                                 ]"
-                                class="resetLabel"
                             >
                                 <template #label>
                                     <FormLabel
-                                        required
                                         text="token地址"
+                                        required
                                         tooltip="设置token令牌的地址"
                                     />
                                 </template>
@@ -251,6 +251,7 @@
                                 />
                             </j-form-item>
                             <j-form-item
+                                class="resetLabel"
                                 :name="[
                                     'apiClient',
                                     'authConfig',
@@ -267,12 +268,11 @@
                                         message: '最多可输入64个字符',
                                     },
                                 ]"
-                                class="resetLabel"
                             >
                                 <template #label>
                                     <FormLabel
-                                        required
                                         text="appId"
+                                        required
                                         tooltip="第三方应用唯一标识"
                                     />
                                 </template>
@@ -281,11 +281,12 @@
                                         form.data.apiClient.authConfig.oauth2
                                             .clientId
                                     "
-                                    :disabled="!!form.data.id"
                                     placeholder="请输入appId"
+                                    :disabled="!!form.data.id"
                                 />
                             </j-form-item>
                             <j-form-item
+                                class="resetLabel"
                                 :name="[
                                     'apiClient',
                                     'authConfig',
@@ -302,12 +303,11 @@
                                         message: '最多可输入64个字符',
                                     },
                                 ]"
-                                class="resetLabel"
                             >
                                 <template #label>
                                     <FormLabel
-                                        required
                                         text="appKey"
+                                        required
                                         tooltip="第三方应用唯一标识的密钥"
                                     />
                                 </template>
@@ -322,9 +322,9 @@
                         </div>
                         <div v-else-if="form.data.provider === 'third-party'">
                             <j-form-item
+                                label="认证方式"
                                 :name="['apiClient', 'authConfig', 'type']"
                                 :rules="[{ required: true }]"
-                                label="认证方式"
                             >
                                 <j-select
                                     v-model:value="
@@ -349,6 +349,7 @@
                                 "
                             >
                                 <j-form-item
+                                    class="resetLabel"
                                     :name="[
                                         'apiClient',
                                         'authConfig',
@@ -361,12 +362,11 @@
                                             message: '请输入授权地址',
                                         },
                                     ]"
-                                    class="resetLabel"
                                 >
                                     <template #label>
                                         <FormLabel
-                                            required
                                             text="授权地址"
+                                            required
                                             tooltip="认证授权地址"
                                         />
                                     </template>
@@ -380,6 +380,7 @@
                                 </j-form-item>
 
                                 <j-form-item
+                                    label="请求方式"
                                     :name="[
                                         'apiClient',
                                         'authConfig',
@@ -392,7 +393,6 @@
                                             message: '请选择请求方式',
                                         },
                                     ]"
-                                    label="请求方式"
                                 >
                                     <j-select
                                         v-model:value="
@@ -411,6 +411,7 @@
                                 </j-form-item>
 
                                 <j-form-item
+                                    class="resetLabel"
                                     :name="[
                                         'apiClient',
                                         'authConfig',
@@ -427,12 +428,11 @@
                                             message: '最多可输入64个字符',
                                         },
                                     ]"
-                                    class="resetLabel"
                                 >
                                     <template #label>
                                         <FormLabel
-                                            required
                                             text="client_id"
+                                            required
                                             tooltip="应用唯一标识"
                                         />
                                     </template>
@@ -445,6 +445,7 @@
                                     />
                                 </j-form-item>
                                 <j-form-item
+                                    class="resetLabel"
                                     :name="[
                                         'apiClient',
                                         'authConfig',
@@ -461,12 +462,11 @@
                                             message: '最多可输入64个字符',
                                         },
                                     ]"
-                                    class="resetLabel"
                                 >
                                     <template #label>
                                         <FormLabel
-                                            required
                                             text="client_secret"
+                                            required
                                             tooltip="应用唯一标识的秘钥"
                                         />
                                     </template>
@@ -486,6 +486,7 @@
                                 "
                             >
                                 <j-form-item
+                                    label="用户名"
                                     :name="[
                                         'apiClient',
                                         'authConfig',
@@ -502,7 +503,6 @@
                                             message: '最多可输入64个字符',
                                         },
                                     ]"
-                                    label="用户名"
                                 >
                                     <j-input
                                         v-model:value="
@@ -513,6 +513,7 @@
                                     />
                                 </j-form-item>
                                 <j-form-item
+                                    label="密码"
                                     :name="[
                                         'apiClient',
                                         'authConfig',
@@ -529,7 +530,6 @@
                                             message: '最多可输入64个字符',
                                         },
                                     ]"
-                                    label="密码"
                                 >
                                     <j-input
                                         v-model:value="
@@ -545,6 +545,7 @@
                                     form.data.apiClient.authConfig.type ===
                                     'bearer'
                                 "
+                                label="token"
                                 :name="[
                                     'apiClient',
                                     'authConfig',
@@ -557,7 +558,6 @@
                                         message: '请输入token',
                                     },
                                 ]"
-                                label="token"
                             >
                                 <j-input
                                     v-model:value="
@@ -592,11 +592,12 @@
                                 </template>
 
                                 <RequestTable
-                                    v-model:valid="headerValid"
                                     v-model:value="form.data.apiClient.headers"
+                                    v-model:valid="headerValid"
                                 />
                             </j-form-item>
                             <j-form-item
+                                label="参数"
                                 :name="['apiClient', 'parameters']"
                                 :rules="[
                                     {
@@ -607,13 +608,12 @@
                                         validator: paramsValidator,
                                     },
                                 ]"
-                                label="参数"
                             >
                                 <RequestTable
-                                    v-model:valid="paramsValid"
                                     v-model:value="
                                         form.data.apiClient.parameters
                                     "
+                                    v-model:valid="paramsValid"
                                 />
                             </j-form-item>
                         </div>
@@ -621,6 +621,7 @@
                     <!-- API服务 -->
                     <template v-if="item === 'apiServer'">
                         <j-form-item
+                            class="resetLabel"
                             v-if="
                                 !form.data.integrationModes.includes(
                                     'apiClient',
@@ -628,12 +629,11 @@
                             "
                             :name="['apiServer', 'appId']"
                             :rules="[{ required: true }]"
-                            class="resetLabel"
                         >
                             <template #label>
                                 <FormLabel
-                                    required
                                     text="appId"
+                                    required
                                     tooltip="第三方应用唯一标识"
                                 />
                             </template>
@@ -645,6 +645,7 @@
                         </j-form-item>
 
                         <j-form-item
+                            class="resetLabel"
                             :name="['apiServer', 'secureKey']"
                             :rules="[
                                 {
@@ -652,12 +653,11 @@
                                     message: '请输入secureKey',
                                 },
                             ]"
-                            class="resetLabel"
                         >
                             <template #label>
                                 <FormLabel
-                                    required
                                     text="secureKey"
+                                    required
                                     tooltip="第三方应用唯一标识匹配的秘钥"
                                 />
                             </template>
@@ -667,10 +667,10 @@
                             />
                         </j-form-item>
                         <j-form-item
+                            class="resetLabel"
                             v-show="
                                 form.data.provider === 'internal-standalone'
                             "
-                            class="resetLabel"
                         >
                             <template #label>
                                 <FormLabel
@@ -684,6 +684,7 @@
                             />
                         </j-form-item>
                         <j-form-item
+                            class="resetLabel"
                             :name="['apiServer', 'roleIdList']"
                             :rules="[
                                 {
@@ -691,12 +692,11 @@
                                     message: '请选择角色',
                                 },
                             ]"
-                            class="resetLabel"
                         >
                             <template #label>
                                 <FormLabel
-                                    required
                                     text="角色"
+                                    required
                                     tooltip="为应用用户分配角色，根据绑定的角色，进行系统菜单赋权"
                                 />
                             </template>
@@ -708,7 +708,6 @@
                             ></j-select>
                             <PermissionButton
                                 :hasPermission="`${rolePermission}:update`"
-                                class="add-item"
                                 type="link"
                                 @click="
                                     clickAddItem(
@@ -716,6 +715,7 @@
                                         'Role',
                                     )
                                 "
+                                class="add-item"
                             >
                                 <AIcon type="PlusOutlined" />
                             </PermissionButton>
@@ -729,6 +729,10 @@
                             </template>
                             <j-tree-select
                                 v-model:value="form.data.apiServer.orgIdList"
+                                :filterTreeNode="
+                                (v: string, node: any) => filterSelectNode(v, node, 'name')
+                            "
+                                multiple
                                 :dropdown-style="{
                                     maxHeight: '400px',
                                     overflow: 'auto',
@@ -737,13 +741,9 @@
                                     label: 'name',
                                     value: 'id',
                                 }"
-                                :filterTreeNode="
-                                (v: string, node: any) => filterSelectNode(v, node, 'name')
-                            "
-                                :tree-data="form.orgIdList"
-                                multiple
-                                placeholder="请选择组织"
                                 show-search
+                                :tree-data="form.orgIdList"
+                                placeholder="请选择组织"
                                 style="width: 100%"
                             >
                                 <template #title="{ name }">
@@ -752,7 +752,6 @@
                             </j-tree-select>
                             <PermissionButton
                                 :hasPermission="`${deptPermission}:update`"
-                                class="add-item"
                                 type="link"
                                 @click="
                                     clickAddItem(
@@ -760,6 +759,7 @@
                                         'Department',
                                     )
                                 "
+                                class="add-item"
                             >
                                 <AIcon type="PlusOutlined" />
                             </PermissionButton>
@@ -781,20 +781,20 @@
                                 />
                             </j-form-item>
                             <j-form-item
+                                label="IP白名单"
                                 :name="['apiServer', 'ipWhiteList']"
                                 :rules="[
                                     {
                                         validator: validateIP,
                                     },
                                 ]"
-                                label="IP白名单"
                             >
                                 <j-textarea
                                     v-model:value="
                                         form.data.apiServer.ipWhiteList
                                     "
-                                    :rows="3"
                                     placeholder="请输入IP白名单，多个地址回车分隔，不填默认均可访问"
+                                    :rows="3"
                                     style="width: 100%"
                                 />
                             </j-form-item>
@@ -805,6 +805,7 @@
                         <!-- 第三方应用 -->
                         <div v-if="form.data.provider === 'third-party'">
                             <j-form-item
+                                label="认证方式"
                                 :name="[
                                     'sso',
                                     'configuration',
@@ -817,20 +818,20 @@
                                         message: '请选择认证方式',
                                     },
                                 ]"
-                                label="认证方式"
                             >
                                 <j-select
                                     v-model:value="
                                         form.data.sso.configuration.oauth2.type
                                     "
+                                    placeholder="请选择认证方式"
                                     :options="[
                                         { label: 'oauth2', value: 'oauth2' },
                                     ]"
-                                    placeholder="请选择认证方式"
                                 />
                             </j-form-item>
 
                             <j-form-item
+                                class="resetLabel"
                                 :name="[
                                     'sso',
                                     'configuration',
@@ -847,12 +848,11 @@
                                         message: '最多可输入64个字符',
                                     },
                                 ]"
-                                class="resetLabel"
                             >
                                 <template #label>
                                     <FormLabel
-                                        required
                                         text="scope"
+                                        required
                                         tooltip="限制用户访问应用程序的权限"
                                     />
                                 </template>
@@ -864,6 +864,7 @@
                                 />
                             </j-form-item>
                             <j-form-item
+                                class="resetLabel"
                                 :name="[
                                     'sso',
                                     'configuration',
@@ -880,12 +881,11 @@
                                         message: '最多可输入64个字符',
                                     },
                                 ]"
-                                class="resetLabel"
                             >
                                 <template #label>
                                     <FormLabel
-                                        required
                                         text="client_id"
+                                        required
                                         tooltip="应用唯一标识"
                                     />
                                 </template>
@@ -898,6 +898,7 @@
                                 />
                             </j-form-item>
                             <j-form-item
+                                class="resetLabel"
                                 :name="[
                                     'sso',
                                     'configuration',
@@ -914,12 +915,11 @@
                                         message: '最多可输入64个字符',
                                     },
                                 ]"
-                                class="resetLabel"
                             >
                                 <template #label>
                                     <FormLabel
-                                        required
                                         text="client_secret"
+                                        required
                                         tooltip="应用唯一标识的秘钥"
                                     />
                                 </template>
@@ -940,6 +940,7 @@
                                     'apiClient',
                                 )
                             "
+                            class="resetLabel"
                             :name="[
                                 'sso',
                                 'configuration',
@@ -952,12 +953,11 @@
                                     message: '请输入授权地址',
                                 },
                             ]"
-                            class="resetLabel"
                         >
                             <template #label>
                                 <FormLabel
-                                    required
                                     text="授权地址"
+                                    required
                                     tooltip="认证授权地址"
                                 />
                             </template>
@@ -973,6 +973,7 @@
                         <!-- 第三方应用 -->
                         <div v-if="form.data.provider === 'third-party'">
                             <j-form-item
+                                class="resetLabel"
                                 :name="[
                                     'sso',
                                     'configuration',
@@ -985,12 +986,11 @@
                                         message: '请输入token地址',
                                     },
                                 ]"
-                                class="resetLabel"
                             >
                                 <template #label>
                                     <FormLabel
-                                        required
                                         text="token地址"
+                                        required
                                         tooltip="设置token令牌的地址"
                                     />
                                 </template>
@@ -1042,6 +1042,7 @@
                         </j-form-item> -->
 
                             <j-form-item
+                                label="用户信息地址"
                                 :name="[
                                     'sso',
                                     'configuration',
@@ -1054,7 +1055,6 @@
                                         message: '请输入用户信息地址',
                                     },
                                 ]"
-                                label="用户信息地址"
                             >
                                 <j-input
                                     v-model:value="
@@ -1065,6 +1065,7 @@
                                 />
                             </j-form-item>
                             <j-form-item
+                                class="resetLabel"
                                 :name="[
                                     'sso',
                                     'configuration',
@@ -1078,12 +1079,11 @@
                                         message: '请输入用户ID',
                                     },
                                 ]"
-                                class="resetLabel"
                             >
                                 <template #label>
                                     <FormLabel
-                                        required
                                         text="用户ID"
+                                        required
                                         tooltip="通过jsonpath表达式从授权结果中获取第三方平台用户的唯一标识"
                                     />
                                 </template>
@@ -1096,6 +1096,7 @@
                                 />
                             </j-form-item>
                             <j-form-item
+                                label="用户名"
                                 :name="[
                                     'sso',
                                     'configuration',
@@ -1109,7 +1110,6 @@
                                         message: '请输入用户名',
                                     },
                                 ]"
-                                label="用户名"
                             >
                                 <j-input
                                     v-model:value="
@@ -1159,6 +1159,7 @@
                             <!-- 非钉钉 -->
                             <j-form-item
                                 v-if="form.data.provider !== 'dingtalk-ent-app'"
+                                class="resetLabel"
                                 :name="['sso', 'configuration', 'appId']"
                                 :rules="[
                                     {
@@ -1170,12 +1171,11 @@
                                         message: '最多可输入64个字符',
                                     },
                                 ]"
-                                class="resetLabel"
                             >
                                 <template #label>
                                     <FormLabel
-                                        required
                                         text="appId"
+                                        required
                                         tooltip="第三方应用唯一标识"
                                     />
                                 </template>
@@ -1192,6 +1192,7 @@
                                     form.data.provider !== 'wechat-webapp' &&
                                     form.data.provider !== 'wechat-miniapp'
                                 "
+                                class="resetLabel"
                                 :name="['sso', 'configuration', 'appKey']"
                                 :rules="[
                                     {
@@ -1203,12 +1204,11 @@
                                         message: '最多可输入64个字符',
                                     },
                                 ]"
-                                class="resetLabel"
                             >
                                 <template #label>
                                     <FormLabel
-                                        required
                                         text="appKey"
+                                        required
                                         tooltip="第三方应用唯一标识的密钥"
                                     />
                                 </template>
@@ -1223,6 +1223,7 @@
                             <!-- 钉钉 + 微信 -->
                             <j-form-item
                                 v-if="['wechat-miniapp', 'wechat-webapp', 'dingtalk-ent-app'].includes(form.data?.provider)"
+                                class="resetLabel"
                                 :name="['sso', 'configuration', 'appSecret']"
                                 :rules="[
                                     {
@@ -1234,12 +1235,11 @@
                                         message: '最多可输入64个字符',
                                     },
                                 ]"
-                                class="resetLabel"
                             >
                                 <template #label>
                                     <FormLabel
-                                        required
                                         text="appSecret"
+                                        required
                                         tooltip="应用的唯一标识的秘钥"
                                     />
                                 </template>
@@ -1255,8 +1255,8 @@
                         <j-form-item class="resetLabel">
                             <template #label>
                                 <FormLabel
-                                    required
                                     text="自动创建用户"
+                                    required
                                     tooltip="开启后，第三方用户第一次授权登录系统时，无需进入授权绑定页面。系统默认创建一个新用户与之绑定。"
                                 />
                             </template>
@@ -1267,6 +1267,7 @@
 
                         <div v-if="form.data.sso.autoCreateUser">
                             <j-form-item
+                                label="用户名前缀"
                                 :name="['sso', 'usernamePrefix']"
                                 :rules="[
                                     {
@@ -1274,7 +1275,6 @@
                                         message: '请输入用户名前缀',
                                     },
                                 ]"
-                                label="用户名前缀"
                             >
                                 <j-input
                                     v-model:value="form.data.sso.usernamePrefix"
@@ -1282,6 +1282,7 @@
                                 />
                             </j-form-item>
                             <j-form-item
+                                label="默认密码"
                                 :name="['sso', 'defaultPasswd']"
                                 :rules="[
                                     {
@@ -1300,7 +1301,6 @@
                                         validator: checkPassword,
                                     }
                                 ]"
-                                label="默认密码"
                             >
                                 <j-input
                                     v-model:value="form.data.sso.defaultPasswd"
@@ -1311,13 +1311,12 @@
                             <j-form-item label="角色">
                                 <j-select
                                     v-model:value="form.data.sso.roleIdList"
-                                    :options="form.roleIdList"
                                     mode="multiple"
+                                    :options="form.roleIdList"
                                     placeholder="请选择角色"
                                 ></j-select>
                                 <PermissionButton
                                     :hasPermission="`${rolePermission}:update`"
-                                    class="add-item"
                                     type="link"
                                     @click="
                                         clickAddItem(
@@ -1325,6 +1324,7 @@
                                             'Role',
                                         )
                                     "
+                                    class="add-item"
                                 >
                                     <AIcon type="PlusOutlined" />
                                 </PermissionButton>
@@ -1332,6 +1332,8 @@
                             <j-form-item label="组织">
                                 <j-tree-select
                                     v-model:value="form.data.sso.orgIdList"
+                                    :tree-data="form.orgIdList"
+                                    show-search
                                     :dropdown-style="{
                                         maxHeight: '400px',
                                         overflow: 'auto',
@@ -1340,11 +1342,9 @@
                                         label: 'name',
                                         value: 'id',
                                     }"
-                                    :tree-data="form.orgIdList"
                                     multiple
-                                    placeholder="请选择组织"
-                                    show-search
                                     style="width: 100%"
+                                    placeholder="请选择组织"
                                 >
                                     <template #title="{ name }">
                                         {{ name }}
@@ -1352,7 +1352,6 @@
                                 </j-tree-select>
                                 <PermissionButton
                                     :hasPermission="`${deptPermission}:update`"
-                                    class="add-item"
                                     type="link"
                                     @click="
                                         clickAddItem(
@@ -1360,6 +1359,7 @@
                                             'Department',
                                         )
                                     "
+                                    class="add-item"
                                 >
                                     <AIcon type="PlusOutlined" />
                                 </PermissionButton>

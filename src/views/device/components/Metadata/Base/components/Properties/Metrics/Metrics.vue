@@ -1,11 +1,11 @@
 <template>
   <div>
     <j-data-table
-        ref="tableRef"
-        :columns="newColumns"
         :dataSource="dataSource"
-        :serial="true"
+        ref="tableRef"
         :showTool="false"
+        :columns="newColumns"
+        :serial="true"
     >
       <template #range="{data}">
         {{ data.record.range === true ? '范围值' : '固定值'}}

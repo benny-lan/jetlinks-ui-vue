@@ -13,15 +13,15 @@
                     v-model:fileList="modelRef.upload"
                     :accept="'.xlsx,.csv'"
                     :action="FILE_UPLOAD"
-                    :before-upload="beforeUpload"
-                    :disabled="disabled"
                     :headers="{
                         'X-Access-Token': LocalStore.get(TOKEN_KEY),
                     }"
                     :maxCount="1"
                     :showUploadList="false"
-                    name="file"
                     @change="uploadChange"
+                    :before-upload="beforeUpload"
+                    :disabled="disabled"
+                    name="file"
                     @drop="handleDrop"
                 >
                     <div class="dragger-box">

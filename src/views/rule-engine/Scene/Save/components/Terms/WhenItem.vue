@@ -14,12 +14,12 @@
       </div>
       <div
           class='terms-params-content'
-          @mouseout='mouseout'
           @mouseover='mouseover'
+          @mouseout='mouseout'
       >
         <j-popconfirm
-            :overlayStyle='{minWidth: "180px"}'
             title='确认删除？'
+            :overlayStyle='{minWidth: "180px"}'
             @confirm='onDelete'
         >
           <div v-show='showDelete' class='terms-params-delete'>
@@ -31,10 +31,10 @@
           :key='item.key'
           :branchName='branchName'
           :data='item'
-          :isFirst='index === 0'
-          :isLast='index === termsData.length -1'
           :name='index'
           :showDeleteBtn='termsData.length > 1'
+          :isFirst='index === 0'
+          :isLast='index === termsData.length -1'
           :whenName='props.name'
         />
       </div>

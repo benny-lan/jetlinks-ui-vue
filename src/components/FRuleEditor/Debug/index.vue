@@ -16,16 +16,16 @@
                     :columns="columns"
                     :data-source="property"
                     :pagination="false"
-                    :scroll="{ y: 200 }"
                     bordered
                     size="small"
+                    :scroll="{ y: 200 }"
                 >
                     <template #bodyCell="{ column, record, index }">
                         <template v-if="column.key === 'id'">
                             <j-select
-                                v-model:value="record.id"
                                 :options="options"
                                 showSearch
+                                v-model:value="record.id"
                                 size="small"
                                 style="width: 100%; z-index: 1400 !important"
                             />
@@ -51,9 +51,9 @@
                     </template>
                 </j-table>
                 <j-button
+                    type="dashed"
                     block
                     style="margin-top: 5px"
-                    type="dashed"
                     @click="addItem"
                 >
                     <template #icon>

@@ -28,10 +28,10 @@
         }}</j-descriptions-item>
         <j-descriptions-item label="接入方式">
             <PermissionButton
-                    hasPermission="device/Product:update"
-                    style="width:100%;padding:0"
                     type="link"
+                    hasPermission="device/Product:update"
                     @click="changeTables"
+                    style="width:100%;padding:0"
                     >
                     <div style="white-space: normal">
                     <Ellipsis>{{

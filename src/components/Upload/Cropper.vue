@@ -1,19 +1,19 @@
 <template>
   <j-modal
-      :confirmLoading="loading"
       :title="title"
+      :confirmLoading="loading"
       :width="400"
-      visible
       @cancel="cancel"
       @ok="ok"
+      visible
   >
     <div style="height: 300px; width: 100%;">
       <vue-cropper
           ref="cropper"
           :auto-crop-height="200"
+          :fixed-box="true"
           :auto-crop-width="200"
           :autoCrop="true"
-          :fixed-box="true"
           :img="img"
           outputType="jpg"
       ></vue-cropper>

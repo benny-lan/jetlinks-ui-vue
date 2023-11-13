@@ -1,10 +1,10 @@
 <template>
   <j-modal
+      visible
       :getContainer="getPopupContainer"
+      width="650px"
       :maskClosable="false"
       title="功能详情"
-      visible
-      width="650px"
       @cancel="cancel"
       @ok="ok"
   >
