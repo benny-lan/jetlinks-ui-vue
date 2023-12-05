@@ -29,6 +29,7 @@ export default defineConfig(({ mode}) => {
               'layouts': path.resolve(__dirname, 'src/layouts'),
               'components': path.resolve(__dirname, 'src/components'),
               'store': path.resolve(__dirname, 'src/store'),
+              '@LowCode': path.resolve(__dirname, '../low-code-ui/src'),
           }
       },
       build: {
@@ -83,6 +84,7 @@ export default defineConfig(({ mode}) => {
           copy({
             targets: [
               {src: 'node_modules/@liveqing/liveplayer-v3/dist/component/liveplayer-lib.min.js', dest: 'public/js'},
+              { src: '../low-code-ui/public/images/**/*', dest: 'public/images' },
             ]
           }),
           progress()

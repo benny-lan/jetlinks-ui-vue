@@ -2,6 +2,8 @@ import { BlankLayoutPage, BasicLayoutPage, SinglePage } from 'components/Layout'
 import { isNoCommunity } from '@/utils/utils'
 import Iframe from '../views/iframe/index.vue'
 import { shallowRef, defineAsyncComponent, h } from 'vue'
+import { extraMenu as lowCodeMenu } from '../../../low-code-ui/src/router/extraMenu'
+import {isArray} from "lodash-es";
 
 const pagesComponent = import.meta.glob('../views/**/*.vue');
 
@@ -101,6 +103,7 @@ export type MenuItem = {
 
 // 额外子级路由
 const extraRouteObj = {
+  ...lowCodeMenu,
   'media/Cascade': {
     children: [
       { code: 'Save', name: '新增' },
@@ -176,7 +179,6 @@ const handleMeta = (item: MenuItem, isApp: boolean) => {
   return {
     icon: item.icon,
     title: meta?.title || item.name,
-    hideInMenu: meta?.hideInMenu ?? item.isShow === false,
     buttons: handleButtons(item.buttons),
     isApp
   }
@@ -215,25 +217,33 @@ const findComponents = (code: string, level: number, isApp: boolean, components:
 const hasExtraChildren = (item: MenuItem, extraMenus: any ) => {
   const extraItem = extraMenus[item.code]
   if (extraItem) {
-    return extraItem.children.map(e => ({
-      ...e,
-      code: `${item.code}/${e.code}`,
-      url: `${item.url}/${e.code}`,
-      isShow: false
-    }))
+    if (extraItem.children) {
+      return extraItem.children.map(e => ({
+        ...e,
+        code: `${item.code}/${e.code}`,
+        url: `${item.url}/${e.code}`,
+        isShow: false
+      }))
+    } else if(isArray(extraItem)){
+      return extraItem.map(e => ({
+        ...e,
+        url: `${item.url}${e.url}`,
+        isShow: false
+      }))
+    }
   }
 
   return undefined
 }
 
-export const getAsyncRoutesMap = () => {
-  const modules = {}
-  Object.keys(pagesComponent).forEach(item => {
-    const code = item.replace('../views/', '').replace('/index.vue', '')
-    modules[code] = pagesComponent[item]
-  })
-  return modules
-}
+// export const getAsyncRoutesMap = () => {
+//   const modules = {}
+//   Object.keys(pagesComponent).forEach(item => {
+//     const code = item.replace('../views/', '').replace('/index.vue', '')
+//     modules[code] = pagesComponent[item]
+//   })
+//   return modules
+// }
 
 const findDetailRouteItem = (item: any, components: any) => {
   const { code, url } = item
@@ -286,7 +296,7 @@ export const handleMenus = (menuData: any[], components: any, level: number = 1,
         route.children = route.children ? [...route.children, ...extraRoute] : extraRoute
       }
 
-      if (item.options?.LowCode && level === 1) {
+      if (item.options?.LowCode && level === 1 && self === top) {
         route.component = SinglePage
       }
 
@@ -330,10 +340,11 @@ export const handleSiderMenu = (menuData: any[]) => {
   if (menuData && menuData.length) {
     return menuData.filter(item => {
 
-      if ((item.options?.isShow === false) || item.meta?.hideInMenu === true) {
-        return false
-      }
-      return true
+      // if ((item.options?.isShow === false) || item.meta?.hideInMenu === true) {
+      //   return false
+      // }
+      // return true
+      return item.meta?.hideInMenu !== true
     }).map(item => {
       const { isApp, appUrl } = hasAppID(item) // 是否为第三方程序
       if ( item.options?.isShow !== undefined && item.isShow === undefined) {

@@ -4,7 +4,7 @@ import {
   handleMenus,
   MenuItem,
   handleSiderMenu,
-  getAsyncRoutesMap, handleMenusMap
+  handleMenusMap
 } from '@/utils/menu'
 import { cloneDeep, isArray } from 'lodash-es'
 import { usePermissionStore } from './permission'
@@ -13,6 +13,9 @@ import { onlyMessage } from '@/utils/comm'
 import { AccountMenu, NotificationRecordCode, NotificationSubscriptionCode } from '@/router/menu'
 import { USER_CENTER_MENU_CODE } from '@/utils/consts'
 import {isNoCommunity} from "@/utils/utils";
+import { getGlobModules } from '../router/globModules'
+import { BASIC_ROUTER_DATA } from '../../../low-code-ui/src/router/basic'
+import { handleMenuInit } from '../../../low-code-ui/src/utils'
 
 const defaultOwnParams = [
   {
@@ -116,8 +119,8 @@ export const useMenuStore = defineStore({
         const resp = await queryOwnThree({ paging: false, terms: defaultOwnParams })
         if (resp.success) {
           const permission = usePermissionStore()
-          let resultData = resp.result
-          const components = getAsyncRoutesMap()
+          let resultData = handleMenuInit([...resp.result,...BASIC_ROUTER_DATA])
+          const components = getGlobModules()
           const menusData = handleMenus(cloneDeep(resultData), components)
           permission.handlePermission(resultData)
           const silderMenus = handleSiderMenu(cloneDeep(resultData))
@@ -130,7 +133,7 @@ export const useMenuStore = defineStore({
               hideInMenu: true
             }
           })
-          // console.log(menusData)
+          console.log(menusData)
           // menusData.push(AccountMenu)
           this.siderMenus = silderMenus
           res(menusData)
