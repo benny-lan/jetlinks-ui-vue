@@ -1,5 +1,5 @@
 const routerModules = import.meta.glob('../views/**/index.vue')
-import {getGlobModules as LowCodeComponentsFn} from '../../../low-code-ui/src/router/globModules'
+import {getGlobModules as LowCodeComponentsFn} from '@LowCode/router/globModules'
 
 export const getAsyncRoutesMap = () => {
     const modules = {}

@@ -1,5 +1,5 @@
 import { DeviceInstance, InstanceModel } from "@/views/device/Instance/typings"
-import { defineStore } from "pinia";
+import { defineStore } from '@jetlinks-web/stores'
 import type { MetadataItem, MetadataType } from '@/views/device/Product/typings'
 
 type MetadataModelType = {
@@ -13,7 +13,7 @@ type MetadataModelType = {
 
 export const useMetadataStore = defineStore({
   id: 'metadata',
-  state: () => ({ 
+  state: () => ({
     model: {
       item: undefined,
       edit: false,

@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia';
+import { defineStore } from '@jetlinks-web/stores'
 import { systemVersion } from '@/api/comm'
 import { useMenuStore } from './menu'
 import {getDetails_api, settingDetail} from '@/api/system/basis';

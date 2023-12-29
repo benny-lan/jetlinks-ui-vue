@@ -1,5 +1,5 @@
 import { ProductItem } from "@/views/device/Product/typings";
-import { defineStore } from "pinia";
+import { defineStore } from '@jetlinks-web/stores'
 import { detail, getDeviceNumber } from '@/api/device/product'
 import encodeQuery from "@/utils/encodeQuery";
 

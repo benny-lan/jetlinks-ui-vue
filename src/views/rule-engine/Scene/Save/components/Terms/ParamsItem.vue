@@ -85,7 +85,7 @@ import { useSceneStore } from 'store/scene'
 import { storeToRefs } from 'pinia';
 import { Form } from 'jetlinks-ui-components'
 import {indexOf, isArray, isObject, isString, pick} from 'lodash-es'
-import {cloneDeep} from "lodash";
+import {cloneDeep} from "lodash-es";
 
 const sceneStore = useSceneStore()
 const { data: formModel } = storeToRefs(sceneStore)
@@ -340,7 +340,7 @@ const termsTypeSelect = (e: { key: string, name: string }) => {
   emit('update:value', { ...paramsValue })
   formItemContext.onFieldChange()
   formModel.value.options!.when[props.branchName].terms[props.whenName].terms[props.termsName][1] = e.name
-  
+
 }
 
 const valueSelect = (v: any, label: string, labelObj: Record<number, any>, option: any) => {

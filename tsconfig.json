@@ -17,6 +17,7 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"],
+      "@LowCode/*": ["./apps/low-code-ui/src/*"],
       "components/*": ["./src/components/*"],
       "layouts/*": ["./src/layouts/*"],
       "store/*": ["./src/store/*"],

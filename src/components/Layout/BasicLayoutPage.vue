@@ -75,13 +75,14 @@ watchEffect(() => {
     layoutConf.logo = configInfo.value.front?.logo || DefaultSetting.layout.logo;
 })
 
-const components = computed(() => {
-  const componentName = route.matched[route.matched.length - 1]?.components?.default?.name
-  if (componentName !== 'BasicLayoutPage') {
-    return route.matched[route.matched.length - 1]?.components?.default
-  }
-  return undefined
-})
+const components = ref()
+// const components = computed(() => {
+//   const componentName = route.matched[route.matched.length - 1]?.components?.default?.name
+//   if (componentName !== 'BasicLayoutPage') {
+//     return route.matched[route.matched.length - 1]?.components?.default
+//   }
+//   return undefined
+// })
 
 /**
  * 面包屑
@@ -100,6 +101,14 @@ const breadcrumbs = computed(() =>
       })
     }
 );
+
+const handleRouteComponents = () => {
+  const componentName = route.matched[route.matched.length - 1]?.components?.default?.name
+  if (componentName !== 'BasicLayoutPage') {
+    return route.matched[route.matched.length - 1]?.components?.default
+  }
+  return undefined
+}
 
 const routerBack = () => {
   router.go(-1)
@@ -121,6 +130,10 @@ watchEffect(() => {
   if (route.query?.layout === 'false') {
     basicLayout.value.pure = true
   }
+})
+
+watchEffect(() => {
+  components.value = handleRouteComponents()
 })
 
 const toDoc = () => window.open('http://doc.v2.jetlinks.cn/');

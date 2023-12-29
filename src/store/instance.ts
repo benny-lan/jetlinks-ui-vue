@@ -1,5 +1,5 @@
 import { DeviceInstance, InstanceModel } from "@/views/device/Instance/typings"
-import { defineStore } from "pinia"
+import { defineStore } from '@jetlinks-web/stores'
 import { detail } from '@/api/device/instance'
 import { onlyMessage } from "@/utils/comm"
 

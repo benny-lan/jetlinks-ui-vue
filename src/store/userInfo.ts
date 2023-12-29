@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia';
+import { defineStore } from '@jetlinks-web/stores'
 import { authLogin, userDetail } from '@/api/login';
 import { LocalStore } from '@/utils/comm';
 import { TOKEN_KEY } from '@/utils/variable';
@@ -33,7 +33,7 @@ export const useUserInfo = defineStore('userInfo', {
             tabKey: '' // 站内信的tabkey
         }
     }),
-    
+
     actions: {
         login(userInfo: any) {
             const username = userInfo.userName.trim();

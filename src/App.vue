@@ -8,7 +8,7 @@
 import { ConfigProvider } from 'jetlinks-ui-components'
 import zhCN from 'jetlinks-ui-components/es/locale/zh_CN';
 import { storeToRefs } from 'pinia';
-import { useSystem } from './store/system';
+import { useSystem } from '@/store/system';
 import DefaultSetting from '../config/config'
 import {LocalStore} from "@/utils/comm";
 import {TOKEN_KEY} from "@/utils/variable";

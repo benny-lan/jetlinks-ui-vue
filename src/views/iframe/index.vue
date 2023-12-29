@@ -19,7 +19,7 @@ import { getAppInfo_api } from '@/api/system/apply';
 import { lowCodeUrl } from '@/api/comm'
 import FullPage from "components/Layout/FullPage.vue";
 import {onUnmounted} from "vue";
-import router from "@/router";
+import { router } from '@jetlinks-web/router'
 import {LoginPath} from "@/router/menu";
 import { TokenLose} from "@/utils/request";
 

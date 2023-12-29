@@ -1,5 +1,4 @@
-
-import { defineStore } from "pinia";
+import { defineStore } from '@jetlinks-web/stores'
 
 type DepartmentStateType = {
     productId?: string[];
@@ -12,8 +11,8 @@ export const useDepartmentStore = defineStore({
     id: 'department',
     state: (): DepartmentStateType => ({
         productId: undefined,
-        // 设备资产分配弹窗操作类型: 
-        // 1. optType === 'handle': 手动点击资产分配按钮; 
+        // 设备资产分配弹窗操作类型:
+        // 1. optType === 'handle': 手动点击资产分配按钮;
         // 2. optType === ': 产品资产分配后, 自动弹出设备资产分配
         optType: '',
         crossPageKeys: [], // 表格跨页多选的keys

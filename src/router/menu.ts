@@ -55,12 +55,12 @@ export const AccountMenu = {
     ]
 }
 
-export default [
-    { path: '/*', redirect: '/' },
-    {
+export const Login =  {
         path: LoginPath,
         component: () => import('@/views/user/Login/index.vue')
-    },
+    }
+
+export default [
     {
         path: AccountCenterBindPath,
         component: () => import('@/views/account/Center/bind/index.vue')

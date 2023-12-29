@@ -1,4 +1,4 @@
-import { defineStore } from "pinia";
+import { defineStore } from '@jetlinks-web/stores'
 
 export const useAlarmStore = defineStore('alarm', () => {
   const data = reactive({

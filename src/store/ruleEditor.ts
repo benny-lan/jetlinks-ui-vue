@@ -1,4 +1,4 @@
-import { defineStore } from "pinia";
+import { defineStore } from '@jetlinks-web/stores'
 
 type RuleEditorType = {
   model: 'simple' | 'advance';
@@ -13,12 +13,12 @@ type RuleEditorType = {
 
 export const useRuleEditorStore = defineStore({
   id: 'ruleEditor',
-  state: () => ({ 
+  state: () => ({
     state: {
       model: 'simple',
       code: '',
       log: [],
-    } as RuleEditorType 
+    } as RuleEditorType
   }),
   actions: {
     set(key: string, value: any) {

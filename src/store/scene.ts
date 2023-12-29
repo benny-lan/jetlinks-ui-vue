@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore } from '@jetlinks-web/stores'
 import type { FormModelType } from '@/views/rule-engine/Scene/typings'
 import { detail } from '@/api/rule-engine/scene'
 import { cloneDeep, isArray } from 'lodash-es'

@@ -1,4 +1,4 @@
-import { defineStore } from "pinia";
+import { defineStore } from '@jetlinks-web/stores'
 import {handleAuthMenu} from "@/utils/menu";
 
 export const usePermissionStore = defineStore({

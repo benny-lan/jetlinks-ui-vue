@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { BASE_API_PATH, TOKEN_KEY } from '@/utils/variable'
 import { notification as Notification, Modal } from 'jetlinks-ui-components'
-import router from '@/router'
+import { router } from '@jetlinks-web/router'
 import { LoginPath } from '@/router/menu'
 import { cleanToken, getToken, LocalStore } from '@/utils/comm'
 import type { AxiosInstance, AxiosResponse } from 'axios'

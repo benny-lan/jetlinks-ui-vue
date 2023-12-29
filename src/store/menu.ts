@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore } from '@jetlinks-web/stores'
 import { queryOwnThree } from '@/api/system/menu'
 import {
   handleMenus,
@@ -8,14 +8,15 @@ import {
 } from '@/utils/menu'
 import { cloneDeep, isArray } from 'lodash-es'
 import { usePermissionStore } from './permission'
-import router from '@/router'
 import { onlyMessage } from '@/utils/comm'
+import { router } from '@jetlinks-web/router'
 import { AccountMenu, NotificationRecordCode, NotificationSubscriptionCode } from '@/router/menu'
 import { USER_CENTER_MENU_CODE } from '@/utils/consts'
 import {isNoCommunity} from "@/utils/utils";
 import { getGlobModules } from '../router/globModules'
-import { BASIC_ROUTER_DATA } from '../../../low-code-ui/src/router/basic'
-import { handleMenuInit } from '../../../low-code-ui/src/utils'
+import { BASIC_ROUTER_DATA } from '@LowCode/router/basic'
+import { handleMenuInit } from '@LowCode/utils'
+import {useMenuStore as lowCodeMenuStore} from '@LowCode/store'
 
 const defaultOwnParams = [
   {
@@ -55,7 +56,68 @@ type MenuStateType = {
   params: Record<string, any>
 }
 
-
+// export const useMenuStore = defineStore('menu', () => {
+//   const menus = ref({})
+//   const params = ref({})
+//   const siderMenus = ref([])
+//
+//   const hasPermission = () => {
+//     return (menuCode: string | string[]) => {
+//       if (!menuCode) {
+//         return true
+//       }
+//       if (!!Object.keys(menus.value).length) {
+//         if (typeof menuCode === 'string') {
+//           return !!menus.value[menuCode]
+//         }
+//         return menuCode.some(code => !!menus.value[code])
+//       }
+//       return false
+//     }
+//   }
+//
+//   const hasMenu = (code: string) => {
+//     return menus.value[code]?.path
+//   }
+//
+//   const jumpPage =(name: string, _params?: Record<string, any>, query?: Record<string, any>) => {
+//     const path = hasMenu(name)
+//     if (path) {
+//       params.value = { [name]: _params || {} }
+//       router.push({
+//         name, params: _params, query, state: { params: _params }
+//       })
+//     } else {
+//       onlyMessage('暂无权限，请联系管理员', 'error')
+//       console.warn(`没有找到对应的页面: ${name}`)
+//     }
+//   }
+//
+//   const routerPush = (name: string, _params?: Record<string, any>, query?: Record<string, any>) => {
+//     params.value = { [name]: params || {} }
+//     router.push({
+//       name, params: _params, query, state: { params: _params }
+//     })
+//   }
+//
+//   const handleMenusMapById = (item: { name: string, path: string }) => {
+//     const { name, path } = item
+//     if (name) {
+//       menus.value[name] = { path }
+//     }
+//   }
+//
+//
+//
+//   return {
+//     hasPermission,
+//     hasMenu,
+//     jumpPage,
+//     routerPush,
+//     handleMenusMapById
+//   }
+//
+// })
 export const useMenuStore = defineStore({
   id: 'menu',
   state: (): MenuStateType => ({
@@ -123,19 +185,16 @@ export const useMenuStore = defineStore({
           const components = getGlobModules()
           const menusData = handleMenus(cloneDeep(resultData), components)
           permission.handlePermission(resultData)
-          const silderMenus = handleSiderMenu(cloneDeep(resultData))
           // const { menusData, silderMenus } = filterAsyncRouter(resultData)
           handleMenusMap(cloneDeep(menusData), this.handleMenusMapById)
           menusData.push({
             path: '/',
             redirect: menusData[0]?.path,
-            meta: {
-              hideInMenu: true
-            }
           })
-          console.log(menusData)
           // menusData.push(AccountMenu)
-          this.siderMenus = silderMenus
+          // lowCodeMenuStore().handleMenuMapFn(cloneDeep(menusData))
+          this.siderMenus = handleSiderMenu(cloneDeep(resultData))
+          console.log(cloneDeep(menusData))
           res(menusData)
         }
       })

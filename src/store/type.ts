@@ -1,5 +1,4 @@
-import { defineStore } from "pinia";
-
+import { defineStore } from '@jetlinks-web/stores'
 export const useTypeStore = defineStore({
     id: 'type',
     state: () => ({
