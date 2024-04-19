@@ -1,5 +1,5 @@
 <template>
-    <j-pro-layout
+    <ProLayout
         v-bind="layoutConf"
         v-model:collapsed="basicLayout.collapsed"
         v-model:openKeys="basicLayout.openKeys"
@@ -7,6 +7,7 @@
         :breadcrumb="basicLayout.pure ? undefined : { routes: breadcrumbs }"
         :headerHeight='basicLayout.pure ? 1 : layout.headerHeight'
         :pure="basicLayout.pure"
+        :apps="filterApps"
         @backClick='routerBack'
     >
         <template #breadcrumbRender="slotProps">
@@ -25,12 +26,13 @@
                 <UserInfo />
             </div>
         </template>
+
       <slot>
         <router-view v-slot="{ Component }">
           <component :is="components || Component" />
         </router-view>
       </slot>
-    </j-pro-layout>
+    </ProLayout>
 </template>
 
 <script setup lang="ts" name="BasicLayoutPage">
@@ -41,8 +43,10 @@ import { useMenuStore } from '@/store/menu';
 import { clearMenuItem } from 'jetlinks-ui-components/es/ProLayout/util';
 import { AccountMenu } from '@/router/menu'
 import { useSystem } from '@/store/system';
+import { useApplication } from '@/store/application';
 import { storeToRefs } from 'pinia';
 import { useSlots } from 'vue'
+import { ProLayout } from '@jetlinks-web/components/es/components'
 
 type StateType = {
     collapsed: boolean;
@@ -54,11 +58,18 @@ type StateType = {
 const router = useRouter();
 const route = useRoute();
 
+const application = useApplication();
 const menu = useMenuStore();
 
 const system = useSystem();
 const {configInfo,layout, basicLayout} = storeToRefs(system);
 const slots = useSlots()
+
+const filterApps = computed(() => {
+  return application.apps.filter(item => item.id !== system.microApp.appId)
+})
+
+
 const layoutConf = reactive({
     theme: DefaultSetting.layout.theme,
     siderWidth: layout.value.siderWidth,
@@ -122,6 +133,10 @@ watchEffect(() => {
     basicLayout.value.pure = true
   }
 })
+
+// if ((window as any).__MICRO_APP_ENVIRONMENT__) {
+//   basicLayout.value.pure = true
+// }
 
 const toDoc = () => window.open('http://doc.v2.jetlinks.cn/');
 </script>

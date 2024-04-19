@@ -14,7 +14,13 @@
   },
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",
+    "@jetlinks-web/components": "^2.0.13",
+    "@jetlinks-web/constants": "^1.0.2",
+    "@jetlinks-web/hooks": "^1.0.12",
+    "@jetlinks-web/types": "^1.0.2",
+    "@jetlinks-web/utils": "^1.0.6",
     "@liveqing/liveplayer-v3": "^3.7.10",
+    "@micro-zoe/micro-app": "^1.0.0-rc.4",
     "@types/marked": "^4.0.8",
     "@vitejs/plugin-vue-jsx": "^3.0.0",
     "@vuemap/vue-amap": "^1.1.20",

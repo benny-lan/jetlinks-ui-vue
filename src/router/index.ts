@@ -5,6 +5,7 @@ import { useUserInfo } from '@/store/userInfo'
 import { useSystem } from '@/store/system'
 import NotFindPage from '@/views/404.vue'
 import { useMenuStore } from 'store/menu'
+import {useApplication} from "store/application";
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -29,8 +30,12 @@ router.beforeEach((to, from, next) => {
       const userInfo = useUserInfo()
       const system = useSystem()
       const menu = useMenuStore()
+      const application = useApplication()
+
       if (!Object.keys(menu.menus).length && !filterPath.includes(to.path)) {
         userInfo.getUserInfo().then(() => {
+          application.queryApplication()
+          system.setMircoData()
           system.getSystemVersion().then((menuData: any[]) => {
             menuData.forEach(r => {
               router.addRoute('base', r)

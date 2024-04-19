@@ -9,7 +9,7 @@ import {
 import { cloneDeep, isArray } from 'lodash-es'
 import { usePermissionStore } from './permission'
 import router from '@/router'
-import { onlyMessage } from '@/utils/comm'
+import {LocalStore, onlyMessage} from '@/utils/comm'
 import { AccountMenu, NotificationRecordCode, NotificationSubscriptionCode } from '@/router/menu'
 import { USER_CENTER_MENU_CODE } from '@/utils/consts'
 import {isNoCommunity} from "@/utils/utils";
@@ -110,10 +110,11 @@ export const useMenuStore = defineStore({
         this.menus[name] = { path }
       }
     },
-    queryMenuTree(isCommunity = false): Promise<any[]> {
+    queryMenuTree(isCommunity = false, ): Promise<any[]> {
       return new Promise(async (res) => {
+        const appId = LocalStore.get('appId')
         //过滤非集成的菜单
-        const resp = await queryOwnThree({ paging: false, terms: defaultOwnParams })
+        const resp = await queryOwnThree({ paging: false, terms: defaultOwnParams }, appId)
         if (resp.success) {
           const permission = usePermissionStore()
           let resultData = resp.result
@@ -134,7 +135,7 @@ export const useMenuStore = defineStore({
               hideInMenu: true
             }
           })
-         
+
           // console.log(menusData)
           // menusData.push(AccountMenu)
           this.siderMenus = silderMenus

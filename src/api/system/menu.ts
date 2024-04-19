@@ -3,10 +3,11 @@ import server from '@/utils/request';
 // 获取当前用户可访问菜单
 export const getMenuTree_api = (data: object) => server.post(`/menu/_all/tree`, data);
 
-export const queryOwnThree = (data: any) => server.post<any>('/menu/user-own/tree', data)
+// export const queryOwnThree = (data: any) => server.post<any>('/menu/user-own/tree', data)
+export const queryOwnThree = (data: any, appId: string) => server.post<any>(`application/${appId}/menu/tree`, data)
 /**
  * 校验编码唯一性
- * @param data 
+ * @param data
  */
 export const validCode_api = (data:object) => server.get(`/menu/code/_validate`,data);
 

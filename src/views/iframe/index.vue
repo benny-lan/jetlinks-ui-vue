@@ -46,11 +46,11 @@ const handle = async (appId: string, url: string) => {
     let menuUrl: any = url;
     if (res.status === 200) {
       const result = res.result
-        if (result.page.routeType === 'hash') {
+        if (result.page?.routeType === 'hash') {
             menuUrl = url.startsWith('/') ? `/#${url}` : `/#/${url}`;
         }
 
-        if (result.page.parameters) {
+        if (result.page?.parameters) {
           const params = new URLSearchParams()
           result.page.parameters.forEach((item: any) => {
             if (item?.key) {
@@ -65,6 +65,9 @@ const handle = async (appId: string, url: string) => {
 
         const _url = menuUrl.startsWith('/') ? menuUrl : `/${menuUrl}`;
 
+        const baseUrl = result.page?.baseUrl
+
+      if (baseUrl) {
         if (result.provider === 'internal-standalone') {
             const urlStandalone = `${result.page.baseUrl}/api/application/sso/${appId}/login?redirect=${menuUrl}?layout=false`;
             iframeUrl.value = urlStandalone;
@@ -77,6 +80,8 @@ const handle = async (appId: string, url: string) => {
             const urlOther = `${result.page.baseUrl}${_url}`;
             iframeUrl.value = urlOther;
         }
+      }
+
     }
 }
 

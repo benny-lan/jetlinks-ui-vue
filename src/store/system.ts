@@ -19,7 +19,8 @@ type SystemStateType = {
         openKeys: string[],
         collapsed: boolean
         pure: boolean
-    }
+    },
+    microApp: any
 }
 
 export const useSystem = defineStore('system', {
@@ -37,7 +38,8 @@ export const useSystem = defineStore('system', {
             openKeys: [],
             collapsed: false,
             pure: false
-        }
+        },
+        microApp: {}
     }),
     actions: {
         getSystemVersion(): Promise<any[]> {
@@ -86,6 +88,11 @@ export const useSystem = defineStore('system', {
                     // }
                     this.setDocumentTitle()
                 })
+            }
+        },
+        setMircoData() {
+            if ((window as any).__MICRO_APP_ENVIRONMENT__) {
+                this.microApp = (window as any).microApp.getData() // 获取主应用下发的数据
             }
         }
     }

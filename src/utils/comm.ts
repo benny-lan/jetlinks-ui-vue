@@ -40,6 +40,10 @@ export const getToken = () => {
   return LocalStore.get(TOKEN_KEY)
 }
 
+export const setToken = (token: string) => {
+  return LocalStore.set(TOKEN_KEY, token)
+}
+
 export const cleanToken = () => {
   LocalStore.remove(TOKEN_KEY)
 }
