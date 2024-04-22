@@ -83,6 +83,7 @@ export default defineConfig(({ mode}) => {
           copy({
             targets: [
               {src: 'node_modules/@liveqing/liveplayer-v3/dist/component/liveplayer-lib.min.js', dest: 'public/js'},
+              {src: 'src/views/init-home/data/baseMenuData.json', dest: 'public/js'},
             ]
           }),
           progress()
@@ -95,7 +96,7 @@ export default defineConfig(({ mode}) => {
                   // target: 'http://192.168.32.244:8881',
                 //   target: 'http://192.168.32.163:8844', //张本地
                 //   target: 'http://120.77.179.54:8844', // 120测试
-                target: 'http://192.168.32.66:8800', // 本地开发环境
+                target: 'http://192.168.33.1:8901', // 本地开发环境
                 // target: 'http://192.168.33.1:8848', // 社区版开发环境
                 //   target: 'http://192.168.32.207:8844', // 刘本地
                 //   target: 'http://192.168.32.187:8844', // 谭本地

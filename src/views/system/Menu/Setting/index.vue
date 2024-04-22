@@ -79,10 +79,9 @@ import type { AntTreeNodeDropEvent } from 'ant-design-vue/es/tree';
 import { cloneDeep } from 'lodash-es';
 import { onlyMessage } from '@/utils/comm';
 import {
-    USER_CENTER_MENU_CODE,
-    messageSubscribe
+  USER_CENTER_MENU_CODE,
+  messageSubscribe, OWNER, protocolList
 } from '@/utils/consts';
-import { protocolList } from '@/utils/consts';
 import { getProviders } from '@/api/data-collect/channel';
 import { isNoCommunity } from '@/utils/utils';
 const selectedKeys: any = ref([]);
@@ -101,7 +100,7 @@ const params = {
                 {
                     column: 'owner',
                     termType: 'eq',
-                    value: 'iot',
+                    value: OWNER,
                 },
                 {
                     column: 'owner',
@@ -120,7 +119,7 @@ const params = {
 let filterProtocolList: any[] = [];
 const getProvidersFn = async () => {
     if(!isNoCommunity){
-        return 
+        return
     }else{
         const res: any = await getProviders();
         filterProtocolList = protocolList.filter((item) => {
@@ -155,7 +154,7 @@ getProvidersFn();
 //     return filtered;
 // }
 /**
- * 
+ *
  * @param nodes 菜单数据
  * @param selectedKeys 选中的菜单
  * 选中和非选中改变show的值

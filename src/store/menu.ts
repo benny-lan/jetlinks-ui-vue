@@ -11,7 +11,7 @@ import { usePermissionStore } from './permission'
 import router from '@/router'
 import {LocalStore, onlyMessage} from '@/utils/comm'
 import { AccountMenu, NotificationRecordCode, NotificationSubscriptionCode } from '@/router/menu'
-import { USER_CENTER_MENU_CODE } from '@/utils/consts'
+import {APP_ID, OWNER, USER_CENTER_MENU_CODE} from '@/utils/consts'
 import {isNoCommunity} from "@/utils/utils";
 
 const defaultOwnParams = [
@@ -22,7 +22,7 @@ const defaultOwnParams = [
           {
             column: 'owner',
             termType: 'eq',
-            value: 'iot'
+            value: OWNER
           },
           {
             column: 'owner',
@@ -112,7 +112,13 @@ export const useMenuStore = defineStore({
     },
     queryMenuTree(isCommunity = false, ): Promise<any[]> {
       return new Promise(async (res) => {
-        const appId = LocalStore.get('appId')
+        let appId = APP_ID
+
+        if ((window as any).__MICRO_APP_ENVIRONMENT__) {
+          appId = LocalStore.get('appId')
+        }
+
+
         //过滤非集成的菜单
         const resp = await queryOwnThree({ paging: false, terms: defaultOwnParams }, appId)
         if (resp.success) {
@@ -136,7 +142,7 @@ export const useMenuStore = defineStore({
             }
           })
 
-          // console.log(menusData)
+          console.log(menusData)
           // menusData.push(AccountMenu)
           this.siderMenus = silderMenus
           res(menusData)

@@ -2,6 +2,7 @@ import { BlankLayoutPage, BasicLayoutPage, SinglePage } from 'components/Layout'
 import { isNoCommunity } from '@/utils/utils'
 import Iframe from '../views/iframe/index.vue'
 import { shallowRef, defineAsyncComponent, h } from 'vue'
+import {APP_ID} from "@/utils/consts";
 
 const pagesComponent = import.meta.glob('../views/**/*.vue');
 
@@ -159,7 +160,11 @@ const extraRouteObj = {
 type Buttons = Array<{ id: string }>
 
 const hasAppID = (item: any): { isApp: boolean, appUrl: string } => {
-  const isApp = !!item.appId || item.options?.owner
+  let isApp = !!item.appId || item.options?.owner
+  if (item.appId === APP_ID) {
+    isApp = false
+  }
+
   const isLowCode = !!item.options?.LowCode
   return {
     isApp: isApp || isLowCode,

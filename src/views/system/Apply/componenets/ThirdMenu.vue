@@ -20,7 +20,7 @@
             + 新增菜单
         </PermissionButton>
         <div class="treeContainer">
-            <j-tree 
+            <j-tree
               :fieldNames="{
                     title:'name',
                     key:'id',
@@ -134,8 +134,8 @@
                                   <j-input v-model:value="formData.code" placeholder="请输入编码" />
                               </j-form-item>
                             </j-col>
-                       
-                           
+
+
                        <!-- <j-col :span="12">
                             <j-form-item label="排序" name="sortIndex" :rules="[
                                 {
@@ -174,7 +174,7 @@
 
 <script name="ThirdMenu" setup lang="ts">
 import { getMenuTree_api , validCode_api , addMenuInfo_api ,saveMenuInfo_api , getMenuInfo_api , delMenuInfo_api} from '@/api/system/menu'
-import { USER_CENTER_MENU_CODE,messageSubscribe } from '@/utils/consts'
+import { USER_CENTER_MENU_CODE,messageSubscribe, OWNER } from '@/utils/consts'
 import ChooseIconDialog from '../../Menu/components/ChooseIconDialog.vue'
 import { Rule } from 'ant-design-vue/lib/form';
 import { onlyMessage } from '@/utils/comm';
@@ -211,7 +211,7 @@ const queryParams = {
                         {
                             column: 'owner',
                             termType: 'eq',
-                            value: 'iot',
+                            value: OWNER,
                         },
                         {
                             column: 'owner',
@@ -307,7 +307,7 @@ const saveMenu = () =>{
       ...formData.value,
       owner: 'iot',
       options: { show: true ,owner:props.data?.id },
-    } 
+    }
     api(params).then((res)=>{
       if(res.status === 200){
         onlyMessage('操作成功')

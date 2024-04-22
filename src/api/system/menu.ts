@@ -4,7 +4,7 @@ import server from '@/utils/request';
 export const getMenuTree_api = (data: object) => server.post(`/menu/_all/tree`, data);
 
 // export const queryOwnThree = (data: any) => server.post<any>('/menu/user-own/tree', data)
-export const queryOwnThree = (data: any, appId: string) => server.post<any>(`application/${appId}/menu/tree`, data)
+export const queryOwnThree = (data: any, appId: string) => server.post<any>(`/application/${appId}/menu/tree`, data)
 /**
  * 校验编码唯一性
  * @param data

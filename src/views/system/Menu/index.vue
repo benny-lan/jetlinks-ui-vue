@@ -84,7 +84,7 @@ import PermissionButton from '@/components/PermissionButton/index.vue';
 import { getMenuTree_api, delMenuInfo_api } from '@/api/system/menu';
 import dayjs from 'dayjs';
 import { useUserInfo } from '@/store/userInfo';
-import { USER_CENTER_MENU_CODE,messageSubscribe } from '@/utils/consts'
+import {USER_CENTER_MENU_CODE, messageSubscribe, OWNER} from '@/utils/consts'
 import { storeToRefs } from 'pinia';
 import { onlyMessage } from '@/utils/comm';
 
@@ -185,7 +185,7 @@ const table = reactive({
                         {
                             column: 'owner',
                             termType: 'eq',
-                            value: 'iot',
+                            value: OWNER,
                         },
                         {
                             column: 'owner',
