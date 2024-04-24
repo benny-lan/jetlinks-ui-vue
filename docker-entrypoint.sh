@@ -17,7 +17,7 @@ serverName="server_name $SERVER_NAME;"
 
 sed -i '4c '"$serverName"'' /etc/nginx/conf.d/default.conf
 sed -i '11c '"$resolver"'' /etc/nginx/conf.d/default.conf
-sed -i '23c '"$apiUrl"'' /etc/nginx/conf.d/default.conf
+sed -i '24c '"$apiUrl"'' /etc/nginx/conf.d/default.conf
 
 nginx -g "daemon off;"
 
