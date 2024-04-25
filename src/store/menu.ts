@@ -58,7 +58,8 @@ export const useMenuStore = defineStore({
   state: (): MenuStateType => ({
     menus: {},
     params: {},
-    siderMenus: []
+    siderMenus: [],
+    menuMode: 'list'
   }),
   getters: {
     hasPermission(state) {

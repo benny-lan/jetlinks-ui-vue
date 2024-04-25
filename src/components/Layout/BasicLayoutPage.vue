@@ -1,13 +1,14 @@
 <template>
-    <ProLayout
+    <JLayout
         v-bind="layoutConf"
         v-model:collapsed="basicLayout.collapsed"
         v-model:openKeys="basicLayout.openKeys"
         :selectedKeys="basicLayout.selectedKeys"
-        :breadcrumb="basicLayout.pure ? undefined : { routes: breadcrumbs }"
+        :breadcrumb="{ routes: breadcrumbs }"
         :headerHeight='basicLayout.pure ? 1 : layout.headerHeight'
         :pure="basicLayout.pure"
         :apps="filterApps"
+        :layoutType="layoutType"
         @backClick='routerBack'
     >
         <template #breadcrumbRender="slotProps">
@@ -32,7 +33,7 @@
           <component :is="components || Component" />
         </router-view>
       </slot>
-    </ProLayout>
+    </JLayout>
 </template>
 
 <script setup lang="ts" name="BasicLayoutPage">
@@ -46,7 +47,8 @@ import { useSystem } from '@/store/system';
 import { useApplication } from '@/store/application';
 import { storeToRefs } from 'pinia';
 import { useSlots } from 'vue'
-import { ProLayout } from '@jetlinks-web/components/es/components'
+import { ProLayout as JLayout } from '@jetlinks-web/components/es/components'
+import {LocalStore, setToken} from "@/utils/comm";
 
 type StateType = {
     collapsed: boolean;
@@ -64,11 +66,11 @@ const menu = useMenuStore();
 const system = useSystem();
 const {configInfo,layout, basicLayout} = storeToRefs(system);
 const slots = useSlots()
+const layoutType = ref('list')
 
 const filterApps = computed(() => {
   return application.apps.filter(item => item.id !== system.microApp.appId)
 })
-
 
 const layoutConf = reactive({
     theme: DefaultSetting.layout.theme,
@@ -97,22 +99,10 @@ const components = computed(() => {
 /**
  * 面包屑
  */
-const breadcrumbs = computed(() =>
-    {
-      const paths = router.currentRoute.value.matched
-
-      return paths.map((item, index) => {
-        return {
-          index,
-          isLast: index === (paths.length -1),
-          path: item.path,
-          breadcrumbName: (item.meta as any).title || '',
-        }
-      })
-    }
-);
+const breadcrumbs = ref<any[]>([])
 
 const routerBack = () => {
+  // TODO 子应用时，使用microapp跳转
   router.go(-1)
 }
 
@@ -126,7 +116,16 @@ watchEffect(() => {
     const paths = router.currentRoute.value.matched
     basicLayout.value.selectedKeys = paths.map(item => item.path)
     basicLayout.value.openKeys = paths.map(item => item.path)
-    console.log(paths) //
+
+    breadcrumbs.value = paths.map((item, index) => {
+      return {
+        index,
+        isLast: index === (paths.length -1),
+        path: item.path,
+        breadcrumbName: (item.meta as any).title || '',
+      }
+    })
+    console.log(paths, breadcrumbs.value)
   }
 
   if (route.query?.layout === 'false') {
@@ -134,10 +133,15 @@ watchEffect(() => {
   }
 })
 
-// if ((window as any).__MICRO_APP_ENVIRONMENT__) {
-//   basicLayout.value.pure = true
-// }
+const init = () => {
+  (window as any).microApp?.addDataListener((data: any) => {
+    if (data.layoutType) {
+      layoutType.value = data.layoutType
+    }
+  }, true)
+}
 
+init()
 const toDoc = () => window.open('http://doc.v2.jetlinks.cn/');
 </script>
 

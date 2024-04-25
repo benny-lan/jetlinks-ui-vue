@@ -10,13 +10,14 @@ import FileFormat from './FileFormat/index.vue'
 import JProUpload from './Upload/index.vue'
 import { BasicLayoutPage, BlankLayoutPage, FullPage } from './Layout'
 import RadioCard from './RadioCard/index.vue'
-import { PageContainer, AIcon, Ellipsis } from 'jetlinks-ui-components'
+import { AIcon, Ellipsis } from 'jetlinks-ui-components'
 // import Ellipsis from './Ellipsis/index.vue'
 import JEmpty from './Empty/index.vue'
 import AMapComponent from './AMapComponent/index.vue'
 import PathSimplifier from './AMapComponent/PathSimplifier.vue'
 import ValueItem from './ValueItem/index.vue'
 import RowPagination from './RowPagination/index.vue'
+import { PageContainer } from '@jetlinks-web/components'
 
 export default  {
     install(app: App) {

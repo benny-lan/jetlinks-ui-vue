@@ -240,15 +240,15 @@ const queryParams = {
                         ]
                     },
                     {
-                    terms:[
-                        {
-                            value:`%owner\":\"${props.data.id}%`,
-                            termType:"like",
-                            column:"options"
-                        }
-                    ],
-                    type:"or"
-                }
+                      terms:[
+                          {
+                              value:`%owner\":\"${props.data.id}%`,
+                              termType:"like",
+                              column:"options"
+                          }
+                      ],
+                      type:"and"
+                    }
                 ]
             }
             ],

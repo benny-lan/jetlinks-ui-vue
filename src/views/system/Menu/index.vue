@@ -196,7 +196,7 @@ const table = reactive({
                     ],
                 },
                 {
-                  type: 'or',
+                  type: 'and',
                   terms:[
                     {
                       value:"%show\":true%",

@@ -12,7 +12,7 @@ import { setToken, LocalStore } from '@/utils/comm'
 dayjs.locale('zh-cn');
 
 (window as any).microApp?.addDataListener((data: any) => {
-    console.log(data, data.token)
+    console.log(data)
     if (data.token) {
         setToken(data.token)
     }
