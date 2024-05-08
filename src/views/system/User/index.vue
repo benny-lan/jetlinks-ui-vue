@@ -187,10 +187,10 @@ const columns = [
         search:{
             type:'select',
             rename:'id$in-dimension$role',
-            options:() => 
+            options:() =>
             new Promise((resolve)=>{
                 queryRole_api(
-                    {   
+                    {
                         paging:false,
                         sorts: [
                             { name: 'createTime', order: 'desc' },
@@ -257,6 +257,12 @@ const columns = [
         scopedSlots: true,
     },
 ];
+const applicationTerms = {
+  column: 'type',
+  termType: 'neq',
+  value: 'application',
+  type: 'and'
+}
 const queryParams = ref({});
 
 const tableRef = ref<Record<string, any>>({}); // 表格实例
@@ -335,6 +341,8 @@ const handleParams = (params: any) => {
         }
         return item1;
     });
+
+    newParams.push(applicationTerms)
     queryParams.value = { terms: newParams || [] };
 };
 </script>
