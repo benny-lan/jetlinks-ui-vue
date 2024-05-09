@@ -12,7 +12,9 @@ import { setToken, LocalStore } from '@/utils/comm'
 dayjs.locale('zh-cn');
 
 (window as any).microApp?.addDataListener((data: any) => {
+    const routeInfo = (window as any).microApp.router.current.get((window as any).__MICRO_APP_NAME__)
     console.log(data)
+    console.log('micro-app', routeInfo)
     if (data.token) {
         setToken(data.token)
     }

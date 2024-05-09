@@ -38,9 +38,9 @@ router.beforeEach((to, from, next) => {
           system.setMircoData()
           system.getSystemVersion().then((menuData: any[]) => {
             menuData.forEach(r => {
-              router.addRoute('base', r)
+              router.addRoute(r)
             })
-            router.addRoute('base',{
+            router.addRoute({
               path: '/:pathMatch(.*)',
               name: 'error',
               component: NotFindPage

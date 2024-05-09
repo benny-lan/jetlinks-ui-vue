@@ -90,7 +90,7 @@ export default defineConfig(({ mode}) => {
       ],
       server: {
           host:'0.0.0.0',
-
+          port: '8910',
           proxy: {
               [env.VITE_APP_BASE_API]: {
                   // target: 'http://192.168.32.226:8844',

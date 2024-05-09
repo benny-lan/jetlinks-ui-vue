@@ -131,6 +131,10 @@ watchEffect(() => {
   if (route.query?.layout === 'false') {
     basicLayout.value.pure = true
   }
+
+  if ((window as any).__MICRO_APP_ENVIRONMENT__) {
+    basicLayout.value.pure = true
+  }
 })
 
 const init = () => {
