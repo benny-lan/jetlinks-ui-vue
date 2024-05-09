@@ -81,12 +81,12 @@
 
 <script setup lang="ts" name="Menu">
 import PermissionButton from '@/components/PermissionButton/index.vue';
-import { getMenuTree_api, delMenuInfo_api } from '@/api/system/menu';
+import {getMenuTree_api, delMenuInfo_api, queryOwnThree} from '@/api/system/menu';
 import dayjs from 'dayjs';
 import { useUserInfo } from '@/store/userInfo';
-import {USER_CENTER_MENU_CODE, messageSubscribe, OWNER} from '@/utils/consts'
+import {USER_CENTER_MENU_CODE, messageSubscribe, OWNER, APP_ID} from '@/utils/consts'
 import { storeToRefs } from 'pinia';
-import { onlyMessage } from '@/utils/comm';
+import {LocalStore, onlyMessage} from '@/utils/comm';
 
 const permission = 'system/Menu';
 
@@ -204,7 +204,7 @@ const table = reactive({
                       column:"options"
                     }
                   ]
-            }
+                }
             ],
         };
         const params = {
@@ -216,7 +216,12 @@ const table = reactive({
             sorts: [{ name: 'sortIndex', order: 'asc' }],
             paging: false,
         };
-        const resp: any = await getMenuTree_api(params);
+      let appId = APP_ID
+
+        if ((window as any).__MICRO_APP_ENVIRONMENT__) {
+          appId = LocalStore.get('appId')
+        }
+        const resp: any = await queryOwnThree(params, appId);
         const lastItem = resp.result[resp.result.length - 1];
         table.total = lastItem ? lastItem.sortIndex + 1 : 1;
 
