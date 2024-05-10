@@ -104,18 +104,18 @@ export default defineConfig(({ mode}) => {
                   ws: 'http://192.168.33.1:8901',
                   changeOrigin: true,
                   rewrite: (path) => path.replace(/^\/api/, ''),
-                  // selfHandleResponse: true,
-                  // configure: (proxy, _options) => {
-                  //     proxy.on('proxyRes', (proxyRes, req, res) => {
-                  //
-                  //         res.removeHeader("Access-Control-Allow-Origin")
-                  //         res.removeHeader("access-control-allow-origin")
-                  //         res.setHeader("Access-Control-Allow-Origin", "*")
-                  //         res.setHeader("content-type","application/json")
-                  //
-                  //         proxyRes.pipe(res)
-                  //     });
-                  // }
+                  selfHandleResponse: true,
+                  configure: (proxy, _options) => {
+                      proxy.on('proxyRes', (proxyRes, req, res) => {
+
+                          res.removeHeader("Access-Control-Allow-Origin")
+                          res.removeHeader("access-control-allow-origin")
+                          res.setHeader("Access-Control-Allow-Origin", "*")
+                          res.setHeader("content-type","application/json")
+
+                          proxyRes.pipe(res)
+                      });
+                  }
               }
           }
       },
