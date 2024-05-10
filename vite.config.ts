@@ -97,25 +97,25 @@ export default defineConfig(({ mode}) => {
                   // target: 'http://192.168.32.244:8881',
                 //   target: 'http://192.168.32.163:8844', //张本地
                 //   target: 'http://120.77.179.54:8844', // 120测试
-                target: 'http://192.168.33.1:8901', // 本地开发环境
+                // target: 'http://192.168.33.1:8901', // 本地开发环境
                 // target: 'http://192.168.33.1:8848', // 社区版开发环境
                 //   target: 'http://192.168.32.207:8844', // 刘本地
-                //   target: 'http://192.168.32.187:8844', // 谭本地
+                  target: 'http://192.168.32.66:8800', // 谭本地
                   ws: 'http://192.168.33.1:8901',
                   changeOrigin: true,
                   rewrite: (path) => path.replace(/^\/api/, ''),
-                  selfHandleResponse: true,
-                  configure: (proxy, _options) => {
-                      proxy.on('proxyRes', (proxyRes, req, res) => {
-
-                          res.removeHeader("Access-Control-Allow-Origin")
-                          res.removeHeader("access-control-allow-origin")
-                          res.setHeader("Access-Control-Allow-Origin", "*")
-                          res.setHeader("content-type","application/json")
-
-                          proxyRes.pipe(res)
-                      });
-                  }
+                  // selfHandleResponse: true,
+                  // configure: (proxy, _options) => {
+                  //     proxy.on('proxyRes', (proxyRes, req, res) => {
+                  //
+                  //         res.removeHeader("Access-Control-Allow-Origin")
+                  //         res.removeHeader("access-control-allow-origin")
+                  //         res.setHeader("Access-Control-Allow-Origin", "*")
+                  //         res.setHeader("content-type","application/json")
+                  //
+                  //         proxyRes.pipe(res)
+                  //     });
+                  // }
               }
           }
       },
