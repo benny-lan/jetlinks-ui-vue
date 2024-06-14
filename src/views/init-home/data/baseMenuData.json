@@ -7465,5 +7465,23 @@
     "creatorId": "8004214f8141f29cb951befdca3615f0",
     "createTime": 1699262480040,
     "supportDataAccess": false
+  },
+  {
+    "id": "a5c87606df356ji4140b86a714hf4567d",
+    "code": "fixed",
+    "name": "固定导航页",
+    "url": "/fixed",
+    "sortIndex": 9999,
+    "granted": true,
+    "owner": "am",
+    "options": {
+      "show": false,
+      "image": "",
+      "fixed": true
+    },
+    "permissions": [],
+    "buttons": [],
+    "children": [
+    ]
   }
 ]

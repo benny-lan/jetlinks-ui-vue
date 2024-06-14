@@ -41,14 +41,11 @@ import UserInfo from './components/UserInfo.vue';
 import Notice from './components/Notice.vue';
 import DefaultSetting from '../../../config/config';
 import { useMenuStore } from '@/store/menu';
-import { clearMenuItem } from 'jetlinks-ui-components/es/ProLayout/util';
-import { AccountMenu } from '@/router/menu'
 import { useSystem } from '@/store/system';
 import { useApplication } from '@/store/application';
 import { storeToRefs } from 'pinia';
 import { useSlots } from 'vue'
 import { ProLayout as JLayout } from '@jetlinks-web/components/es/components'
-import {LocalStore, setToken} from "@/utils/comm";
 
 type StateType = {
     collapsed: boolean;
