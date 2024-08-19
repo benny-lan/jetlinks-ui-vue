@@ -1,0 +1,38 @@
+{
+	"zh": {
+		"Object.index.843741-0": "请输入标识",
+		"Object.index.843741-1": "请输入名称",
+		"Object.index.843741-2": "新增",
+		"Object.index.843741-3": "请添加枚举项",
+		"Object.index.843741-4": "请选择元素类型",
+		"Object.index.843741-5": "请选择时间格式",
+		"Object.index.843741-6": "请选择文件类型",
+		"Object.index.843741-7": "参数标识",
+		"Object.index.843741-8": "该标识已存在",
+		"Object.index.843741-9": "最多可输入64个字符",
+		"Object.index.843741-10": "标识只能由数字、字母、下划线组成",
+		"Object.index.843741-11": "参数名称",
+		"Object.index.843741-12": "填写约束",
+		"Object.index.843741-13": "数据类型",
+		"Object.index.843741-14": "请选择数据类型",
+		"Object.index.843741-15": "操作"
+	},
+	"en": {
+		"Object.index.843741-0": "Please enter the identifier",
+		"Object.index.843741-1": "Please enter a name",
+		"Object.index.843741-2": "newly added",
+		"Object.index.843741-3": "Please add an enumeration item",
+		"Object.index.843741-4": "Please select element type",
+		"Object.index.843741-5": "Please choose a time format",
+		"Object.index.843741-6": "Please select file type",
+		"Object.index.843741-7": "Parameter identification",
+		"Object.index.843741-8": "This identifier already exists",
+		"Object.index.843741-9": "Up to 64 characters can be entered",
+		"Object.index.843741-10": "Identification can only be composed of numbers, letters, and underscores",
+		"Object.index.843741-11": "Parameter Name",
+		"Object.index.843741-12": "Fill in constraints",
+		"Object.index.843741-13": "data type",
+		"Object.index.843741-14": "Please select data type",
+		"Object.index.843741-15": "operation"
+	}
+}

@@ -1,0 +1,38 @@
+{
+	"zh": {
+		"Basis.index.803121-0": "高德地图 web服务api",
+		"Basis.index.803121-1": "开发者可通过接口使用各类型的地理数据服务,返回结果支持JSON和XML格式",
+		"Basis.index.803121-2": "请输入高德WebApi Key",
+		"Basis.index.803121-3": "高德地图 JSapi",
+		"Basis.index.803121-4": "提供浏览器精准定位",
+		"Basis.index.803121-5": "高德地图 密钥",
+		"Basis.index.803121-6": "降低明文传输被窃取的风险",
+		"Basis.index.803121-7": "请输入高德API 密钥",
+		"Basis.index.803121-8": "系统后台访问的url。",
+		"Basis.index.803121-9": "格式：",
+		"Basis.index.803121-10": "展示备案号",
+		"Basis.index.803121-11": "备案号内容",
+		"Basis.index.803121-12": "输入内容不能包含 localhost",
+		"Basis.index.803121-13": "最多可输入64个字符",
+		"Basis.index.803121-14": "保存成功",
+		"Basis.index.803121-15": "请上传.jpg.png.jfif.pjp.pjpeg.jpeg格式的图片"
+	},
+	"en": {
+		"Basis.index.803121-0": "Gaode Map Web Service API",
+		"Basis.index.803121-1": "Developers can use various types of geographic data services through interfaces, and the returned results support JSON and XML formats",
+		"Basis.index.803121-2": "Please enter the Gaode WebApi Key",
+		"Basis.index.803121-3": "Gaode Map JSAPI",
+		"Basis.index.803121-4": "Provide precise browser positioning",
+		"Basis.index.803121-5": "Gaode Map Key",
+		"Basis.index.803121-6": "Reduce the risk of plaintext transmission being stolen",
+		"Basis.index.803121-7": "Please enter the Gaode API key",
+		"Basis.index.803121-8": "The URL accessed by the system backend.",
+		"Basis.index.803121-9": "Format:",
+		"Basis.index.803121-10": "Display filing number",
+		"Basis.index.803121-11": "Record number content",
+		"Basis.index.803121-12": "The input content cannot include localhost",
+		"Basis.index.803121-13": "Up to 64 characters can be entered",
+		"Basis.index.803121-14": "Saved successfully",
+		"Basis.index.803121-15": "Please upload an image in. jpg.png. jfif. pjp. pjpeg. jpeg format"
+	}
+}

@@ -1,0 +1,10 @@
+{
+	"zh": {
+		"Notify.VariableDefinitions.918296-0": "收信人，收信人部门，收信人标签至少填写一个",
+		"Notify.VariableDefinitions.918296-1": "收信人，收信人部门至少填写一个"
+	},
+	"en": {
+		"Notify.VariableDefinitions.918296-0": "At least one recipient, recipient department, and recipient label should be filled in",
+		"Notify.VariableDefinitions.918296-1": "Recipient, recipient department must fill in at least one"
+	}
+}

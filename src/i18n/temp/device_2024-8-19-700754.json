@@ -1,0 +1,30 @@
+{
+	"zh": {
+		"DeviceAccess.index.006446-0": "产品类型",
+		"DeviceAccess.index.006446-1": "请选择产品类型",
+		"DeviceAccess.index.006446-2": "此配置来自于产品接入方式所选择的协议",
+		"DeviceAccess.index.006446-3": "请选择",
+		"DeviceAccess.index.006446-4": "请输入",
+		"DeviceAccess.index.006446-5": "存储策略",
+		"DeviceAccess.index.006446-6": "保存",
+		"DeviceAccess.index.006446-7": "分组",
+		"DeviceAccess.index.006446-8": "流传输模式",
+		"DeviceAccess.index.006446-9": "操作成功！",
+		"DeviceAccess.index.006446-10": "产品下有设备实例时不能更换接入方式",
+		"DeviceAccess.index.006446-11": "停用产品后才可更换接入方式"
+	},
+	"en": {
+		"DeviceAccess.index.006446-0": "product type",
+		"DeviceAccess.index.006446-1": "Please select product type",
+		"DeviceAccess.index.006446-2": "This configuration comes from the protocol selected for the product access method",
+		"DeviceAccess.index.006446-3": "Please choose",
+		"DeviceAccess.index.006446-4": "Please enter",
+		"DeviceAccess.index.006446-5": "Storage Strategy",
+		"DeviceAccess.index.006446-6": "preservation",
+		"DeviceAccess.index.006446-7": "grouping",
+		"DeviceAccess.index.006446-8": "Streaming mode",
+		"DeviceAccess.index.006446-9": "Operation successful!",
+		"DeviceAccess.index.006446-10": "When there are device instances under the product, the access method cannot be changed",
+		"DeviceAccess.index.006446-11": "The access method can only be changed after the product is discontinued"
+	}
+}

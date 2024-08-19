@@ -1,0 +1,18 @@
+{
+	"zh": {
+		"Detail.index.782215-0": "配置信息",
+		"Detail.index.782215-1": "物模型",
+		"Detail.index.782215-2": "设备接入",
+		"Detail.index.782215-3": "数据解析",
+		"Detail.index.782215-4": "远程升级",
+		"Detail.index.782215-5": "预处理数据"
+	},
+	"en": {
+		"Detail.index.782215-0": "configuration information",
+		"Detail.index.782215-1": "Physical model",
+		"Detail.index.782215-2": "Device access",
+		"Detail.index.782215-3": "Data parsing",
+		"Detail.index.782215-4": "Remote upgrade",
+		"Detail.index.782215-5": "Preprocess data"
+	}
+}

@@ -1,0 +1,14 @@
+{
+	"zh": {
+		"components.Actions.958212-0": "满足条件后将",
+		"components.Actions.958212-1": "触发",
+		"components.Actions.958212-2": "解除",
+		"components.Actions.958212-3": "当前告警"
+	},
+	"en": {
+		"components.Actions.958212-0": "",
+		"components.Actions.958212-1": "",
+		"components.Actions.958212-2": "",
+		"components.Actions.958212-3": ""
+	}
+}

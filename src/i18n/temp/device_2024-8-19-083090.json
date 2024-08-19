@@ -1,0 +1,14 @@
+{
+	"zh": {
+		"Detail.Charts.829770-0": "实际值",
+		"Detail.Charts.829770-1": "按分钟统计",
+		"Detail.Charts.829770-2": "按小时统计",
+		"Detail.Charts.829770-3": "按天统计"
+	},
+	"en": {
+		"Detail.Charts.829770-0": "actual value",
+		"Detail.Charts.829770-1": "Statistics by minute",
+		"Detail.Charts.829770-2": "Statistics by hour",
+		"Detail.Charts.829770-3": "Daily statistics"
+	}
+}

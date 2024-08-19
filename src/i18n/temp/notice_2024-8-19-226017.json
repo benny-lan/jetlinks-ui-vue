@@ -1,0 +1,16 @@
+{
+	"zh": {
+		"Debug.index.259204-0": "变量",
+		"Debug.index.259204-1": "名称",
+		"Debug.index.259204-2": "值",
+		"Debug.index.259204-3": "收信人，收信人部门至少填写一个",
+		"Debug.index.259204-4": "收信人，收信人部门，收信人标签至少填写一个"
+	},
+	"en": {
+		"Debug.index.259204-0": "variable",
+		"Debug.index.259204-1": "name",
+		"Debug.index.259204-2": "value",
+		"Debug.index.259204-3": "Recipient, recipient department must fill in at least one",
+		"Debug.index.259204-4": "At least one recipient, recipient department, and recipient label should be filled in"
+	}
+}

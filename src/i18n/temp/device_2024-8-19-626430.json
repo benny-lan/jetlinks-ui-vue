@@ -1,0 +1,30 @@
+{
+	"zh": {
+		"DeviceAccess.index.263037-0": "产品类型",
+		"DeviceAccess.index.263037-1": "请选择产品类型",
+		"DeviceAccess.index.263037-2": "此配置来自于产品接入方式所选择的协议",
+		"DeviceAccess.index.263037-3": "请选择",
+		"DeviceAccess.index.263037-4": "请输入",
+		"DeviceAccess.index.263037-5": "存储策略",
+		"DeviceAccess.index.263037-6": "保存",
+		"DeviceAccess.index.263037-7": "分组",
+		"DeviceAccess.index.263037-8": "流传输模式",
+		"DeviceAccess.index.263037-9": "操作成功！",
+		"DeviceAccess.index.263037-10": "产品下有设备实例时不能更换接入方式",
+		"DeviceAccess.index.263037-11": "停用产品后才可更换接入方式"
+	},
+	"en": {
+		"DeviceAccess.index.263037-0": "",
+		"DeviceAccess.index.263037-1": "",
+		"DeviceAccess.index.263037-2": "",
+		"DeviceAccess.index.263037-3": "",
+		"DeviceAccess.index.263037-4": "",
+		"DeviceAccess.index.263037-5": "",
+		"DeviceAccess.index.263037-6": "",
+		"DeviceAccess.index.263037-7": "",
+		"DeviceAccess.index.263037-8": "",
+		"DeviceAccess.index.263037-9": "",
+		"DeviceAccess.index.263037-10": "",
+		"DeviceAccess.index.263037-11": ""
+	}
+}
