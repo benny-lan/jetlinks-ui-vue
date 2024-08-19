@@ -34,7 +34,7 @@
                   {{ value.name }}
                 </span>
               </Ellipsis>
-              <div v-if="showBindTags && activeBranches.length">
+              <div v-if="showBindTags && activeBranches.length  && value.triggerType === 'device'">
                 <div style="margin-top: 16px; margin-bottom: 8px" class="card-item-content-text">
                   {{ $t('Save.CardBox.4265310-0') }}
                 </div>
@@ -104,7 +104,7 @@
           <div class="card-state-content">
             <BadgeStatus
               :status="status"
-              :text="statusText|| $t('Save.CardBox.4265310-6') "
+              :text="statusText"
               :statusNames="statusNames"
             ></BadgeStatus>
           </div>
@@ -146,6 +146,7 @@ const props = defineProps({
   },
   statusText: {
     type: String,
+    default: '正常',
   },
   status: {
     type: [String, Number] as PropType<string | number>,
@@ -190,6 +191,10 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
+  showHistory: {
+    type: Boolean,
+    default: true
+  },
   maskStyle: {
     type: Object,
     default: undefined
@@ -223,7 +228,7 @@ const branchesGroup = computed(() => {
 const activeBranches = computed(() => {
   const { data, invalid } = handleActiveBranches(branchesGroup.value, props.activeKeys)
 
-  isInvalid.value = invalid
+  isInvalid.value = invalid && props.showHistory
   return data
 })
 

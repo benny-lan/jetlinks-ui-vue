@@ -92,6 +92,12 @@ export const handleTimerOptions = (timer: OperationTimer):TimerOption => {
     extraTime = $t('Timer.util.5425718-19', [len])
   }
 
+  if (timer.trigger === 'multi') {
+    const len = timer.multi!.spec.length
+    when = ''
+    extraTime = `自定义日历 共${len}个规则`
+  }
+
   return {
     when,
     time,

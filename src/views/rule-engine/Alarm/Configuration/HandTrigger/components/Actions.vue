@@ -5,7 +5,7 @@
                 <div class="actions-item" v-if="item.executor === 'alarm'">
                     <div class="item-options-warp">
                         <div class="item-options-type">
-                            <img
+                            <!-- <img
                                 style="width: 18px"
                                 :src="
                                     iconMap.get(
@@ -14,14 +14,16 @@
                                             : item.executor,
                                     )
                                 "
-                            />
+                            /> -->
+                            <AIcon :type="iconMap.get(item.executor === 'alarm' ? item.alarm.mode : item.executor)"/>
                         </div>
                         <div class="item-options-content">
                             <template v-if="item.executor === 'alarm'">
-                                <span>{{
+                                <span>
+                                    {{
                                         item.alarm.mode === 'trigger'
-                                            ? $t('components.Actions.426537-0')
-                                            : $t('components.Actions.426537-1')
+                                            ? $t('components.Actions.676500-0')
+                                            : $t('components.Actions.676500-1')
                                     }}
                                 </span>
                             </template>
@@ -77,6 +79,7 @@ const props = defineProps({
             background-color: #f0f0f0;
             border-radius: 6px 0 0 6px;
             cursor: pointer;
+            font-size: 22px;
         }
 
         .item-options-content {

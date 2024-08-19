@@ -305,9 +305,7 @@ const getActions = (
             },
             icon: state === 'enabled' ? 'StopOutlined' : 'CheckCircleOutlined',
             popConfirm: {
-                title: `${
-                  state === 'enabled' ? $t('Channel.index.098164-14') : $t('Channel.index.098164-19')
-                }?`,
+                title: `确认${stateText}?`,
                 onConfirm: () => {
                     const response = update(data.id, updateStatus[state]);
                     response.then((res) => {

@@ -223,7 +223,8 @@
                 </template>
                 <template #cardState="slotProps">
                     <BadgeStatus
-                        :status="slotProps.cardState?.value"
+                        v-if="slotProps.cardState?.state"
+                        :status="slotProps.cardState?.state"
                         :text="slotProps.cardState?.text"
                         :statusNames="{
                             using: 'processing',

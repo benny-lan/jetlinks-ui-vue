@@ -171,11 +171,11 @@ const getPlayCount = async (params: any) => {
     } else if (dt > day && dt < year) {
         _limit = Math.abs(Math.ceil(dt / day));
         _time = '1d';
-        format = $t('DashBoard.index.800201-10')
+        format = 'M月dd日'
     } else if (dt >= year) {
         _limit = Math.abs(Math.floor(dt / month));
         _time = '1M';
-      format = $t('DashBoard.index.800201-11')
+      format = 'YYYY年-MM月'
     }
     dashboardApi
         .getPlayCount([

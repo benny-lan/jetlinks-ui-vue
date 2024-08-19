@@ -20,7 +20,7 @@
                 <template #headerTitle>
                     <j-space>
                         <!-- <j-button type="primary" @click="handleAdd">
-                          <AIcon type="PlusOutlined" />{{ $t('Platform.index.387410-0') }}
+                          <AIcon type="PlusOutlined" />新增
                           </j-button> -->
                         <PermissionButton
                             @click="handleAdd"
@@ -37,7 +37,7 @@
                         :actions="getActions(slotProps, 'card')"
                         v-bind="slotProps"
                         :status="slotProps.state.value"
-                        :statusText="slotProps.state?.value==='enabled'?$t('Cascade.index.755836-7'):$t('Cascade.index.755836-8')"
+                        :statusText="slotProps.state.text"
                         :statusNames="{
                             enabled: 'processing',
                             disabled: 'error',

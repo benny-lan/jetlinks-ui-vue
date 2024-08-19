@@ -42,6 +42,10 @@
                         validator: validatorOpc_UA,
                         trigger: 'change',
                     },
+                    {
+                        validator: validatorOpc_UA,
+                        trigger: 'change',
+                    },
                 ]"
                 v-else-if="data.provider === 'OPC_UA'"
             >

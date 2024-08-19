@@ -137,9 +137,11 @@ import { usePermissionStore } from '@/store/permission';
 import { useI18n } from 'vue-i18n';
 
 const { t: $t } = useI18n();
+import { isNoCommunity } from '@/utils/utils';
+import { useSystem } from '@/store/system';
 
 const menuStory = useMenuStore();
-
+const { showThreshold } = useSystem();
 const route = useRoute();
 const routerParams = useRouterParams();
 const instanceStore = useInstanceStore();
@@ -223,10 +225,27 @@ const getStatus = (id: string) => {
 
 const getDetail = () => {
     const keys = list.value.map((i) => i.key);
-    if (permissionStore.hasPermission('rule-engine/Alarm/Log:view')) {
+    if (permissionStore.hasPermission('rule-engine/Alarm/Log:view') && isNoCommunity && showThreshold) {
         list.value.push({
             key: 'AlarmRecord',
-            tab: $t('Detail.index.827488-15'),
+            tab: $t('Detail.index.205173-0'),
+        });
+    }
+    if (permissionStore.hasPermission('iot-card/CardManagement:view') && isNoCommunity) {
+        list.value.push({
+            key: 'CardManagement',
+            tab: $t('Detail.index.205173-1'),
+        });
+    }
+    if (
+        permissionStore.hasPermission('device/Firmware:view') &&
+        instanceStore.current?.features?.find(
+            (item: any) => item?.id === 'supportFirmware',
+        ) && isNoCommunity
+    ) {
+        list.value.push({
+            key: 'Firmware',
+            tab: $t('Detail.index.205173-2'),
         });
     }
     if (
@@ -333,15 +352,10 @@ const getDetailFn = async () => {
         list.value = [...initList];
         getDetail();
         instanceStore.tabActiveKey = routerParams.params.value.tab || 'Info';
-    }else{
+    } else {
         instanceStore.tabActiveKey = routerParams.params.value.tab || 'Info';
     }
-    
 };
-
-onMounted(() => {
-    getDetailFn();
-});
 
 const onTabChange = (e: string) => {
     if (instanceStore.tabActiveKey === 'Metadata') {
@@ -391,6 +405,10 @@ const jumpProduct = () => {
         id: instanceStore.current?.productId,
     });
 };
+
+onMounted(() => {
+    getDetailFn();
+});
 
 onUnmounted(() => {
     instanceStore.current = {} as any;

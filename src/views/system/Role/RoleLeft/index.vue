@@ -46,8 +46,9 @@
                                 }}</Ellipsis>
                             </div>
                             <div
+                                
                                 @click="(e) => e.stopPropagation()"
-                                v-if="item.id !== 'default_group'"
+                                v-if="item.id !== 'default_group' && admin"
                             >
                                 <PermissionButton
                                     type="text"

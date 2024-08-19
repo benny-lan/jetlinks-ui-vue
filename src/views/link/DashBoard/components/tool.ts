@@ -78,7 +78,7 @@ export const networkParams = (val: any) => {
     } else if (dt > days && dt <= months * 3) {
         _limit = Math.abs(Math.ceil(dt / days)) + 1;
         _time = '1d';
-        format = $t('components.tool.542304-1');
+        format = 'M月dd日';
     } else if (dt > months * 3 && dt < year) {
         _limit = Math.abs(Math.ceil(dt / months)) + 1;
         _time = '1M';

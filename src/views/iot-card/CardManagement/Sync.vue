@@ -12,7 +12,7 @@
         <j-progress :percent="_percent" />
       </div>
       <div v-else>
-        <p>{{ syncData.count }}{{ $t('CardManagement.Sync.237326-2') }}</p>
+        <p>{{ $t('CardManagement.Sync.237326-2',[syncData.count]) }}</p>
       </div>
     </div>
     <template #footer>

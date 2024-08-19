@@ -31,7 +31,7 @@ import type { bootConfig, recommendList } from '../../typing';
 import { useI18n } from 'vue-i18n'
 
 const { t: $t } = useI18n()
-const opsBootConfig = computed(()=>[
+const opsBootConfig: bootConfig[] = [
     {
         english: 'STEP1',
         label: $t('DevOpsHome.index.926510-3'),

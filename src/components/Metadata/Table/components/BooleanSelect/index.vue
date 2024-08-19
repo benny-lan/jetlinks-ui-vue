@@ -26,9 +26,11 @@ const props = defineProps({
   },
   trueLabel: {
     type: String,
+    default: '必填',
   },
   falseLabel: {
     type: String,
+    default: '不必填',
   },
   trueValue: {
     type: [Boolean, Number, String],
@@ -51,12 +53,12 @@ const options = computed(() => {
   const _falseValue = isBoolean(props.falseValue) ? String(props.falseValue) : props.falseValue
   return [
     {
-      label: props.trueLabel||$t('BooleanSelect.index.43486105-0'),
+      label: props.trueLabel,
       value: _trueValue,
       baseValue: props.trueValue
     },
     {
-      label: props.falseLabel||$t('BooleanSelect.index.43486105-1'),
+      label: props.falseLabel,
       value: _falseValue,
       baseValue: props.falseValue
     }

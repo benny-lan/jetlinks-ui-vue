@@ -4,6 +4,7 @@
         v-model:value="keys"
         :placeholder="$t('variableItem.Tag.5425866-0')"
         :options="tagsList"
+        allowClear
         @change="onChange"
     />
 </template>

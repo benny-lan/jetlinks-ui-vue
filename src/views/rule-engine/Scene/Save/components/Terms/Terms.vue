@@ -1,15 +1,6 @@
 <template>
   <div class='actions-terms'>
-    <TitleComponent :data="$t('Terms.Terms.5425726-0')" style='font-size: 14px;' >
-      <template #extra>
-        <j-switch
-          v-model:checked='open'
-          @change='change'
-          :checkedChildren="$t('Terms.Terms.5425726-1')"
-          :unCheckedChildren="$t('Terms.Terms.5425726-2')"
-          style='margin-left: 4px;'
-        />
-      </template>
+    <TitleComponent data='执行动作' style='font-size: 14px;' >
     </TitleComponent>
 <!--    <template v-if='open'>-->
       <div>
@@ -25,6 +16,16 @@
                 {{ b.branchName || $t('Terms.Terms.5425726-3', [i+1]) }}
               </TermsTabPane>
             </template>
+            <div class="filterConditionSwitch">
+                <span>执行</span>
+                  <j-switch
+                      v-model:checked='b.openFilter'
+                      @change='(e)=>change(e,b,i)'
+                      checkedChildren='开'
+                      unCheckedChildren='关'
+                      style='margin-left: 4px;'
+                  />
+                 </div>
             <template v-for='(item, index) in data.branches'>
               <template v-if="index >= b.start && index < (b.start + b.len)">
                 <Branches
@@ -97,7 +98,6 @@ const { t: $t } = useI18n()
 
 const sceneStore = useSceneStore()
 const { data } = storeToRefs(sceneStore)
-const open = ref<boolean>(false)
 const columnOptions = ref<any>([])
 const group = ref<Array<{ id: string, len: number}>>([])
 const activeKey = ref('')
@@ -106,15 +106,42 @@ const conditionName = ref<any>()
 
 provide(ContextKey, columnOptions)
 
-const change = (e: boolean) => {
-  group.value = []
-  activeKey.value = ''
-  if (!e) {
-    data.value.branches!.length = 1
-    data.value.branches![0].when = []
-  } else {
-    data.value.branches!.push(null as any)
-    data.value.branches![0].when = [
+const change = (e: boolean,groupItem:any,index:number) => {
+  // group.value = []
+  // activeKey.value = ''
+  // if (!e) {
+  //   data.value.branches!.length = 1
+  //   data.value.branches![0].when = []
+  // } else {
+  //   data.value.branches!.push(null as any)
+  //   data.value.branches![0].when = [
+  //     {
+  //       terms: [
+  //         {
+  //           column: undefined,
+  //           value: {
+  //             source: 'fixed',
+  //             value: undefined
+  //           },
+  //           termType: undefined,
+  //           key: `params_${randomString()}`,
+  //           type: 'and',
+  //         },
+  //       ],
+  //       type: 'and',
+  //       key: `terms_${randomString()}`,
+  //     },
+  //   ]
+  // }
+  const start = groupItem.start
+  const len = groupItem.len
+  if(!e){
+    data.value.branches?.splice(start + 1 , len - 1)
+    data.value.branches![start].when = []
+    data.value.options!.when.splice(start,len - 1)
+  }else{
+    data.value.branches!.splice(start + 1,0,null)
+       data.value.branches![start].when = [
       {
         terms: [
           {
@@ -144,9 +171,10 @@ const queryColumn = (dataModel: FormModelType) => {
 }
 
 const addBranches = (len: number) => {
+  const key = randomNumber()
   const branchesItem = {
     when: [],
-    key: randomNumber(),
+    key: key,
     shakeLimit: {
       enabled: false,
       time: 1,
@@ -154,12 +182,13 @@ const addBranches = (len: number) => {
       alarmFirst: false,
     },
     then: [],
-    branchId: randomNumber()
+    branchId: key
   }
   // const lastIndex = data.value.branches!.length - 1 || 0
   data.value.branches?.splice(len - 1, 1, branchesItem)
   data.value.options!.when.splice(len - 1, 1, {
-    terms: []
+    terms: [],
+    key
   })
 }
 
@@ -381,12 +410,6 @@ watchEffect(() => {
 
 watchEffect(() => {
   const branches = data.value.branches
-  if (data.value.branches?.filter(item => item).length) {
-    open.value = !!data.value.branches[0].when.length
-  } else {
-    open.value = true
-  }
-
   let _group = []
   let _branchesIndex = 0
   if (branches) {
@@ -409,9 +432,11 @@ watchEffect(() => {
           branchKey: item.key,
           branchId: item.branchId,
           // branchName: item.branchName || whenItem?.branchName || `条件 ${_branchesIndex + 1}`,
-          branchName: item.branchName || whenItem?.branchName || $t('Terms.Terms.5425726-7'),
-          groupIndex: _branchesIndex
+          branchName: item.branchName || whenItem?.branchName || `条件`,
+          groupIndex: _branchesIndex,
+          openFilter: !!item.when.length
         }
+
       } else {
         _group[lastIndex].len += 1
       }
@@ -446,5 +471,14 @@ defineExpose({
       color: #fff;
     }
   }
+}
+.filterConditionSwitch{
+  display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 16px;
+    font-weight: 800;
+    font-size: 14px;
+    line-height: 32px;
 }
 </style>

@@ -164,6 +164,10 @@ import { useI18n } from 'vue-i18n';
 
 const { t: $t } = useI18n();
 
+import { isNoCommunity } from '@/utils/utils';
+import { useSystem } from '@/store/system';
+
+const { showThreshold } = useSystem();
 const permissionStore = usePermissionStore();
 const menuStory = useMenuStore();
 const route = useRoute();
@@ -276,58 +280,50 @@ const handleUndeploy = () => {
  * 是否显示数据解析模块
  */
 const getProtocol = async () => {
+    list.value = [
+        {
+            key: 'Info',
+            tab: $t('Detail.index.782215-0'),
+        },
+        {
+            key: 'Metadata',
+            tab: $t('Detail.index.782215-1'),
+            class: 'objectModel',
+        },
+        {
+            key: 'Device',
+            tab: $t('Detail.index.782215-2'),
+        },
+    ];
     if (productStore.current?.messageProtocol) {
         const res: any = await getProtocolDetail(
             productStore.current?.messageProtocol,
         );
         if (res.status === 200) {
-            const paring = res.result?.transports[0]?.features?.find(
+            const transport = res.result?.transports?.find((item: any) => {
+                return item.id === productStore.current?.transportProtocol;
+            });
+            const paring = transport?.features?.find(
                 (item: any) => item.id === 'transparentCodec',
             );
+            const supportFirmware = transport?.features?.find(
+                (item: any) => item.id === 'supportFirmware',
+            );
             if (paring) {
-                list.value = [
-                    {
-                        key: 'Info',
-                        tab: $t('Detail.index.064554-9'),
-                    },
-                    {
-                        key: 'Metadata',
-                        tab: $t('Detail.index.064554-10'),
-                        class: 'objectModel',
-                    },
-                    {
-                        key: 'Device',
-                        tab: $t('Detail.index.064554-11'),
-                    },
-                    {
-                        key: 'DataAnalysis',
-                        tab: $t('Detail.index.064554-14'),
-                    },
-                    {
-                        key: 'Firmware',
-                        tab: $t('Detail.index.064554-12'),
-                    },
-                ];
-            } else {
-                list.value = [
-                    {
-                        key: 'Info',
-                        tab: $t('Detail.index.064554-9'),
-                    },
-                    {
-                        key: 'Metadata',
-                        tab: $t('Detail.index.064554-10'),
-                        class: 'objectModel',
-                    },
-                    {
-                        key: 'Device',
-                        tab: $t('Detail.index.064554-11'),
-                    },
-                    {
-                        key: 'Firmware',
-                        tab: $t('Detail.index.064554-12'),
-                    },
-                ];
+                list.value.push({
+                    key: 'DataAnalysis',
+                    tab: $t('Detail.index.782215-3'),
+                });
+            }
+            if (
+                supportFirmware &&
+                permissionStore.hasPermission('device/Firmware:view') &&
+                isNoCommunity
+            ) {
+                list.value.push({
+                    key: 'Firmware',
+                    tab: $t('Detail.index.782215-4'),
+                });
             }
         }
         //当前设备接入选择的协议
@@ -344,11 +340,13 @@ const getProtocol = async () => {
         if (
             permissionStore.hasPermission(
                 'rule-engine/Alarm/Configuration:view',
-            )
+            ) &&
+            isNoCommunity &&
+            showThreshold
         ) {
             list.value.push({
                 key: 'AlarmRecord',
-                tab: $t('Detail.index.064554-16'),
+                tab: $t('Detail.index.782215-5'),
             });
         }
     }

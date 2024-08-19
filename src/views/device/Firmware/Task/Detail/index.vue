@@ -49,7 +49,7 @@
                         :format="(percent) => `${percent}%`"
                     ></a-progress>
                 </div>
-                <span class="total">{{ $t('Detail.index.378845-6') }}{{ general.total }}{{ $t('Detail.index.378845-7') }}</span>
+                <span class="total">{{ $t('Detail.index.378845-7',[general.total]) }}</span>
             </div>
         </div>
         <j-table

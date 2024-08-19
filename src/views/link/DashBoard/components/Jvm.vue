@@ -143,7 +143,7 @@ const getJVMEcharts = async (val: any) => {
 
 const setOptions = (optionsData: any, key: string) => ({
     data: arrayReverse(optionsData[key]),
-    // name: key!= 'undefined' ? key : '',
+    name: key !== 'undefined' ? key : '',
     type: 'line',
     smooth: true,
     symbol: 'none',
@@ -161,6 +161,7 @@ const echartsOptions = computed(() => {
   const series = serverActive.value.length
       ? serverActive.value.map((key) => setOptions(serverData.data, key))
       : typeDataLine
+
   return {
     xAxis: {
       type: 'category',

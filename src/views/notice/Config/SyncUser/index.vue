@@ -2,10 +2,10 @@
 <template>
     <div>
         <j-modal
-            v-model:visible="_vis"
+            visible
             :title="$t('SyncUser.index.7374417-0')"
             :footer="null"
-            @cancel="_vis = false"
+            @cancel="$emit('cancel')"
             width="80%"
         >
             <j-row :gutter="10" class="model-body">
@@ -134,33 +134,16 @@ const { t: $t } = useI18n()
 const useForm = Form.useForm;
 
 type Emits = {
-    (e: 'update:visible', data: boolean): void;
+    (e: 'cancel'): void;
 };
 const emit = defineEmits<Emits>();
 
 const props = defineProps({
-    visible: { type: Boolean, default: false },
     data: {
         type: Object as PropType<Partial<Record<string, any>>>,
         default: () => ({}),
     },
 });
-
-const _vis = computed({
-    get: () => props.visible,
-    set: (val) => emit('update:visible', val),
-});
-
-watch(
-    () => _vis.value,
-    (val) => {
-        if (val) {
-            getDepartment();
-        } else {
-            dataSource.value = [];
-        }
-    },
-);
 
 // 左侧部门
 const deptTreeData = ref([]);
@@ -185,15 +168,10 @@ const getDepartment = async () => {
     }
 
     deptTreeData.value = _result;
-    deptId.value = _result[0]?.id;
+    if(_result.length){
+        deptId.value = _result[0]?.id;
+    }
 };
-
-watch(
-    () => deptName.value,
-    (val: any) => {
-        if (!val) getDepartment();
-    },
-);
 
 /**
  * 部门点击
@@ -210,7 +188,7 @@ const onTreeSelect = (keys: any) => {
 
 const columns = [
     {
-        title: $t('SyncUser.index.7374417-7'),
+        title: props.data.type === 'weixin' ? $t('SyncUser.index.120866-0') : $t('SyncUser.index.120866-1'),
         dataIndex: 'thirdPartyUserName',
         key: 'thirdPartyUserName',
     },
@@ -339,7 +317,7 @@ const getAllUsers = async (terms?: any) => {
     };
     const { result } = await configApi.getPlatformUsers(params);
     allUserList.value = result.map((m: any) => ({
-        label: m.name,
+        label: m.name + ` (${m.username})`,
         value: m.id,
         ...m,
     }));
@@ -360,7 +338,7 @@ const getTableData = (terms?: any) => {
             (deptUsers || []).forEach((deptUser: any) => {
                 // 未绑定的用户
                 let unBindUser = unBindUsers.find(
-                    (f: any) => f.name === deptUser?.name,
+                    (f: any) => f.id === deptUser?.id,
                 );
                 // 绑定的用户
                 const bindUser = bindUsers.find(
@@ -401,14 +379,6 @@ const handleTableChange = (pagination: any) => {
     current.value = pagination.current;
     pageSize.value = pagination.pageSize;
 };
-
-watch(
-    () => deptId.value,
-    () => {
-        getTableData();
-    },
-    { immediate: true },
-);
 
 /**
  * 绑定用户
@@ -490,6 +460,23 @@ const handleCancel = () => {
     bindVis.value = false;
     resetFields();
 };
+
+watch(
+    () => deptId.value,
+    () => {
+        getTableData();
+    },
+    // { immediate: true },
+);
+watch(
+    () => deptName.value,
+    (val: any) => {
+        if (!val) getDepartment();
+    },
+);
+onMounted(() => {
+    getDepartment();
+});
 </script>
 
 <style lang="less" scoped>

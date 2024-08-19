@@ -240,10 +240,15 @@ const columns = [
         key: 'alarmName',
     },
     {
-        title: $t('TabComponent.index.891292-11'),
+        title: $t('TabComponent.index.808290-0'),
         dataIndex: 'targetType',
         key: 'targetType',
         scopedSlots: true,
+    },
+    {
+        title: $t('TabComponent.index.808290-1'),
+        dataIndex: 'sourceName',
+        key: 'sourceName',
     },
     {
         title: $t('TabComponent.index.891292-12'),

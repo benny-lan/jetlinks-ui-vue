@@ -58,7 +58,7 @@
                                 :rules="[
                                     {
                                         max: 64,
-                                        message: $t('Detail.index.217872-2'),
+                                        message: $t('Detail.index.485013-0'),
                                     },
                                 ]"
                             >
@@ -128,140 +128,404 @@
                                 />
                             </j-form-item>
                         </j-col>
-                        <j-col :span="8" class="form-item">
-                            <j-form-item
-                                :name="['configuration', 'rtpIp']"
-                                :rules="[
-                                    {
-                                        required: true,
-                                        message: $t('Detail.index.217872-12'),
-                                    },
-                                    {
-                                        validator: validateAddress,
-                                        message: $t('Detail.index.217872-8'),
-                                    },
-                                ]"
-                            >
-                                <template #label>
-                                    RTP IP
-                                    <j-tooltip
-                                        :title="$t('Detail.index.217872-13')"
-                                    >
-                                        <AIcon
-                                            type="QuestionCircleOutlined"
-                                            style="margin-left: 2px"
-                                        />
-                                    </j-tooltip>
-                                </template>
-                                <j-input
-                                    :placeholder="$t('Detail.index.217872-12')"
-                                    v-model:value="formData.configuration.rtpIp"
-                                />
-                            </j-form-item>
-                        </j-col>
-                        <j-col :span="4" v-if="!checked">
-                            <j-form-item
-                                class="form-item"
-                                :name="['configuration', 'rtpPort']"
-                                :rules="[
-                                    {
-                                        required: true,
-                                        message: $t('Detail.index.217872-10'),
-                                    },
-                                ]"
-                            >
-                                <div class="form-label"></div>
 
-                                <j-input-number
-                                    style="width: 100%"
-                                    :min="1"
-                                    :max="65535"
-                                    :precision="0"
-                                    :placeholder="$t('Detail.index.217872-10')"
-                                    v-model:value="
-                                        formData.configuration.rtpPort
-                                    "
-                                />
-                            </j-form-item>
-                        </j-col>
-                        <j-col :span="4" v-if="checked">
-                            <j-form-item
-                                class="form-item"
-                                :name="[
-                                    'configuration',
-                                    'dynamicRtpPortRange0',
-                                ]"
-                                :rules="[
-                                    {
-                                        required: true,
-                                        message: $t('Detail.index.217872-14'),
-                                    },
-                                ]"
-                            >
-                                <div class="form-label"></div>
-                                <j-input-number
-                                    style="width: 100%"
-                                    :min="1"
-                                    :max="
-                                        formData.configuration
-                                            .dynamicRtpPortRange1 || 65535
-                                    "
-                                    :precision="0"
-                                    :placeholder="$t('Detail.index.217872-15')"
-                                    v-model:value="
-                                        formData.configuration
-                                            .dynamicRtpPortRange0
-                                    "
-                                />
-                            </j-form-item>
-                        </j-col>
-                        <div class="form-item-checked" v-if="checked">{{ $t('Detail.index.217872-16') }}</div>
-                        <j-col :span="4" v-if="checked">
-                            <j-form-item
-                                class="form-item"
-                                :name="[
-                                    'configuration',
-                                    'dynamicRtpPortRange1',
-                                ]"
-                                :rules="[
-                                    {
-                                        required: true,
-                                        message: $t('Detail.index.217872-17'),
-                                    },
-                                ]"
-                            >
-                                <div class="form-label"></div>
-                                <j-input-number
-                                    style="width: 100%"
-                                    :min="
-                                        formData.configuration
-                                            .dynamicRtpPortRange0 || 1
-                                    "
-                                    :max="65535"
-                                    :precision="0"
-                                    :placeholder="$t('Detail.index.217872-18')"
-                                    v-model:value="
-                                        formData.configuration
-                                            .dynamicRtpPortRange1
-                                    "
-                                />
-                            </j-form-item>
-                        </j-col>
-                        <j-col :span="4">
-                            <j-form-item
-                                class="form-item-checked2"
-                                :name="['configuration', 'dynamicRtpPort']"
-                            >
-                                <div class="form-label"></div>
-                                <j-checkbox
-                                    v-model:checked="
-                                        formData.configuration.dynamicRtpPort
-                                    "
+                        <template
+                            v-if="formData.provider === 'embedded-zlmedia'"
+                        >
+                            <j-col :span="24">
+                                <j-form-item
+                                    :name="['configuration', 'rtpIp']"
+                                    :rules="[
+                                        {
+                                            required: true,
+                                            message: $t('Detail.index.485013-1'),
+                                        },
+                                        {
+                                            validator: validateAddress,
+                                            message:
+                                                $t('Detail.index.485013-2'),
+                                        },
+                                    ]"
                                 >
-                                    {{ $t('Detail.index.217872-19') }}
-                                </j-checkbox>
-                            </j-form-item>
-                        </j-col>
+                                    <template #label>
+                                        IP
+                                        <j-tooltip
+                                            :title="$t('Detail.index.485013-3')"
+                                        >
+                                            <AIcon
+                                                type="QuestionCircleOutlined"
+                                                style="margin-left: 2px"
+                                            />
+                                        </j-tooltip>
+                                    </template>
+                                    <j-input
+                                        :placeholder="$t('Detail.index.485013-1')"
+                                        style="width: 50%"
+                                        v-model:value="
+                                            formData.configuration.rtpIp
+                                        "
+                                    />
+                                </j-form-item>
+                            </j-col>
+                            <j-col :span="12" class="item">
+                                <j-row :gutter="[16, 0]">
+                                    <j-col :span="20" v-if="!checked">
+                                        <j-form-item
+                                            class="form-item"
+                                            :name="['configuration', 'rtpPort']"
+                                            :rules="[
+                                                {
+                                                    required: true,
+                                                    message: $t('Detail.index.485013-4'),
+                                                },
+                                            ]"
+                                        >
+                                            <template #label>
+                                                {{ $t('Detail.index.485013-5') }}
+                                                <j-tooltip
+                                                    :title="$t('Detail.index.485013-6')"
+                                                >
+                                                    <AIcon
+                                                        type="QuestionCircleOutlined"
+                                                        style="margin-left: 2px"
+                                                    />
+                                                </j-tooltip>
+                                            </template>
+
+                                            <j-input-number
+                                                style="width: 100%"
+                                                :min="1"
+                                                :max="65535"
+                                                :precision="0"
+                                                :placeholder="$t('Detail.index.485013-4')"
+                                                v-model:value="
+                                                    formData.configuration
+                                                        .rtpPort
+                                                "
+                                            />
+                                        </j-form-item>
+                                    </j-col>
+                                    <j-col :span="8" v-if="checked">
+                                        <j-form-item
+                                            class="form-item"
+                                            :name="[
+                                                'configuration',
+                                                'dynamicRtpPortRange0',
+                                            ]"
+                                            :rules="[
+                                                {
+                                                    required: true,
+                                                    message: $t('Detail.index.485013-7'),
+                                                },
+                                            ]"
+                                        >
+                                            <template #label>
+                                                {{ $t('Detail.index.485013-5') }}
+                                                <j-tooltip
+                                                    :title="$t('Detail.index.485013-6')"
+                                                >
+                                                    <AIcon
+                                                        type="QuestionCircleOutlined"
+                                                        style="margin-left: 2px"
+                                                    />
+                                                </j-tooltip>
+                                            </template>
+                                            <j-input-number
+                                                style="width: 100%"
+                                                :min="1"
+                                                :max="
+                                                    formData.configuration
+                                                        .dynamicRtpPortRange1 ||
+                                                    65535
+                                                "
+                                                :precision="0"
+                                                :placeholder="$t('Detail.index.485013-8')"
+                                                v-model:value="
+                                                    formData.configuration
+                                                        .dynamicRtpPortRange0
+                                                "
+                                            />
+                                        </j-form-item>
+                                    </j-col>
+                                    <div
+                                        class="form-item-checked"
+                                        v-if="checked"
+                                    >
+                                        {{ $t('Detail.index.485013-9') }}
+                                    </div>
+                                    <j-col :span="8" v-if="checked">
+                                        <j-form-item
+                                            class="form-item"
+                                            :name="[
+                                                'configuration',
+                                                'dynamicRtpPortRange1',
+                                            ]"
+                                            :rules="[
+                                                {
+                                                    required: true,
+                                                    message: $t('Detail.index.485013-10'),
+                                                },
+                                            ]"
+                                        >
+                                            <div class="form-label"></div>
+                                            <j-input-number
+                                                style="width: 100%"
+                                                :min="
+                                                    formData.configuration
+                                                        .dynamicRtpPortRange0 ||
+                                                    1
+                                                "
+                                                :max="65535"
+                                                :precision="0"
+                                                :placeholder="$t('Detail.index.485013-11')"
+                                                v-model:value="
+                                                    formData.configuration
+                                                        .dynamicRtpPortRange1
+                                                "
+                                            />
+                                        </j-form-item>
+                                    </j-col>
+                                    <j-col :span="4">
+                                        <j-form-item
+                                            class="form-item-checked2"
+                                            :name="[
+                                                'configuration',
+                                                'dynamicRtpPort',
+                                            ]"
+                                        >
+                                            <div class="form-label"></div>
+                                            <j-checkbox
+                                                v-model:checked="
+                                                    formData.configuration
+                                                        .dynamicRtpPort
+                                                "
+                                            >
+                                                {{ $t('Detail.index.485013-12') }}
+                                            </j-checkbox>
+                                        </j-form-item>
+                                    </j-col>
+
+                                    <j-col :span="24">
+                                        <j-form-item
+                                            class="form-item"
+                                            :name="[
+                                                'configuration',
+                                                'rtmpPort',
+                                            ]"
+                                            :rules="[
+                                                {
+                                                    required: true,
+                                                    message: $t('Detail.index.485013-13'),
+                                                },
+                                            ]"
+                                        >
+                                            <template #label>
+                                                {{ $t('Detail.index.485013-14') }}
+                                                <j-tooltip
+                                                    :title="$t('Detail.index.485013-15')"
+                                                >
+                                                    <AIcon
+                                                        type="QuestionCircleOutlined"
+                                                        style="margin-left: 2px"
+                                                    />
+                                                </j-tooltip>
+                                            </template>
+                                            <j-input-number
+                                                style="width: 100%"
+                                                :min="1"
+                                                :max="65535"
+                                                :precision="0"
+                                                :placeholder="$t('Detail.index.485013-14')"
+                                                v-model:value="
+                                                    formData.configuration
+                                                        .rtmpPort
+                                                "
+                                            />
+                                        </j-form-item>
+                                    </j-col>
+                                    <j-col :span="24">
+                                        <j-form-item
+                                            :name="[
+                                                'configuration',
+                                                'rtspPort',
+                                            ]"
+                                            :rules="[
+                                                {
+                                                    required: true,
+                                                    message: $t('Detail.index.485013-16'),
+                                                },
+                                            ]"
+                                        >
+                                            <template #label>
+                                                {{ $t('Detail.index.485013-17') }}
+                                                <j-tooltip
+                                                    :title="$t('Detail.index.485013-18')"
+                                                >
+                                                    <AIcon
+                                                        type="QuestionCircleOutlined"
+                                                        style="margin-left: 2px"
+                                                    />
+                                                </j-tooltip>
+                                            </template>
+                                            <j-input-number
+                                                style="width: 100%"
+                                                :min="1"
+                                                :max="65535"
+                                                :precision="0"
+                                                :placeholder="$t('Detail.index.485013-17')"
+                                                v-model:value="
+                                                    formData.configuration
+                                                        .rtspPort
+                                                "
+                                            />
+                                        </j-form-item>
+                                    </j-col>
+                                </j-row>
+                            </j-col>
+                        </template>
+
+                        <div v-else style="width: 100%; display: flex">
+                            <j-col :span="8" class="form-item">
+                                <j-form-item
+                                    :name="['configuration', 'rtpIp']"
+                                    :rules="[
+                                        {
+                                            required: true,
+                                            message: $t('Detail.index.485013-19'),
+                                        },
+                                        {
+                                            validator: validateAddress,
+                                            message:
+                                                $t('Detail.index.485013-2'),
+                                        },
+                                    ]"
+                                >
+                                    <template #label>
+                                        RTP IP
+                                        <j-tooltip
+                                            :title="$t('Detail.index.485013-3')"
+                                        >
+                                            <AIcon
+                                                type="QuestionCircleOutlined"
+                                                style="margin-left: 2px"
+                                            />
+                                        </j-tooltip>
+                                    </template>
+                                    <j-input
+                                        :placeholder="$t('Detail.index.485013-19')"
+                                        v-model:value="
+                                            formData.configuration.rtpIp
+                                        "
+                                    />
+                                </j-form-item>
+                            </j-col>
+                            <j-col :span="4" v-if="!checked">
+                                <j-form-item
+                                    class="form-item"
+                                    :name="['configuration', 'rtpPort']"
+                                    :rules="[
+                                        {
+                                            required: true,
+                                            message: $t('Detail.index.485013-20'),
+                                        },
+                                    ]"
+                                >
+                                    <div class="form-label"></div>
+
+                                    <j-input-number
+                                        style="width: 100%"
+                                        :min="1"
+                                        :max="65535"
+                                        :precision="0"
+                                        :placeholder="$t('Detail.index.485013-20')"
+                                        v-model:value="
+                                            formData.configuration.rtpPort
+                                        "
+                                    />
+                                </j-form-item>
+                            </j-col>
+                            <j-col :span="4" v-if="checked">
+                                <j-form-item
+                                    class="form-item"
+                                    :name="[
+                                        'configuration',
+                                        'dynamicRtpPortRange0',
+                                    ]"
+                                    :rules="[
+                                        {
+                                            required: true,
+                                            message: $t('Detail.index.485013-7'),
+                                        },
+                                    ]"
+                                >
+                                    <div class="form-label"></div>
+                                    <j-input-number
+                                        style="width: 100%"
+                                        :min="1"
+                                        :max="
+                                            formData.configuration
+                                                .dynamicRtpPortRange1 || 65535
+                                        "
+                                        :precision="0"
+                                        :placeholder="$t('Detail.index.485013-8')"
+                                        v-model:value="
+                                            formData.configuration
+                                                .dynamicRtpPortRange0
+                                        "
+                                    />
+                                </j-form-item>
+                            </j-col>
+                            <div class="form-item-checked" v-if="checked">
+                                {{ $t('Detail.index.485013-9') }}
+                            </div>
+                            <j-col :span="4" v-if="checked">
+                                <j-form-item
+                                    class="form-item"
+                                    :name="[
+                                        'configuration',
+                                        'dynamicRtpPortRange1',
+                                    ]"
+                                    :rules="[
+                                        {
+                                            required: true,
+                                            message: $t('Detail.index.485013-10'),
+                                        },
+                                    ]"
+                                >
+                                    <div class="form-label"></div>
+                                    <j-input-number
+                                        style="width: 100%"
+                                        :min="
+                                            formData.configuration
+                                                .dynamicRtpPortRange0 || 1
+                                        "
+                                        :max="65535"
+                                        :precision="0"
+                                        :placeholder="$t('Detail.index.485013-11')"
+                                        v-model:value="
+                                            formData.configuration
+                                                .dynamicRtpPortRange1
+                                        "
+                                    />
+                                </j-form-item>
+                            </j-col>
+                            <j-col :span="4">
+                                <j-form-item
+                                    class="form-item-checked2"
+                                    :name="['configuration', 'dynamicRtpPort']"
+                                >
+                                    <div class="form-label"></div>
+                                    <j-checkbox
+                                        v-model:checked="
+                                            formData.configuration
+                                                .dynamicRtpPort
+                                        "
+                                    >
+                                        {{ $t('Detail.index.485013-12') }}
+                                    </j-checkbox>
+                                </j-form-item>
+                            </j-col>
+                        </div>
 
                         <j-col :span="24">
                             <j-form-item>
@@ -312,10 +576,7 @@ const Validator = {
 
 const validateAddress = (_rule: any, value: string): Promise<any> =>
     new Promise(async (resolve, reject) => {
-        if (
-            testIpv4_6(value) ||
-            Validator.regDomain.test(value)
-        ) {
+        if (testIpv4_6(value) || Validator.regDomain.test(value)) {
             return resolve('');
         } else {
             return value ? reject($t('Detail.index.217872-8')) : resolve('');
@@ -331,6 +592,8 @@ const formData = ref<FormDataType>({
         apiPort: '',
         rtpIp: '',
         rtpPort: '',
+        rtspPort: '',
+        rtmpPort: '',
         dynamicRtpPort: false,
         // dynamicRtpPortRange: [],
         dynamicRtpPortRange0: '',
@@ -415,6 +678,13 @@ watch(
     .form-label {
         height: 30px;
         padding-bottom: 8px;
+    }
+    .item{
+        padding-top: 6px;
+        border: 1px solid #d1d1d1;
+        background-color: #e0e0e007;
+        border-radius: 4px;
+        margin-bottom: 10px;
     }
 }
 </style>

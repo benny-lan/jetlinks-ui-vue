@@ -75,7 +75,7 @@ const systemNotice = [
             },
             {
                 provider: 'alarm-org',
-                name: $t('NoticeRule.index.866440-5'),
+                name: $t('NoticeRule.index.016727-0'),
             },
             {
                 provider: 'alarm-other',

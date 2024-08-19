@@ -148,7 +148,9 @@ import {
 import LivePlayer from '@/components/Player/index.vue';
 import MediaTool from '@/components/Player/mediaTool.vue';
 import { onlyMessage } from '@/utils/comm';
+import { useI18n } from 'vue-i18n'
 
+const { t: $t } = useI18n()
 type Player = {
     id?: string;
     url?: string;

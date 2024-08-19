@@ -540,7 +540,10 @@ const getProduct = async () => {
 
 const getAliyunProduct = async (data: any) => {
     if (data.regionId && data.accessKeyId && data.accessSecret) {
-        const resp: any = await getAliyunProductsList(data);
+        const resp: any = await getAliyunProductsList(data).catch(()=>{
+            aliyunProductList.value = [];
+            modelRef.bridgeProductKey = undefined;
+        });
         if (resp.status === 200) {
             aliyunProductList.value = resp?.result?.data as Record<
                 string,
@@ -723,6 +726,7 @@ watch(
                     },
                 ];
                 modelRef.description = undefined;
+                aliyunProductList.value = [];
             } else if (props.data?.type === 'noData') {
                 noData.value = true;
             }

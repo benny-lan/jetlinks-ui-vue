@@ -7,13 +7,13 @@
         :okText="$t('BindChannel.index.755834-2')"
         width="80%"
         @ok="handleSave"
-        @cancel="_vis = false"
+        @cancel="$emit('cancel')"
         :confirmLoading="loading"
     >
         <pro-search
             :columns="columns"
-            target="media-bind"
             @search="handleSearch"
+            type="simple"
         />
 
         <JProTable
@@ -68,7 +68,6 @@
 <script setup lang="ts">
 import CascadeApi from '@/api/media/cascade';
 import { onlyMessage } from '@/utils/comm';
-import { PropType } from 'vue';
 import { useI18n } from 'vue-i18n'
 
 const { t: $t } = useI18n()
@@ -76,31 +75,10 @@ const { t: $t } = useI18n()
 const route = useRoute();
 
 type Emits = {
-    (e: 'update:visible', data: boolean): void;
+    (e: 'cancel'): void;
     (e: 'submit'): void;
 };
 const emit = defineEmits<Emits>();
-
-const props = defineProps({
-    visible: { type: Boolean, default: false },
-    data: {
-        type: Object as PropType<Partial<Record<string, any>>>,
-        default: () => ({}),
-    },
-});
-
-const _vis = computed({
-    get: () => props.visible,
-    set: (val) => emit('update:visible', val),
-});
-
-watch(
-    () => _vis.value,
-    (val) => {
-        if (val) handleSearch({ terms: [] });
-        else _selectedRowKeys.value = [];
-    },
-);
 
 const columns = [
     {
@@ -214,10 +192,13 @@ const handleSave = async () => {
     })
     if (resp.success) {
         onlyMessage($t('BindChannel.index.755834-12'));
-        _vis.value = false;
         emit('submit');
     } else {
         onlyMessage($t('BindChannel.index.755834-13'), 'error');
     }
 };
+
+onMounted(()=>{
+    handleSearch({ terms: [] })
+})
 </script>

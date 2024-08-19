@@ -31,12 +31,13 @@
         ><template #createTime="slotProps">
             {{ dayjs(slotProps.createTime).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
-        <template #thingId="slotProps">
+        <template #thingName="slotProps">
             <Ellipsis>
-                {{ $t('Invalid.index.584341-0') }}
+                {{ $t('Invalid.index.571103-0') }}
                 <span
                     class="deviceId"
-                    >{{ slotProps.thingId }}</span
+                     @click="() => gotoDevice(slotProps.thingId)"
+                    >{{ slotProps.thingName }}</span
                 ></Ellipsis
             >
         </template>
@@ -57,6 +58,7 @@ const props = defineProps({
         default: 'device',
     },
 });
+const menuStory = useMenuStore();
 const { current } =
     props.goal === 'device' ? useInstanceStore() : useProductStore();
 const columns = props.goal === 'device' ? [
@@ -95,9 +97,9 @@ const columns = props.goal === 'device' ? [
         scopedSlots: true,
     },
     {
-        title: $t('Invalid.index.584341-4'),
-        dataIndex: 'thingId',
-        key: 'thingId',
+        title: $t('Invalid.index.571103-1'),
+        dataIndex: 'thingName',
+        key: 'thingName',
         scopedSlots: true,
         search: {
             type: 'string',
@@ -117,6 +119,10 @@ const columns = props.goal === 'device' ? [
         },
     },
 ]
+
+const gotoDevice = (id) => {
+    menuStory.jumpPage('device/Instance/Detail', { id, tab: 'Running' });
+};
 const handleSearch = (e) => {
     params.value = e;
 };

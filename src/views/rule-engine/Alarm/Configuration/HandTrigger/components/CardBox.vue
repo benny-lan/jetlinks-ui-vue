@@ -70,7 +70,7 @@
                     <div class="card-state-content">
                         <BadgeStatus
                             :status="status"
-                            :text="statusText|| $t('Save.CardBox.4265310-6')"
+                            :text="statusText"
                             :statusNames="statusNames"
                         ></BadgeStatus>
                     </div>
@@ -126,6 +126,7 @@ const props = defineProps({
     },
     statusText: {
         type: String,
+        default: '正常',
     },
     status: {
         type: [String, Number] as PropType<string | number>,

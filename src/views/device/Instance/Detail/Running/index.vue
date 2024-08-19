@@ -71,6 +71,11 @@ const events: any = ref(undefined);
 watch(
     () => current.value,
     (value) => {
+        tabList.value = [{
+            key: 'property',
+            tab: $t('Running.index.526759-0'),
+            type: 'property',
+        }]
         const metadata = JSON.parse(value?.metadata || '{}');
         properties.value = metadata.properties;
         events.value = metadata.events;

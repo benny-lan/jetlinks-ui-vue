@@ -138,7 +138,7 @@
             </JProTable>
         </FullPage>
 
-        <BindChannel v-model:visible="bindVis" @submit="listRef.reload()" />
+        <BindChannel v-if="bindVis" @submit="submitData" @cancel="cancel"/>
     </page-container>
 </template>
 
@@ -423,6 +423,14 @@ const handleClose = (data: any) => {
     valid.value = undefined;
     gbID.value = '';
 };
+
+const cancel = () =>{
+    bindVis.value = false
+}
+const submitData = () =>{
+    bindVis.value = false
+    listRef.value?.reload()
+}
 </script>
 <style lang="less" scoped>
 .header {

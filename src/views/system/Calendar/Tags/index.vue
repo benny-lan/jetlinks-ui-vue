@@ -86,6 +86,11 @@ const addTag = () => {
     editType.value = 'add';
 };
 const buildInTag = ['weekend', 'holiday', 'workday'];
+const defaultColor = new Map()
+defaultColor.set('weekend', 'rgb(149, 222, 100)')
+defaultColor.set('holiday', 'rgb(161, 180, 204)')
+defaultColor.set('workday', 'rgba(105,177,255,1')
+
 const createDrag = () => {
     new Draggable(tags.value, {
         itemSelector: '.tagName',
@@ -114,6 +119,7 @@ const queryTagsData = async () => {
             }
             if (buildInTag.includes(i.id)) {
                 disabled = true;
+                color = defaultColor.get(i.id);
             }
             return {
                 ...i,

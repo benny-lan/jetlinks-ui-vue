@@ -241,11 +241,13 @@
                 </j-form-item>
                 <j-form-item :label="$t('Detail.BasicInfo.159198-28')">
                     <PermissChoose
+                        v-if="showPermissionChoose"
                         :first-width="3"
                         max-height="350px"
                         v-model:value="form.data.permissions"
                         :key="form.data.id || ''"
                     />
+                    <a-spin v-else/>
                 </j-form-item>
             </j-form>
         </div>
@@ -294,6 +296,7 @@ const permission = 'system/Menu';
 // 路由
 const route = useRoute();
 const router = useRouter();
+const showPermissionChoose = ref(false)
 const routeParams = {
     id: route.params.id === ':id' ? undefined : (route.params.id as string),
     ...route.query,
@@ -326,7 +329,7 @@ const form = reactive({
 
     init: () => {
         // 获取菜单详情
-        routeParams.id &&
+        routeParams.id ?
             getMenuInfo_api(routeParams.id).then((resp: any) => {
                 form.data = {
                     ...(resp.result as formType),
@@ -337,7 +340,8 @@ const form = reactive({
                         resp.result?.accessSupport?.value || 'unsupported',
                 };
                 form.sourceCode = resp.result.code;
-            });
+                showPermissionChoose.value = true
+            }) : showPermissionChoose.value = true
 
         if (isNoCommunity) {
             // 获取关联菜单
@@ -349,8 +353,8 @@ const form = reactive({
                             {
                                 terms: [
                                     {
-                                        value: '%show":true%',
-                                        termType: 'like',
+                                        value: '%show":false%',
+                                        termType: 'nlike',
                                         column: 'options',
                                     },
                                 ],

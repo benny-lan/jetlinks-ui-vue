@@ -618,7 +618,7 @@ const getClustersList = async () => {
         value: m.id,
     }));
 };
-getClustersList();
+
 /**
  * SIP本地地址
  */
@@ -632,7 +632,7 @@ const getAllList = async () => {
     }));
     setPorts();
 };
-getAllList();
+
 
 const handleTransportChange = () => {
     formData.value.host = undefined;
@@ -672,9 +672,6 @@ const getDetail = async () => {
     // console.log('formData.value: ', formData.value);
 };
 
-onMounted(() => {
-    getDetail();
-});
 
 const regDomain = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?:\.|$)){4}$/
     // /[j-zA-Z0-9][-j-zA-Z0-9]{0,62}(\.[j-zA-Z0-9][-j-zA-Z0-9]{0,62})+\.?/;
@@ -779,6 +776,12 @@ const handleSubmit = () => {
             console.log('err: ', err);
         });
 };
+
+onMounted(async() => {
+    await getDetail();
+    getClustersList();
+    getAllList();
+});
 </script>
 
 <style lang="less" scoped>

@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts" setup>
-import { handleLog } from '@/api/rule-engine/log';
+import { handleLog, handlePreconditioning } from '@/api/rule-engine/log';
 import { onlyMessage } from '@/utils/comm';
 import { useI18n } from 'vue-i18n'
 
@@ -39,6 +39,10 @@ const props = defineProps({
         default: 'handle',
     },
     handleDes: {
+        type: String,
+        default: '',
+    },
+    goal: {
         type: String,
         default: '',
     },
@@ -69,14 +73,17 @@ const handleSave = () => {
     formRef.value
         .validate()
         .then(async () => {
-            const res = await handleLog({
+            const params = {
                 describe: form.describe,
                 type: 'user',
                 state: 'normal',
                 alarmRecordId: props.data?.id || '',
                 alarmConfigId: props.data?.alarmConfigId || '',
                 alarmTime: props?.data?.alarmTime || '',
-            });
+            };
+            const res = props.goal
+                ? await handlePreconditioning(params)
+                : await handleLog(params);
             if (res.status === 200) {
                 onlyMessage($t('SolveComponent.index.891293-5'));
                 emit('refresh');
@@ -85,13 +92,13 @@ const handleSave = () => {
             }
             loading.value = false;
         })
-        .catch((error) => {
+        .catch((error:any) => {
             console.log(error);
             loading.value = false;
         });
 };
 onMounted(() => {
-    props.solveType === 'view' ? form.describe = props.handleDes : '';
+    props.solveType === 'view' ? (form.describe = props.handleDes) : '';
 });
 </script>
 <style lang="less" scoped></style>

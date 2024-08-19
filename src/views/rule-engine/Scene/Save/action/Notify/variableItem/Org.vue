@@ -5,6 +5,7 @@
         :placeholder="$t('variableItem.Org.5425867-0')"
         :tree-data="departmentTree"
         @change="onChange"
+        allowClear
         :fieldNames="{
             label: 'name',
             value: 'id',

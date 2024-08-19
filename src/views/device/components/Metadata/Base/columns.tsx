@@ -63,6 +63,10 @@ export const validatorConfig = (value: any, _isObject: boolean = false) => {
     return Promise.reject($t('Base.columns.6916023-9'))
   }
 
+  if (value.type === 'date' && !value.format) {
+    return Promise.reject('请选择时间格式')
+  }
+
   if (value.type === 'file' && (!value.bodyType || (isObject(value.bodyType) && !Object.keys(value.bodyType).length))) {
     return Promise.reject($t('Base.columns.6916023-10'))
   }
@@ -469,7 +473,7 @@ export const useColumns = (dataSource: Ref<MetadataItem[]>, type?: MetadataType,
       // }
     },
     // {
-    //   title: '{$t('Base.columns.6916023-3')}{$t('Base.columns.6916023-4')}类型',
+    //   title: '读写类型',
     //   dataIndex: 'expands',
     //   width: 190,
     //   form: {
@@ -477,7 +481,7 @@ export const useColumns = (dataSource: Ref<MetadataItem[]>, type?: MetadataType,
     //       {
     //         asyncValidator: async (rule: any, value: any) => {
     //           if (!value?.type?.length) {
-    //             return Promise.reject($t('Base.columns.6916023-23'))
+    //             return Promise.reject('请选择读写类型')
     //           }
     //           return Promise.resolve()
     //       }

@@ -120,34 +120,34 @@ const init = () => {
     })
 
     player.on(Events.PLAY, (ev) => {
-      console.log($t('Player.index.318843-0'), ev);
+      console.log('-播放开始-', ev);
       props.onPlay?.()
     })
     player.on(Events.PAUSE, (ev) => {
-      console.log($t('Player.index.318843-1'), ev);
+      console.log('-播放暂停-', ev);
       props.onPause?.()
     })
     player.on(Events.ENDED, (ev) => {
-      console.log($t('Player.index.318843-2'), ev);
+      console.log('-播放结束-', ev);
       props.onEnded?.()
     })
     player.on(Events.TIME_UPDATE, (ev) => {
       props.onTimeUpdate?.(ev)
     })
     player.on(Events.CANPLAY, (ev) => {
-      console.log($t('Player.index.318843-3'), ev);
+      console.log('-媒体数据加载好了-', ev);
       if (props.autoplay !== false) {
         play()
       }
     })
     player.on(Events.SEEKED, (ev) => {
-      console.log($t('Player.index.318843-4'), ev);
+      console.log('-跳着播放-', ev);
       if (props.live) {
         init()
       }
     })
     player.on(Events.ERROR, (ev) => {
-      console.log($t('Player.index.318843-5'), ev);
+      console.log('-播放错误-', ev);
       if (props.live) {
         setTimeout(() => {
           init()

@@ -114,7 +114,7 @@
                             
                             <!-- <j-input
                                 v-model:value="form.data.page.baseUrl"
-                                :placeholder="$t('components.EditForm.5222311-7')"
+                                placeholder="请输入接入地址"
                             /> -->
                             <InputGroup v-model:value="form.data.page.baseUrl" style="width: 100%;"/>
                         </j-form-item>
@@ -287,7 +287,7 @@
                                             .clientId
                                     "
                                     :placeholder="$t('components.EditForm.5222311-26')"
-                                    :disabled="!!form.data.id"
+                                    :disabled="!!form.data.id && !!form.data.apiClient.authConfig.oauth2.clientId"
                                 />
                             </j-form-item>
                             <j-form-item

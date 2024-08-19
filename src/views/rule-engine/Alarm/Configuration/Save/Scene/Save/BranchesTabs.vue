@@ -22,10 +22,10 @@
               <span class="branches-shakeLimit-action">{{ $t('Save.BranchesTabs.4265311-4') }}</span>
               <template v-if="branch.shakeLimit?.enabled">
                 <span>{{ $t('Save.BranchesTabs.4265311-5') }}</span>
-                <span class="branches-shakeLimit-time">{{ $t('Save.BranchesTabs.4265311-13') }}
+                <span class="branches-shakeLimit-time">
                   {{ branch.shakeLimit.time }}</span>
                 <span>{{ $t('Save.BranchesTabs.4265311-6') }}</span>
-                <span class="branches-shakeLimit-time">{{ $t('Save.BranchesTabs.4265311-14') }}
+                <span class="branches-shakeLimit-time">
                   {{ branch.shakeLimit.threshold }}</span>
                 <span>{{ $t('Save.BranchesTabs.4265311-7') }}</span>
                 <span>{{ branch.shakeLimit.alarmFirst ? $t('Save.BranchesTabs.4265311-8') : $t('Save.BranchesTabs.4265311-9') }}</span>

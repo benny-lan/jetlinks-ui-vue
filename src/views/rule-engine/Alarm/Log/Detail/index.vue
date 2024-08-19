@@ -20,11 +20,11 @@
                 <template #alarmTime="slotProps">{{
                     dayjs(slotProps.alarmTime).format('YYYY-MM-DD HH:mm:ss')
                 }}</template>
-                <template #sourceId="slotProps"
-                    >{{ $t('Detail.index.8913311-0') }}<a-button
+                <template #sourceName="slotProps"
+                    >{{ $t('Detail.index.253260-0') }}<a-button
                         type="link"
                         @click="() => gotoDevice(slotProps.sourceId)"
-                        >{{ slotProps.sourceId }}</a-button
+                        >{{ slotProps.sourceName }}</a-button
                     ></template
                 >
                 <template #action="slotProps">
@@ -215,9 +215,9 @@ watch(
                         key: 'triggerDesc',
                     },
                     {
-                        title: $t('Detail.index.8913311-7'),
-                        dataIndex: 'sourceId',
-                        key: 'sourceId',
+                        title: $t('Detail.index.253260-1'),
+                        dataIndex: 'sourceName',
+                        key: 'sourceName',
                         scopedSlots: true,
                         search: {
                             type: 'string',

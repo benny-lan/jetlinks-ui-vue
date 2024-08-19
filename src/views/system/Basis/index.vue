@@ -34,11 +34,9 @@
                             </j-form-item>
                             <j-form-item>
                                 <template #label>
-                                    <span>{{
-                                        $t('Basis.index.283711-5')
-                                    }}</span>
+                                    <span>{{ $t('Basis.index.803121-0') }}</span>
                                     <j-tooltip
-                                        :title="$t('Basis.index.283711-6')"
+                                        :title="$t('Basis.index.803121-1')"
                                     >
                                         <img
                                             class="img-style"
@@ -50,17 +48,13 @@
                                 </template>
                                 <j-input
                                     v-model:value="formValue.webKey"
-                                    :placeholder="$t('Basis.index.283711-7')"
+                                    :placeholder="$t('Basis.index.803121-2')"
                                 />
                             </j-form-item>
                             <j-form-item>
                                 <template #label>
-                                    <span>{{
-                                        $t('Basis.index.283711-8')
-                                    }}</span>
-                                    <j-tooltip
-                                        :title="$t('Basis.index.283711-9')"
-                                    >
+                                    <span>{{ $t('Basis.index.803121-3') }}</span>
+                                    <j-tooltip :title="$t('Basis.index.803121-4')">
                                         <img
                                             class="img-style"
                                             :src="
@@ -95,25 +89,32 @@
                                     :placeholder="$t('Basis.index.283711-13')"
                                 />
                             </j-form-item>
+                            <j-form-item>
+                                <template #label>
+                                    <span>{{ $t('Basis.index.803121-5') }}</span>
+                                    <j-tooltip :title="$t('Basis.index.803121-6')">
+                                        <img
+                                            class="img-style"
+                                            :src="
+                                                getImage('/init-home/mark.png')
+                                            "
+                                        />
+                                    </j-tooltip>
+                                </template>
+                                <j-input
+                                    v-model:value="formValue.secretKey"
+                                    :placeholder="$t('Basis.index.803121-7')"
+                                />
+                            </j-form-item>
                             <j-form-item name="base-path">
                                 <template #label>
                                     <span>base-path</span>
                                     <j-tooltip>
                                         <template #title>
                                             <div style="word-break: break-all">
+                                                <div>{{ $t('Basis.index.803121-8') }}</div>
                                                 <div>
-                                                    {{
-                                                        $t(
-                                                            'Basis.index.283711-14',
-                                                        )
-                                                    }}
-                                                </div>
-                                                <div>
-                                                    {{
-                                                        $t(
-                                                            'Basis.index.283711-15',
-                                                        )
-                                                    }}{http/https}:
+                                                    {{ $t('Basis.index.803121-9') }}{http/https}:
                                                     //{前端所在服务器IP地址}:{前端暴露的服务端口}/api
                                                 </div>
                                             </div>
@@ -134,7 +135,7 @@
                             </j-form-item>
                             <j-form-item
                                 name="showRecordNumber"
-                                :label="$t('Basis.index.283711-16')"
+                                :label="$t('Basis.index.803121-10')"
                                 :required="true"
                             >
                                 <a-switch
@@ -144,7 +145,7 @@
                             <j-form-item
                                 v-if="formValue.showRecordNumber"
                                 name="recordNumber"
-                                :label="$t('Basis.index.283711-17')"
+                                :label="$t('Basis.index.803121-11')"
                                 :required="true"
                             >
                                 <a-input
@@ -480,7 +481,7 @@ const form = reactive<formType>({
             {
                 validator: (rule, value, callback) => {
                     if (value && value.includes('localhost')) {
-                        callback($t('Basis.index.283711-33'));
+                        callback($t('Basis.index.803121-12'));
                     } else {
                         callback();
                     }
@@ -491,7 +492,7 @@ const form = reactive<formType>({
         recordNumber: [
             {
                 max: 64,
-                message: $t('Basis.index.283711-30'),
+                message: $t('Basis.index.803121-13'),
             },
         ],
     },
@@ -508,7 +509,7 @@ const form = reactive<formType>({
             headerTheme: configInfo.front?.headerTheme,
             logo: configInfo.front?.logo || '/logo.png',
             ico: configInfo.front?.ico || '/favicon.ico',
-            showRecordNumber: configInfo.front?.showRecordNumber,
+            showRecordNumber: configInfo.front?.showRecordNumber || false,
             recordNumber: configInfo.front?.recordNumber,
             background: configInfo.front?.background || '/images/login.png',
             apiKey: configInfo.amap?.apiKey,
@@ -553,7 +554,7 @@ const form = reactive<formType>({
                 save_api(params)
                     .then(async (resp) => {
                         if (resp.status === 200) {
-                            onlyMessage($t('Basis.index.283711-34'));
+                            onlyMessage($t('Basis.index.803121-14'));
                             await system.getSystemConfig();
                             await form.getDetails();
                         }
@@ -588,7 +589,10 @@ const uploader: uploaderType = {
                 .filter((typeStr) => file.type.includes(typeStr)).length > 0;
         const sizeBool = file.size / 1024 / 1024 < 4;
         if (!typeBool) {
-            onlyMessage($t('Basis.index.283711-36'), 'error');
+            onlyMessage(
+                $t('Basis.index.803121-15'),
+                'error',
+            );
         } else if (!sizeBool) {
             onlyMessage($t('Basis.index.283711-37'), 'error');
         }

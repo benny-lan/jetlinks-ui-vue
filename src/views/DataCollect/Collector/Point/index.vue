@@ -573,10 +573,18 @@ const onCheckChange = () => {
 };
 
 const handleBatchDelete = () => {
+    if (!_selectedRowKeys.value.length) {
+        onlyMessage($t('Point.index.527963-0'), 'error');
+        return
+    }
     handleDelete();
 };
 
 const handleBatchUpdate = () => {
+    if (!_selectedRowKeys.value.length) {
+        onlyMessage($t('Point.index.527963-0'), 'error');
+        return
+    }
     const dataSet = new Set(_selectedRowKeys.value);
     const dataMap = new Map();
     tableRef?.value?._dataSource.forEach((i: any) => {

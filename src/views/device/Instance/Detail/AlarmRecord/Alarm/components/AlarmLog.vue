@@ -33,12 +33,13 @@
                 </div>
             </div>
         </div>
-        <Log :currentId="AlarmData.id" :configId="AlarmData.alarmConfigId" />
+        <Log :currentId="AlarmData.id" :configId="AlarmData.alarmConfigId" :goal="goal"/>
     </a-drawer>
     <SolveComponent
         v-if="solveVisible"
         @closeSolve="closeSolve"
         @refresh="refresh"
+        :goal="goal"
         :data="AlarmData"
     />
 </template>
@@ -56,6 +57,10 @@ const props = defineProps({
         type: Object,
         default: {},
     },
+    goal:{
+        type:String,
+        default:''
+    }
 });
 const emit = defineEmits(['closeDrawer', 'refreshTable']);
 const { levelMap } = useAlarmLevel();

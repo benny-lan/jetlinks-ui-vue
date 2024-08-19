@@ -112,7 +112,7 @@ const submitData = () =>{
         const res = await addDictionary(form)
             if(res.status === 200){
                 onlyMessage($t('save.index.464662-15'))
-                emit('success')
+                emit('success',form.id)
             }else{
                 onlyMessage($t('save.index.464662-16'),'error')
             }

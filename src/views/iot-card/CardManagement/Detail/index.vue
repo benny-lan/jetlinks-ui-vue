@@ -1,7 +1,7 @@
-<!-- 物联卡查看 -->
+s<!-- 物联卡查看 -->
 <template>
     <page-container v-if="type === 'card'">
-        <!-- 新增、{{ $t('Detail.index.237328-1') }} -->
+        <!-- 新增、编辑 -->
         <div>
             <Save
                 v-if="visible"

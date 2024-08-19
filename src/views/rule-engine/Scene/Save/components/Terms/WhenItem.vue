@@ -159,7 +159,7 @@ const addWhen = () => {
         };
     }
     formModel.value.options?.when?.[props.branches_Index]?.terms.push({
-        termType: '并且',
+        termType: $t('Terms.WhenItem.5425722-0'),
         terms: [['', 'eq', '', 'and']],
     });
 };

@@ -22,7 +22,7 @@
                 </template>
                 {{ selectedKeys.some(selectKey => selectKey === item.actionId) ? $t('Save.Actions.4265312-4') : $t('Save.Actions.4265312-5') }}
               </a-button>
-              <a-button v-else-if="activeKeys.some(active => active === item.actionId)" type="link" @click.stop="onSelect(item)">
+              <a-button v-else-if="activeKeys.some(active => active === item.actionId || active === -1)" type="link" @click.stop="onSelect(item)">
                 <template #icon>
                   <AIcon type="icon-jiebang"/>
                 </template>
@@ -252,8 +252,8 @@ const onBind = (record) => {
 }
 
 const onSelect = (record) => {
-  const selected = props.activeKeys.some(item => item === record.actionId)
-  emit('select', record.actionId, !selected)
+  const id = props.activeKeys.find(active => active === record.actionId || active === -1)
+  emit('select', id, false)
 }
 
 

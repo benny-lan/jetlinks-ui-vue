@@ -144,6 +144,45 @@ const _vis = computed({
  * 获取通知模板
  */
 const configList = ref<BindConfig[]>([]);
+
+const columns = [
+    {
+        title: $t('Debug.index.259204-0'),
+        dataIndex: 'id',
+        width: 100,
+        ellipsis: true,
+        scopedSlots: { customRender: 'id' },
+    },
+    {
+        title: $t('Debug.index.259204-1'),
+        dataIndex: 'name',
+        scopedSlots: { customRender: 'name' },
+    },
+    {
+        title: $t('Debug.index.259204-2'),
+        dataIndex: 'type',
+        width: 160,
+        scopedSlots: { customRender: 'type' },
+    },
+];
+
+// 表单数据
+const formData = ref<{
+    configId: string;
+    variableDefinitions: string;
+    templateDetailTable: IVariableDefinitions[];
+}>({
+    configId: '',
+    variableDefinitions: '',
+    templateDetailTable: [],
+});
+
+/**
+ * 提交
+ */
+const formRef = ref();
+const btnLoading = ref(false);
+
 const getConfigList = async () => {
     const params = {
         terms: [
@@ -156,16 +195,6 @@ const getConfigList = async () => {
     // 设置默认配置
     if (configList.value.length) formData.value.configId = props.data.configId;
 };
-
-watch(
-    () => _vis.value,
-    (val) => {
-        if (val) {
-            getConfigList();
-            getTemplateDetail();
-        }
-    },
-);
 
 /**
  * 获取模板详情
@@ -201,44 +230,26 @@ const getTemplateDetail = async () => {
     );
 };
 
-const columns = [
-    {
-        title: $t('Debug.index.214683-5'),
-        dataIndex: 'id',
-        width: 100,
-        ellipsis: true,
-        scopedSlots: { customRender: 'id' },
-    },
-    {
-        title: $t('Debug.index.214683-9'),
-        dataIndex: 'name',
-        scopedSlots: { customRender: 'name' },
-    },
-    {
-        title: $t('Debug.index.214683-10'),
-        dataIndex: 'type',
-        width: 160,
-        scopedSlots: { customRender: 'type' },
-    },
-];
-
-// 表单数据
-const formData = ref<{
-    configId: string;
-    variableDefinitions: string;
-    templateDetailTable: IVariableDefinitions[];
-}>({
-    configId: '',
-    variableDefinitions: '',
-    templateDetailTable: [],
-});
-
-/**
- * 提交
- */
-const formRef = ref();
-const btnLoading = ref(false);
 const handleOk = () => {
+    console.log(formData.value.templateDetailTable)
+    const filterData = formData.value.templateDetailTable.filter((item: any) =>
+        ['user', 'org', 'tag', 'userIdList', 'departmentIdList'].includes(
+            item.id,
+        ),
+    );
+    const pass = filterData.length
+        ? filterData.some((i: any) => {
+              return i.value;
+          })
+        : true;
+    if (!pass && props.data.type === 'dingTalk') {
+        onlyMessage($t('Debug.index.259204-3'), 'warning');
+        return;
+    }
+    if (!pass && props.data.type === 'weixin') {
+        onlyMessage($t('Debug.index.259204-4'), 'warning');
+        return;
+    }
     formRef.value
         .validate()
         .then(async () => {
@@ -269,6 +280,16 @@ const handleCancel = () => {
     formRef.value.resetFields();
     formData.value.templateDetailTable = [];
 };
+
+watch(
+    () => _vis.value,
+    (val) => {
+        if (val) {
+            getConfigList();
+            getTemplateDetail();
+        }
+    },
+);
 </script>
 
 <style lang="less" scoped>

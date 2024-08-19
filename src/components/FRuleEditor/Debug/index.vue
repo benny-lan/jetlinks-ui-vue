@@ -46,7 +46,7 @@
                                 showSearch
                                 :options="options"
                                 v-model:value="record.id"
-                                :getPopupContainer="(node) => tableWrapperRef || node"
+                                :getPopupContainer="getPopupContainer"
                                 size="small"
                                 style="width: 100%;"
                                 :virtual="true"
@@ -105,7 +105,7 @@
                                 size="small"
                                 style="width: 100%;"
                                 :virtual="true"
-                                :getPopupContainer="(node) => tableWrapperRef || node"
+                                :getPopupContainer="getPopupContainer"
                                 :dropdownStyle="{
                                   zIndex: 1072
                                 }"
@@ -205,6 +205,7 @@ import {message} from "ant-design-vue";
 import { useI18n } from 'vue-i18n'
 
 const { t: $t } = useI18n()
+import { useTableFullScreen} from "@/components/Metadata/Table/context";
 
 const props = defineProps({
     virtualRule: Object as PropType<Record<any, any>>,
@@ -225,7 +226,7 @@ type propertyType = {
 const property = ref<propertyType[]>([]);
 const tag = ref<Array<any>>([]);
 const tableWrapperRef = useTableWrapper()
-
+const fullScreen = useTableFullScreen()
 const columns = [
     {
         title: $t('Debug.index.43487114-10'),
@@ -290,6 +291,14 @@ const ruleEditorStore = useRuleEditorStore();
 const time = ref<number>(0);
 const timer = ref<any>(null);
 
+//是否全屏监听
+const getPopupContainer = (node: any) => {
+  if (fullScreen.value) {
+    return tableWrapperRef.value || node
+  }
+
+  return document.body
+}
 const runScript = () => {
     const propertiesList = medataSource?.value || []
     const _properties = property.value.map((item: any) => {
@@ -311,7 +320,7 @@ const runScript = () => {
           return tableWrapperRef.value || document.body
         }
       })
-        onlyMessage($t('Debug.index.43487114-14'), 'warning');
+        onlyMessage('请编辑规则', 'warning');
         return;
     }
 
@@ -340,7 +349,7 @@ const runScript = () => {
     }, () => {}, () => {
       ruleEditorStore.state.log.push({
         time: new Date().getTime(),
-        content: $t('Debug.index.43487114-15'),
+        content: '运行结束',
         _time: unref(time.value),
       });
       stopAction()
@@ -397,7 +406,7 @@ const beginAction = () => {
         return tableWrapperRef.value || document.body
       },
     })
-    return onlyMessage($t('Debug.index.43487114-18'), 'warning')
+    return onlyMessage('请填写属性值', 'warning')
   }
     isBeginning.value = false;
     runScript();

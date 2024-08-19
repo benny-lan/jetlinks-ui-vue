@@ -236,41 +236,55 @@ watch(
     (val) => {
         const diffInSeconds = dayjs(val[1]).diff(dayjs(val[0]), 'minute');
         if (diffInSeconds < 60) {
-            periodOptions.value = [
+            periodOptions.value = _type.value ? [
                 {
-                    label: $t('Detail.Charts.2866713-7'),
+                    label: $t('Detail.Charts.829770-0'),
                     value: '*',
                 },
                 {
-                    label: $t('Detail.Charts.2866713-8'),
+                    label: $t('Detail.Charts.829770-1'),
                     value: '1m',
                 },
-            ];
-            cycle.value = '*';
+            ] : [
+                {
+                    label: $t('Detail.Charts.829770-1'),
+                    value: '1m',
+                },
+            ]
+            cycle.value = _type.value ? '*' : '1m';
         } else if (diffInSeconds < 1440) {
-            periodOptions.value = [
+            periodOptions.value = _type.value ? [
                 {
-                    label: $t('Detail.Charts.2866713-7'),
+                    label: $t('Detail.Charts.829770-0'),
                     value: '*',
                 },
                 {
-                    label: $t('Detail.Charts.2866713-8'),
+                    label: $t('Detail.Charts.829770-1'),
                     value: '1m',
                 },
                 {
-                    label: $t('Detail.Charts.2866713-9'),
+                    label: $t('Detail.Charts.829770-2'),
                     value: '1h',
                 },
-            ];
-            cycle.value = '*';
+            ] :  [
+                {
+                    label: $t('Detail.Charts.829770-1'),
+                    value: '1m',
+                },
+                {
+                    label: $t('Detail.Charts.829770-2'),
+                    value: '1h',
+                },
+            ]
+            cycle.value = _type.value ? '*' : '1m';
         } else if (diffInSeconds < 43200) {
             periodOptions.value = [
                 {
-                    label: $t('Detail.Charts.2866713-9'),
+                    label: $t('Detail.Charts.829770-2'),
                     value: '1h',
                 },
                 {
-                    label: $t('Detail.Charts.2866713-10'),
+                    label: $t('Detail.Charts.829770-3'),
                     value: '1d',
                 },
             ];

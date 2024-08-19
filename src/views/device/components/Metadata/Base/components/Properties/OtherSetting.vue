@@ -212,7 +212,7 @@
                                         v-model:value="extraForm.mode"
                                         :options="[
                                             { label: $t('Properties.OtherSetting.6916232-13'), value: 'ignore' },
-                                            { label: $t('Properties.OtherSetting.6916232-14'), value: 'record' },
+                                            { label: $t('Properties.OtherSetting.6916232-14'), value: 'device-record' },
                                             {
                                                 label: $t('Properties.OtherSetting.6916232-15'),
                                                 value: 'device-alarm',
@@ -315,6 +315,7 @@ const props = defineProps({
 
 const type = inject('_metadataType');
 
+const { showThreshold } = useSystem();
 const productStore = useProductStore();
 const deviceStore = useInstanceStore();
 const tableWrapperRef = useTableWrapper();
@@ -358,7 +359,7 @@ const typeMap = {
 const handleTip = computed(() => {
     if (extraForm.mode === 'ignore') {
         return $t('Properties.OtherSetting.6916232-18');
-    } else if (extraForm.mode === 'record') {
+    } else if (extraForm.mode === 'device-record') {
         return $t('Properties.OtherSetting.6916232-19');
     }
     return $t('Properties.OtherSetting.6916232-20');
@@ -370,7 +371,7 @@ const showContent = computed(() => {
         return showExtra.value;
     }
 
-    return showMetrics.value || config.value.length > 0;
+    return (showMetrics.value || config.value.length > 0) && props.id;
 });
 
 const showMetrics = computed(() => {
@@ -388,7 +389,8 @@ const showMetrics = computed(() => {
 const showExtra = computed(() => {
     return (
         ['int', 'long', 'float', 'double'].includes(props.type as any) &&
-        props.metadataType === 'properties'
+        props.metadataType === 'properties' &&
+        showThreshold
     );
 });
 
@@ -489,8 +491,8 @@ const getConfig = async () => {
         } else if (showMetrics.value) {
             activeKey.value = ['metrics'];
         }
-        if(showExtra.value){
-            activeKey.value = ['extra']
+        if (showExtra.value) {
+            activeKey.value = ['extra'];
         }
         if (resp.result.length && !configValue.value) {
             resp.result.forEach((a) => {

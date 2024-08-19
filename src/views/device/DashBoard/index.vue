@@ -566,11 +566,11 @@ const getEcharts = (data: any) => {
     } else if (dt > days && dt < year) {
         limit = Math.abs(Math.ceil(dt / days)) + 1;
         _time = '1d';
-        format = $t('DashBoard.index.790391-18');
+        format = 'M月dd日';
     } else if (dt >= year) {
         limit = Math.abs(Math.floor(dt / months));
         _time = '1M';
-        format = $t('DashBoard.index.790391-19');
+        format = 'yyyy年-M月';
     }
 
     dashboard([

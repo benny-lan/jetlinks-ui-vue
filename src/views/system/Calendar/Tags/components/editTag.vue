@@ -14,7 +14,8 @@
                             type="color"
                             :hex="tagInfo.color"
                             :rgba="tagInfo.color"
-                            :themeColor="themeColor" 
+                            :themeColor="themeColor"
+                            :show-opacity="false"
                             @change="changeColor"
                         />
                     </a-form-item>
@@ -87,8 +88,8 @@ const themeColor =  [
     '#FF85C0'
 ]
 const submit = () => {
-    loading.value = true
     form.value.validate().then(async () => {
+        loading.value = true
         let id;
         if (props.editType === 'add') {
             id = randomString();
@@ -99,7 +100,9 @@ const submit = () => {
             id,
             name: tagInfo.name,
         };
-        const res = await saveTag(submitData);
+        const res = await saveTag(submitData).finally(()=>{
+            loading.value = false
+        });
         if (res.success) {
             colorData.value[id] = tagInfo.color;
             const saveRes = await saveTagsColor(colorData.value).catch(()=>{

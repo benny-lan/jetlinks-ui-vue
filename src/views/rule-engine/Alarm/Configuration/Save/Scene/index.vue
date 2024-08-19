@@ -46,6 +46,7 @@
           :showBranches="false"
           :showBindTags="true"
           :showRule="false"
+           :showHistory="false"
           @click="handleView(slotProps)"
         >
           <div class="scene-view">
@@ -119,32 +120,32 @@ const {data: activeKeys, reload} = useRequest(queryBindScene, {
   defaultValue: {}
 })
 
-const getActions = (
-  data: Partial<Record<string, any>>,
-  type: 'card' | 'table',
-): ActionsType[] => {
-  if (!data) return [];
-  const actions: ActionsType[] = [
-    {
-      key: 'action',
-      text: $t('Scene.index.426523-2'),
-      icon: 'DisconnectOutlined',
-      popConfirm: {
-        title: $t('Scene.index.426523-3'),
-        onConfirm: async () => {
-          // const res = await unbindScene(id, [data.id], data.branchIndex);
-          const res = await unbindScene(id, [data.id]);
-          if (res.status === 200) {
-            onlyMessage($t('Scene.index.426523-4'));
-            actionRef.value.reload();
-          }
-          return
-        },
-      },
-    },
-  ];
-  return actions;
-};
+// const getActions = (
+//   data: Partial<Record<string, any>>,
+//   type: 'card' | 'table',
+// ): ActionsType[] => {
+//   if (!data) return [];
+//   const actions: ActionsType[] = [
+//     {
+//       key: 'action',
+//       text: '解绑',
+//       icon: 'DisconnectOutlined',
+//       popConfirm: {
+//         title: '确认解绑？',
+//         onConfirm: async () => {
+//           // const res = await unbindScene(id, [data.id], data.branchIndex);
+//           const res = await unbindScene(id, [data.id]);
+//           if (res.status === 200) {
+//             onlyMessage('操作成功');
+//             actionRef.value.reload();
+//           }
+//           return
+//         },
+//       },
+//     },
+//   ];
+//   return actions;
+// };
 
 const queryTable = (_terms: any) => {
   return query(_terms, id)

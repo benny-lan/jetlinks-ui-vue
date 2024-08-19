@@ -227,7 +227,7 @@ const addTerms = () => {
         props.actionName
     ].options!.terms.push({
         terms: [['', 'eq', '', 'and']],
-        termType:'并且',
+        termType: '并且',
     });
 };
 

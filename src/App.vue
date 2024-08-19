@@ -1,6 +1,6 @@
 <template>
   <ConfigProvider
-    :locale='enGB'
+    :locale='zhCN'
     :IconConfig="{
       scriptUrl: '//at.alicdn.com/t/c/font_4035907_i1jazcune3.js'
     }"
@@ -36,7 +36,7 @@ watch(() => JSON.stringify(route.query || {}), () => {
 
 ConfigProvider.config({
   theme: {
-    primaryColor: "#315efb"
+    primaryColor: "#1677FF"
   }
 })
 </script>
