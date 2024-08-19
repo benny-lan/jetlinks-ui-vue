@@ -50,7 +50,7 @@ const opsBootConfig: bootConfig[] = [
         label: $t('DevOpsHome.index.926510-5'),
         link: 'link/DashBoard',
     },
-]);
+];
 const opsStepDetails = computed(()=>[
     {
         title: $t('DevOpsHome.index.926510-6'),

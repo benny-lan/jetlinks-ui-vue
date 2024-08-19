@@ -195,38 +195,6 @@ const triggerOptions = computed(() => {
     return _options;
 });
 
-const multiRules = [
-  {
-    validator: async (_: any, v: string) => {
-      if (!v.spec?.length) {
-        return Promise.reject($t('Timer.index.5425719-11'));
-      } else {
-        const index = v.spec.findIndex(item => !item.scheduleTags.length)
-        if (index > -1) {
-          return Promise.reject($t('Timer.index.5425719-12', [index + 1]));
-        }
-      }
-
-      return Promise.resolve()
-    }
-  }
-]
-
-const triggerOptions = computed(() => {
-  let _options = [
-    { label: $t('Timer.index.5425719-13'), value: "week" },
-    { label: $t('Timer.index.5425719-14'), value: "month" },
-    { label: $t('Timer.index.5425719-15'), value: "cron" },
-    { label: $t('Timer.index.5425719-16'), value: "multi" }
-  ]
-
-  // if (props.type === 'timer') {
-  //   _options = [..._options, {
-  //     label: $t('Timer.index.5425719-16'), value: "multi"
-  //   }]
-  // }
-  return _options
-})
 
 const formModel = reactive<OperationTimer>({
     trigger: 'week',

@@ -176,9 +176,6 @@ const { t: $t } = useI18n()
 
 const menuStory = useMenuStore();
 const route: any = useRoute();
-
-const menuStory = useMenuStore();
-const route: any = useRoute();
 const accessMethod=computed(()=> route.query.type === 'onvif'
   ? 'Onvif'
   : 'GB/T28181')
