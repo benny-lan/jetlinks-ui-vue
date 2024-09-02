@@ -38,7 +38,7 @@
                 </j-descriptions-item>
                 <j-descriptions-item :label="$t('Recharge.Detail.797371-9')">{{
                     data.createTime
-                        ? moment(data.createTime).format('YYYY-MM-DD HH:mm:ss')
+                        ? dayjs(data.createTime).format('YYYY-MM-DD HH:mm:ss')
                         : '-'
                 }}</j-descriptions-item>
             </j-descriptions>
@@ -47,10 +47,11 @@
 </template>
 
 <script lang="ts" setup>
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { useI18n } from 'vue-i18n';
 
 const { t: $t } = useI18n();
+
 const emit = defineEmits(['close']);
 
 const props = defineProps({

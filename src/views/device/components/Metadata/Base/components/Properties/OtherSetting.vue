@@ -271,8 +271,9 @@ import { PopoverModal } from '@/components/Metadata/Table';
 import { useTableWrapper } from '@/components/Metadata/Table/context';
 import { useThreshold } from './hooks';
 import { useI18n } from 'vue-i18n'
-
+import { useSystem } from '@/store/system';
 const { t: $t } = useI18n()
+
 
 
 const props = defineProps({

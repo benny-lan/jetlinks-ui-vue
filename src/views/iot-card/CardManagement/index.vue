@@ -518,7 +518,8 @@ const columns = [
         title: $t('CardManagement.index.237321-2'),
         dataIndex: 'operatorState',
         key: 'operatorState',
-        hidden: true,
+        // hidden: true,
+        hideInTable: true,
         search: {
             type: 'select',
             options: [

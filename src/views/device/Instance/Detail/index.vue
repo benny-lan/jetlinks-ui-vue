@@ -135,11 +135,10 @@ import { useRouterParams } from '@/utils/hooks/useParams';
 import { EventEmitter } from '@/utils/utils';
 import { usePermissionStore } from '@/store/permission';
 import { useI18n } from 'vue-i18n';
-
-const { t: $t } = useI18n();
 import { isNoCommunity } from '@/utils/utils';
 import { useSystem } from '@/store/system';
 
+const { t: $t } = useI18n();
 const menuStory = useMenuStore();
 const { showThreshold } = useSystem();
 const route = useRoute();

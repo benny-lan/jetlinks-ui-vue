@@ -76,7 +76,7 @@
                     </div>
                     <div v-else>{{ $t('DeviceAccess.index.0645611-8') }}</div>
                 </div>
-                <!--        {{ $t('DeviceAccess.index.006446-0') }}        -->
+                <!--        产品类型        -->
                 <j-form
                     ref="pluginFormRef"
                     :model="productData"

@@ -128,12 +128,7 @@ watchEffect(() => {
   }
 })
 
-const changeLocale = ()=>{
-  localStorage.setItem('locale',locale.value)
-  // location.reload()
-}
-
-const toDoc = () => window.open('http://doc.v2.jetlinks.cn/');
+const toDoc = () => window.open('https://hanta.yuque.com/px7kg1/yfac2l');
 </script>
 
 <style scoped>

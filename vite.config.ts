@@ -15,6 +15,7 @@ import { JetlinksVueResolver } from './plugin/jetlinks'
 import { optimizeDeps } from './plugin/optimize'
 import copy from 'rollup-plugin-copy';
 import progress from 'vite-plugin-progress'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode}) => {
@@ -85,7 +86,8 @@ export default defineConfig(({ mode}) => {
               {src: 'node_modules/@liveqing/liveplayer-v3/dist/component/liveplayer-lib.min.js', dest: 'public/js'},
             ]
           }),
-          progress()
+          progress(),
+          visualizer()
       ],
       server: {
           host:'0.0.0.0',
@@ -97,7 +99,7 @@ export default defineConfig(({ mode}) => {
                 //   target: 'http://192.168.32.217:8844', //张本地
                 //   target: 'http://120.77.179.54:8844', // 120测试
                 target: 'http://192.168.33.46:8844', // 本地开发环境
-                // target: 'http://192.168.33.97:8844', // 本地开发环境1
+                // target: 'http://192.168.33.99:8844', // 本地开发环境1
                 // target: 'http://192.168.33.6:38848', // 社区版开发环境
                 //   target: 'http://192.168.32.207:8844', // 刘本地
                 //   target: 'http://192.168.32.187:8844', // 谭本地
@@ -114,7 +116,6 @@ export default defineConfig(({ mode}) => {
               less: {
                   modifyVars: {
                       'root-entry-name': 'variable',
-                      'primary-color': '#1677FF',
                       hack: `true; @import (reference) "${path.resolve('src/style/variable.less')}";`,
                   },
                   javascriptEnabled: true,

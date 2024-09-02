@@ -50,8 +50,10 @@ import { useInstanceStore } from '@/store/instance';
 import { useProductStore } from '@/store/product';
 import dayjs from 'dayjs';
 import { useI18n } from 'vue-i18n'
+import { useMenuStore } from 'store/menu';
 
 const { t: $t } = useI18n()
+
 const props = defineProps({
     goal: {
         type: String,

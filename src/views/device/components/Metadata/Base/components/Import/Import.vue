@@ -70,8 +70,10 @@ import {getTemplate as getProductTemplate} from '@/api/device/product'
 import {downloadFileByUrl} from "@/utils/utils";
 import {useGroupActive, useTableWrapper} from "@/components/Metadata/Table/context";
 import { useI18n } from 'vue-i18n'
+import { useProductStore } from '@/store/product';
 
 const { t: $t } = useI18n()
+
 
 
 const props = defineProps({

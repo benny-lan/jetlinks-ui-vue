@@ -22,7 +22,7 @@
             <h5>{{ $t('components.ApiDoes.148101-2') }}</h5>
             <div>{{ props.selectApi.description }}</div>
         </div>
-        <div class="api-card" v-if="requestCard.codeText">
+        <div class="api-card" v-if="requestCard.codeText !== undefined">
             <h5>{{ $t('components.ApiDoes.148101-3') }}</h5>
             <JsonViewer :value="requestCard.codeText" copyable />
         </div>
@@ -181,6 +181,7 @@ const requestCard = reactive<cardType>({
                     })),
                 },
             ];
+            // console.log(requestCard,'requestCard')
         }
     },
 });

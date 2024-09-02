@@ -31,7 +31,7 @@
                         </div>
                         <div class="dialog-time">
                             {{
-                                moment(item.endTime).format(
+                            dayjs(item.endTime).format(
                                     'YYYY-MM-DD HH:mm:ss',
                                 )
                             }}
@@ -50,10 +50,11 @@
 </template>
 
 <script lang="ts" setup>
-import moment from 'moment';
 import { useI18n } from 'vue-i18n'
+import dayjs from 'dayjs';
 
 const { t: $t } = useI18n()
+
 
 const operationMap = new Map();
 operationMap.set('connection', $t('Dialog.index.5856012-0'));

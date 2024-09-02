@@ -24,10 +24,11 @@ const AliyunVoice = () => {
         <div> {$t('doc.AliyunVoice.214688-9')}</div>
         <h2> {$t('doc.AliyunVoice.214688-10')}</h2>
         <div> {$t('doc.AliyunVoice.214688-11')}</div>
-        <div>{$t('doc.AliyunVoice.214688-12')}</div>
-        <div>{$t('doc.AliyunVoice.214688-13')}</div>
+
         <h2> {$t('doc.AliyunVoice.214688-14')}</h2>
         <div> {$t('doc.AliyunVoice.214688-15')}</div>
+        <div>{$t('doc.AliyunVoice.214688-12')}</div>
+        <div>{$t('doc.AliyunVoice.214688-13')}</div>
         <h2> {$t('doc.AliyunVoice.214688-16')}</h2>
         <div> {$t('doc.AliyunVoice.214688-17')}</div>
         <h2> {$t('doc.AliyunVoice.214688-18')}</h2>

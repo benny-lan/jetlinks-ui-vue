@@ -106,6 +106,7 @@ const handleBind = (id, selected) => {
     }).finally(() => {
       loading.value = false
     })
+
   }
 }
 

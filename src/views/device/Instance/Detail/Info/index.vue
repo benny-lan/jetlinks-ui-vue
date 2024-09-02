@@ -60,21 +60,21 @@
         }}</j-descriptions-item>
         <j-descriptions-item :label="$t('Info.index.735510-12')">{{
             instanceStore.current?.createTime
-                ? moment(instanceStore.current?.createTime).format(
+                ? dayjs(instanceStore.current?.createTime).format(
                       'YYYY-MM-DD HH:mm:ss',
                   )
                 : ''
         }}</j-descriptions-item>
         <j-descriptions-item :label="$t('Info.index.735510-13')">{{
             instanceStore.current?.registerTime
-                ? moment(instanceStore.current?.registerTime).format(
+                ? dayjs(instanceStore.current?.registerTime).format(
                       'YYYY-MM-DD HH:mm:ss',
                   )
                 : ''
         }}</j-descriptions-item>
         <j-descriptions-item :label="$t('Info.index.735510-14')">{{
             instanceStore.current?.onlineTime
-                ? moment(instanceStore.current?.onlineTime).format(
+                ? dayjs(instanceStore.current?.onlineTime).format(
                       'YYYY-MM-DD HH:mm:ss',
                   )
                 : ''
@@ -124,7 +124,7 @@ import Config from './components/Config/index.vue';
 import Tags from './components/Tags/index.vue';
 import Relation from './components/Relation/index.vue';
 import InkingModal from './components/InklingModal';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { detail as queryPluginAccessDetail } from '@/api/link/accessConfig';
 import { getPluginData } from '@/api/link/plugin';
 import { useI18n } from 'vue-i18n';

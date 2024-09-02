@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { _export } from '@/api/iot-card/cardManagement';
 import { downloadFileByUrl } from '@/utils/utils';
 import { useI18n } from 'vue-i18n';
@@ -51,7 +51,7 @@ const handleOk = () => {
             const url = URL.createObjectURL(blob);
             downloadFileByUrl(
                 url,
-                $t('CardManagement.Export.237323-5', [moment(new Date()).format(
+                $t('CardManagement.Export.237323-5', [dayjs(new Date()).format(
                     'YYYY/MM/DD HH:mm:ss',
                 )]),
                 type.value,

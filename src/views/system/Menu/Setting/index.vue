@@ -87,14 +87,13 @@ import {
 } from './utils';
 import BaseMenu from '@/views/init-home/data/baseMenu';
 import type { AntTreeNodeDropEvent } from 'ant-design-vue/es/tree';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, unionBy } from 'lodash-es';
 import { onlyMessage } from '@/utils/comm';
 import { USER_CENTER_MENU_CODE, messageSubscribe } from '@/utils/consts';
 import { protocolList } from '@/utils/consts';
 import { getProviders } from '@/api/data-collect/channel';
 import { isNoCommunity } from '@/utils/utils';
 import { USER_CENTER_MENU_DATA } from '@/views/init-home/data/baseMenu';
-import { unionBy } from 'lodash';
 import { useI18n } from 'vue-i18n';
 
 const { t: $t } = useI18n();
