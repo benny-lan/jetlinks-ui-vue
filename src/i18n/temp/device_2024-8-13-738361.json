@@ -14,7 +14,7 @@
 		"Detail.index.378845-11": "所属产品",
 		"Detail.index.378845-12": "创建时间",
 		"Detail.index.378845-13": "完成时间",
-		"Detail.index.378845-14": "设备版本",
+		"Detail.index.378845-14": "固件版本",
 		"Detail.index.378845-15": "状态",
 		"Detail.index.378845-16": "操作成功"
 	},
@@ -33,7 +33,7 @@
 		"Detail.index.378845-11": "Belonging products",
 		"Detail.index.378845-12": "Creation time",
 		"Detail.index.378845-13": "Completion time",
-		"Detail.index.378845-14": "Device version",
+		"Detail.index.378845-14": "Firmware version",
 		"Detail.index.378845-15": "State",
 		"Detail.index.378845-16": "Operation successful"
 	}
